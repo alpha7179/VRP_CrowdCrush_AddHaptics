@@ -502,72 +502,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1 &691344885912693818
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7830616707284937138}
-  - component: {fileID: 7030600849113148428}
-  m_Layer: 5
-  m_Name: UIManger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &7830616707284937138
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 691344885912693818}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1035827764741182444}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &7030600849113148428
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 691344885912693818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a016a3c3172541242879d960f5698c4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  introPanel: {fileID: 2818457907801106155}
-  startPanel: {fileID: 828388813844438073}
-  placePanel: {fileID: 1462284457651913886}
-  manualPanel: {fileID: 4697219582074074907}
-  tipsPanel: {fileID: 2868654413571417670}
-  settingPanel: {fileID: 1703084629034484121}
-  tip1: {fileID: 275711687425368008}
-  tip2: {fileID: 5897935957023707470}
-  tip3: {fileID: 2598729797243577136}
-  tip4: {fileID: 7105377379885184709}
-  tip5: {fileID: 2464526124794701615}
-  tipPageText: {fileID: 1927281109454771650}
-  manualPageText: {fileID: 1927281109454771650}
-  audioText: {fileID: 5261927572970225749}
-  audioSlider: {fileID: 5059604965207233435}
-  modeText: {fileID: 3966492726491875402}
-  modeSlider: {fileID: 4624997571680445845}
-  isDebug: 1
 --- !u!1 &727139115163153614
 GameObject:
   m_ObjectHideFlags: 0
@@ -1433,7 +1367,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickSettingButton
         m_Mode: 1
@@ -2456,7 +2390,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickPlayButton
         m_Mode: 1
@@ -4815,7 +4749,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 7830616707284937138}
   - {fileID: 5248719993882502579}
   - {fileID: 7967772980445726634}
   - {fileID: 2208625324152990913}
@@ -5408,7 +5341,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickManualButton
         m_Mode: 1
@@ -8198,7 +8131,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickIntroButton
         m_Mode: 1
@@ -8467,7 +8400,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickNextTipButton
         m_Mode: 1
@@ -9905,7 +9838,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickPlaceButton
         m_Mode: 1
@@ -10249,7 +10182,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickTipsButton
         m_Mode: 1
@@ -11331,7 +11264,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7030600849113148428}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IntroUIManager, Assembly-CSharp
         m_MethodName: OnClickPreTipButton
         m_Mode: 1

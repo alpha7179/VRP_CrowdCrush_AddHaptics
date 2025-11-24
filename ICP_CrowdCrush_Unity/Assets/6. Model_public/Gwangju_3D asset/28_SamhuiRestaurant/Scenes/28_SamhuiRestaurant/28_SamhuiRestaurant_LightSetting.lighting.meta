@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bd65d9cdf4ab8b3418dfe0ea7bcd8fed
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 4890085278179872738
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 282535
+  packageName: Samhui Restaurant
+  packageVersion: 1.0
+  assetPath: Assets/Gwangju_3D asset/Scenes/28_SamhuiRestaurant/28_SamhuiRestaurant_LightSetting.lighting
+  uploadId: 657911
