@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f8e3d2b8280141041b771fdd32cd1f3e
+timeCreated: 1512506450
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 106607
+  packageName: Christmas pack
+  packageVersion: 1.0
+  assetPath: Assets/Christmas pack/Prefabs/GiftBox_Rectangle_TypeA.prefab
+  uploadId: 216578

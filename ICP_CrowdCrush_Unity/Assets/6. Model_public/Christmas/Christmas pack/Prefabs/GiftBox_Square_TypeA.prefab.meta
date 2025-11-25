@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 10a9cb4554200574dbe94e4026ff0b59
+timeCreated: 1512508433
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 106607
+  packageName: Christmas pack
+  packageVersion: 1.0
+  assetPath: Assets/Christmas pack/Prefabs/GiftBox_Square_TypeA.prefab
+  uploadId: 216578

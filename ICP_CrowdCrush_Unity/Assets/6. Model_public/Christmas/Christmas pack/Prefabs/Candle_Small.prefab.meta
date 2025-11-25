@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0028db48146f308478646a9ed409dadd
+timeCreated: 1512505502
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 106607
+  packageName: Christmas pack
+  packageVersion: 1.0
+  assetPath: Assets/Christmas pack/Prefabs/Candle_Small.prefab
+  uploadId: 216578
