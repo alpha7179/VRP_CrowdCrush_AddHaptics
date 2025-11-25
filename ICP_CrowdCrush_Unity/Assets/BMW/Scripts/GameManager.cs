@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.parent = null;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -59,7 +60,7 @@ public class GameManager : MonoBehaviour
         // 이벤트 발생 -> GameUIManager 등이 구독하여 팝업 처리
         OnPauseStateChanged?.Invoke(IsPaused);
 
-        if(isDebug) Debug.Log($"[GameManager3] Pause State: {IsPaused}");
+        if(isDebug) Debug.Log($"[GameManager] Pause State: {IsPaused}");
     }
 
     // 특정 씬으로 비동기 전환 (로딩 화면 처리 가능)
@@ -71,7 +72,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator LoadSceneRoutine(string sceneName)
     {
-        if(isDebug) Debug.Log($"[GameManager3] Loading Scene: {sceneName}...");
+        if(isDebug) Debug.Log($"[GameManager] Loading Scene: {sceneName}...");
 
         // 비동기 로딩 시작
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
@@ -90,27 +91,27 @@ public class GameManager : MonoBehaviour
         // 씬 로드 완료 이벤트 전파 (PlayerManager, UIManager 초기화)
         OnSceneLoaded?.Invoke(sceneName);
 
-        if(isDebug) Debug.Log($"[GameManager3] Scene Loaded Complete: {sceneName}");
+        if(isDebug) Debug.Log($"[GameManager] Scene Loaded Complete: {sceneName}");
     }
 
     // 게임 클리어 (탈출 성공) 처리 -> OuttroUIManager 호출용
     public void TriggerGameClear()
     {
-        if(isDebug) Debug.Log("[GameManager3] Mission Clear!");
+        if(isDebug) Debug.Log("[GameManager] Mission Clear!");
         OnGameClear?.Invoke();
     }
 
     // 게임 오버 (실패) 처리
     public void TriggerGameOver()
     {
-        if(isDebug) Debug.Log("[GameManager3] Game Over!");
+        if(isDebug) Debug.Log("[GameManager] Game Over!");
         OnGameOver?.Invoke();
     }
 
     // 애플리케이션 종료
     public void QuitGame()
     {
-        if(isDebug) Debug.Log("[GameManager3] Quitting Application...");
+        if(isDebug) Debug.Log("[GameManager] Quitting Application...");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
