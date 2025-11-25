@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: e88383b28fa9049408fb72235350effe
+timeCreated: 1526431166
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70313
+  packageName: Ambulance
+  packageVersion: 2.0
+  assetPath: Assets/Ambulance/Prefab/Ambulance_no_damage.prefab
+  uploadId: 252055
