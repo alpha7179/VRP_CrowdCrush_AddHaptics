@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 02f90a21a2a9bfd4dbffb6e81b7439e8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 9100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228474
+  packageName: Tokyo Street
+  packageVersion: 1.1
+  assetPath: Assets/Tokyo_Street/Animation/Main Camera.controller
+  uploadId: 631600

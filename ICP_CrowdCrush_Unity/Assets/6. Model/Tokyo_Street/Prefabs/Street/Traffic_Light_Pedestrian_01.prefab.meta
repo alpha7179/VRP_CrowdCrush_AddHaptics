@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f332067ba869aeb4fb27c39b8ef73c1f
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228474
+  packageName: Tokyo Street
+  packageVersion: 1.1
+  assetPath: Assets/Tokyo_Street/Prefabs/Street/Traffic_Light_Pedestrian_01.prefab
+  uploadId: 631600

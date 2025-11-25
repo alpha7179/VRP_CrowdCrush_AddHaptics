@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f74e37ae2e866c84eb1b728291104e51
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2655988077585873504
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228474
+  packageName: Tokyo Street
+  packageVersion: 1.1
+  assetPath: Assets/Tokyo_Street/Other/LODGroup.preset
+  uploadId: 631600

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 23c1235022e21be48b813e6c3e9e583b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228474
+  packageName: Tokyo Street
+  packageVersion: 1.1
+  assetPath: Assets/Tokyo_Street/Materials/Environment/Fence_Concrete.mat
+  uploadId: 631600

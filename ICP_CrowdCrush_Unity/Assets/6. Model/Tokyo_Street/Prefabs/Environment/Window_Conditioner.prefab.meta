@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c61ac1346ebfb0742a71b8f9b9e2222d
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228474
+  packageName: Tokyo Street
+  packageVersion: 1.1
+  assetPath: Assets/Tokyo_Street/Prefabs/Environment/Window_Conditioner.prefab
+  uploadId: 631600

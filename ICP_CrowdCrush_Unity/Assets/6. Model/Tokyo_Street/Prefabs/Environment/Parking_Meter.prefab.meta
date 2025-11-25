@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c4f2ca10ea650b54499d60f59d8c377a
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 228474
+  packageName: Tokyo Street
+  packageVersion: 1.1
+  assetPath: Assets/Tokyo_Street/Prefabs/Environment/Parking_Meter.prefab
+  uploadId: 631600
