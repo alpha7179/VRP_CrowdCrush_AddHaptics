@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b03851801ad4427499ef073e81939289
+timeCreated: 1512508623
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 106607
+  packageName: Christmas pack
+  packageVersion: 1.0
+  assetPath: Assets/Christmas pack/Prefabs/GiftBox_Cylinder_TypeA.prefab
+  uploadId: 216578
