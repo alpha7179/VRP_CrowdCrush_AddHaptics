@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &168649525751748648
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -13.933242
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.15814888
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2.8914924
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -2036251405706963329, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 2bd684ad8eaae5445923bd08af8c164c, type: 2}
+    - target: {fileID: 919132149155446097, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: m_Name
+      value: 'XMas Tree geoNode SF v002 '
+      objectReference: {fileID: 0}
+    - target: {fileID: 960233517048641412, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: deeb59fa7809e784bb9feb25bbac9933, type: 2}
+    - target: {fileID: 3823396407532958762, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 90b01f432c9071b4d9f77376a878586b, type: 2}
+    - target: {fileID: 3823396407532958762, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 4fe66a74a4c4ac042a0180dda37fbd50, type: 2}
+    - target: {fileID: 3823396407532958762, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: 'm_Materials.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2100000, guid: dfcdbc5f89aa78a41bd4eeaec48a87c5, type: 2}
+    - target: {fileID: 3823396407532958762, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
+      propertyPath: 'm_Materials.Array.data[4]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8937cd9da3f33934d93d0dde2baff80e, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 960704b51126f0f459e542bb0645b7d4, type: 3}
