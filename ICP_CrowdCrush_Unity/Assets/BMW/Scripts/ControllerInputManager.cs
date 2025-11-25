@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 /// <summary>
 /// XR 컨트롤러 입력을 처리하는 싱글톤 매니저
@@ -20,12 +21,18 @@ public class ControllerInputManager : MonoBehaviour
     public bool IsLeftGripHeld { get; private set; }
     public bool IsRightTriggerHeld { get; private set; }
     public bool IsLeftTriggerHeld { get; private set; }
+    public Vector2 RightJoystickValue { get; private set; }
+
+    // A,B 버튼 입력 이벤트 (구독 가능)
+    public event Action OnAButtonDown;
+    public event Action OnBButtonDown;
+    public event Action OnYButtonDown;
 
     // 액션 참조 변수들
     private InputAction AButton, BButton, XButton, YButton;
     private InputAction RGripButton, LGripButton;
     private InputAction RTriggerButton, LTriggerButton;
-    private InputAction MenuButton; // 추가된 메뉴 버튼
+    private InputAction RJoystick;
 
     private void Awake()
     {
@@ -33,6 +40,7 @@ public class ControllerInputManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.parent = null;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -79,18 +87,6 @@ public class ControllerInputManager : MonoBehaviour
 
             YButton = leftMap.FindAction("YButton");
             if (YButton != null) { YButton.Enable(); YButton.performed += OnYButtonPressed; }
-
-            // 메뉴 버튼 바인딩
-            MenuButton = leftMap.FindAction("YButton");
-            if (MenuButton != null)
-            {
-                MenuButton.Enable();
-                MenuButton.performed += OnMenuButtonPressed;
-            }
-            else
-            {
-                if (isDebug) Debug.LogWarning("Menu Action not found in XRI Left map. Check Action Name.");
-            }
         }
 
         // --- Interaction (Grip/Trigger) ---
@@ -133,42 +129,36 @@ public class ControllerInputManager : MonoBehaviour
                 LTriggerButton.canceled += ctx => { IsLeftTriggerHeld = false; if (isDebug) Debug.Log("L Trigger Released"); };
             }
         }
+
+        var rLocoMap = inputActions.FindActionMap("XRI Right Locomotion");
+        if (rLocoMap != null)
+        {
+            RJoystick = rLocoMap.FindAction("Turn");
+            if (RJoystick != null)
+            {
+                RJoystick.Enable();
+                RJoystick.performed += ctx => RightJoystickValue = ctx.ReadValue<Vector2>();
+                RJoystick.canceled += ctx => RightJoystickValue = Vector2.zero;
+            }
+
+        }
     }
 
     // --- 기본 버튼 이벤트 핸들러 (로그 출력용) ---
-    private void OnAButtonPressed(InputAction.CallbackContext ctx) { if (isDebug) Debug.Log("A Pressed"); }
-    private void OnBButtonPressed(InputAction.CallbackContext ctx) { if (isDebug) Debug.Log("B Pressed"); }
-    private void OnXButtonPressed(InputAction.CallbackContext ctx) { if (isDebug) Debug.Log("X Pressed"); }
-    private void OnYButtonPressed(InputAction.CallbackContext ctx) { if (isDebug) Debug.Log("Y Pressed"); }
-
-    // [수정됨] 메뉴 버튼 -> GameManager 일시정지 호출 (조건부 실행)
-    private void OnMenuButtonPressed(InputAction.CallbackContext ctx)
+    private void OnAButtonPressed(InputAction.CallbackContext ctx)
     {
-        if (isDebug) Debug.Log("Menu Button Input Received");
-
-        // 1. GameManager 인스턴스 확인
-        if (GameManager.Instance == null) return;
-
-        // 2. 인트로 씬인지 확인 (인트로에서는 메뉴 버튼 무시)
-        // GameManager3를 쓰고 있다면 GameManager3.Instance를 참조해야 할 수도 있음 (여기서는 GameManager로 통일)
-        if (GameManager.Instance.CurrentSceneName.Equals("IntroScene", System.StringComparison.OrdinalIgnoreCase))
-        {
-            if (isDebug) Debug.Log("Ignored: In Intro Scene");
-            return;
-        }
-
-        // 3. 아웃트로 UI(결과창)가 떠있는지 확인
-        // FindObjectOfType은 무거울 수 있으니, 실제로는 GameManager나 UIManager를 통해 상태를 받아오는 것이 좋음.
-        // 여기서는 안전하고 확실한 방법을 위해 씬 내 활성화된 OuttroUIManager를 찾음.
-        var outtroUI = FindAnyObjectByType<OuttroUIManager>();
-        if (outtroUI != null && outtroUI.gameObject.activeInHierarchy)
-        {
-            if (isDebug) Debug.Log("Ignored: Outtro UI is Active");
-            return;
-        }
-
-        // 모든 조건을 통과했을 때만 일시정지 토글
-        GameManager.Instance.TogglePause();
+        if (isDebug) Debug.Log("A Button Pressed (Action Triggered)");
+        OnAButtonDown?.Invoke(); // 구독자들에게 알림
+    }
+    private void OnBButtonPressed(InputAction.CallbackContext ctx) {
+        if (isDebug) Debug.Log("B Button Pressed (Action Triggered)");
+        OnBButtonDown?.Invoke();
+    }
+    private void OnXButtonPressed(InputAction.CallbackContext ctx) { if (isDebug) Debug.Log("X Button Pressed"); }
+    private void OnYButtonPressed(InputAction.CallbackContext ctx)
+    {
+        if (isDebug) Debug.Log("Y Button Pressed");
+        OnYButtonDown?.Invoke();
     }
 
     private void OnDestroy()

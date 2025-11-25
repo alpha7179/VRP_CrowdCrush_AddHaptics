@@ -18,6 +18,7 @@ public class PlayerManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.parent = null;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -52,7 +53,7 @@ public class PlayerManager : MonoBehaviour
         bool allowLocomotion = !scene.name.Equals("IntroScene", System.StringComparison.OrdinalIgnoreCase);
 
         ControlLocomotion(xrOrigin, allowLocomotion);
-        Debug.Log($"[PlayerManager2] Scene: {scene.name}, Locomotion Allowed: {allowLocomotion}");
+        Debug.Log($"[PlayerManager] Scene: {scene.name}, Locomotion Allowed: {allowLocomotion}");
     }
 
     // 씬 루트 객체 중에서 XROrigin 키워드로 시작하는 객체 검색 (대소문자 무시)
@@ -90,7 +91,7 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[PlayerManager2] '{xrOrigin.name}' 하위에서 '{locomotionKeyword}' 객체를 찾을 수 없습니다.");
+            Debug.LogWarning($"[PlayerManager] '{xrOrigin.name}' 하위에서 '{locomotionKeyword}' 객체를 찾을 수 없습니다.");
         }
     }
 

@@ -3,74 +3,151 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// 게임 종료 후 결과 및 요약(Summary)을 보여주는 UI 매니저.
-/// 결과 표시 -> 요약 보기 -> 페이지네이션 -> 메인으로 이동 기능을 포함
+/// [V5] 게임 종료 후 결과 및 요약 UI 매니저 (V2 - 버튼/조이스틱 조작 버전).
+/// B 버튼: [결과 -> 요약] 또는 [요약 -> 메인] 이동.
+/// R 조이스틱: 요약 페이지 좌우 넘김.
 /// </summary>
 public class OuttroUIManager : MonoBehaviour
 {
     [Header("Panels")]
-    [SerializeField] private GameObject resultPanel;  // 결과 점수 패널
-    [SerializeField] private GameObject summaryPanel; // 요약 학습 패널
+    [SerializeField] private GameObject resultPanel;
+    [SerializeField] private GameObject summaryPanel;
 
     [Header("Result Elements")]
+    [SerializeField] private GameObject[] starIcons;
     [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private GameObject[] starIcons; // 별점 아이콘 (3~5개)
 
     [Header("Summary Elements")]
-    [SerializeField] private GameObject[] summaryPages; // 요약 페이지들 (Page 1, 2, 3...)
+    [SerializeField] private GameObject[] summaryPages;
+    [SerializeField] private GameObject pageNumber;
+    [SerializeField] private GameObject IntroButton;
     [SerializeField] private TextMeshProUGUI pageNumberText;
-    [SerializeField] private Button prevButton;
-    [SerializeField] private Button nextButton;
+
+    // 버튼들은 시각적 피드백용으로 남겨둘 수 있지만, 실제 입력은 조이스틱으로 처리
+    [SerializeField] private GameObject prevBtnVisual;
+    [SerializeField] private GameObject nextBtnVisual;
 
     private int currentPageIndex = 0;
 
+    // 조이스틱 중복 입력 방지용 플래그
+    private bool isJoystickReady = true;
+    [SerializeField] private float joystickThreshold = 0.5f;
+
+    private void OnEnable()
+    {
+        // ControllerInputManage의 A버튼 이벤트 구독
+        if (ControllerInputManager.Instance != null)
+        {
+            ControllerInputManager.Instance.OnAButtonDown += HandleAButtonInput;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (ControllerInputManager.Instance != null)
+        {
+            ControllerInputManager.Instance.OnAButtonDown -= HandleAButtonInput;
+        }
+    }
+
+    private void Update()
+    {
+        // 요약 패널이 켜져 있을 때만 조이스틱 입력 체크
+        if (summaryPanel.activeSelf)
+        {
+            HandleJoystickInput();
+        }
+    }
+
     /// <summary>
-    /// 결과창 초기화 (게임 종료 시 호출됨)
+    /// B 버튼 입력 처리 (상태 전환)
     /// </summary>
+    private void HandleAButtonInput()
+    {
+        if (resultPanel.activeSelf)
+        {
+            // 결과 화면 -> 요약 보기
+            ShowSummary();
+        }
+        else if (summaryPanel.activeSelf)
+        {
+            // 요약 화면 -> 메인으로 돌아가기 (인트로)
+            if (currentPageIndex == summaryPages.Length - 1)
+            {
+                GoHome();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 오른쪽 조이스틱 좌우 입력 처리 (페이지 넘김)
+    /// </summary>
+    private void HandleJoystickInput()
+    {
+        if (ControllerInputManager.Instance == null) return;
+
+        Vector2 input = ControllerInputManager.Instance.RightJoystickValue;
+
+        // 조이스틱이 충분히 기울어졌고, 입력 가능한 상태일 때
+        if (isJoystickReady)
+        {
+            if (input.x > joystickThreshold) // 오른쪽 -> 다음 페이지
+            {
+                NextPage();
+                isJoystickReady = false; // 입력 잠금
+            }
+            else if (input.x < -joystickThreshold) // 왼쪽 -> 이전 페이지
+            {
+                PrevPage();
+                isJoystickReady = false; // 입력 잠금
+            }
+        }
+
+        // 조이스틱이 중앙으로 돌아왔을 때 입력 잠금 해제 (Deadzone 처리)
+        if (Mathf.Abs(input.x) < 0.1f)
+        {
+            isJoystickReady = true;
+        }
+    }
+
+    // --- Logic Methods ---
+
     public void Initialize()
     {
         resultPanel.SetActive(true);
         summaryPanel.SetActive(false);
 
-        // DataManager2 싱글톤에서 세션 결과 가져오기
         int successCount = 0;
         if (DataManager.Instance != null)
         {
             successCount = DataManager.Instance.SuccessCount;
         }
 
-        scoreText.text = $"성공한 대처: {successCount} / 5";
+        //if (scoreText) scoreText.text = $"성공한 대처: {successCount} / 5";
 
-        // 별점 연출 (성공 횟수만큼 별 활성화)
         for (int i = 0; i < starIcons.Length; i++)
         {
             starIcons[i].SetActive(i < successCount);
         }
     }
 
-    // [요약 보기] 버튼 클릭 시
-    public void OnClickShowSummary()
+    private void ShowSummary()
     {
         resultPanel.SetActive(false);
         summaryPanel.SetActive(true);
-
         currentPageIndex = 0;
-        UpdateSummaryPage(); // 첫 페이지 표시
+        UpdateSummaryPage();
     }
 
-    // [처음으로] 버튼 클릭 시
-    public void OnClickGoHome()
+    private void GoHome()
     {
-        // 인트로 씬 로드
         if (GameManager.Instance != null)
         {
             GameManager.Instance.LoadScene("IntroScene");
         }
     }
 
-    // --- 페이지네이션 로직 (화살표 버튼) ---
-
-    public void OnClickNextPage()
+    private void NextPage()
     {
         if (currentPageIndex < summaryPages.Length - 1)
         {
@@ -79,7 +156,7 @@ public class OuttroUIManager : MonoBehaviour
         }
     }
 
-    public void OnClickPrevPage()
+    private void PrevPage()
     {
         if (currentPageIndex > 0)
         {
@@ -87,25 +164,33 @@ public class OuttroUIManager : MonoBehaviour
             UpdateSummaryPage();
         }
     }
-    
-    // 현재 페이지 인덱스에 맞춰 UI 갱신
+
     private void UpdateSummaryPage()
     {
-        // 모든 페이지 비활성화 후 현재 페이지만 활성화
         for (int i = 0; i < summaryPages.Length; i++)
         {
             if (summaryPages[i] != null)
                 summaryPages[i].SetActive(i == currentPageIndex);
         }
 
-        // 페이지 번호 텍스트 갱신 (예: "1 / 5")
         if (pageNumberText)
         {
             pageNumberText.text = $"{currentPageIndex + 1} / {summaryPages.Length}";
         }
 
-        // 첫 페이지면 이전 버튼 끄기, 마지막 페이지면 다음 버튼 끄기
-        if (prevButton) prevButton.interactable = (currentPageIndex > 0);
-        if (nextButton) nextButton.interactable = (currentPageIndex < summaryPages.Length - 1);
+        // 시각적 피드백 (화살표 활성/비활성)
+        if (prevBtnVisual) prevBtnVisual.SetActive(currentPageIndex > 0);
+        if (nextBtnVisual) nextBtnVisual.SetActive(currentPageIndex < summaryPages.Length - 1);
+
+        if (currentPageIndex == summaryPages.Length - 1)
+        {
+            pageNumber.SetActive(false);
+            IntroButton.SetActive(true);
+        }
+        else
+        {
+            pageNumber.SetActive(true);
+            IntroButton.SetActive(false);
+        }
     }
 }
