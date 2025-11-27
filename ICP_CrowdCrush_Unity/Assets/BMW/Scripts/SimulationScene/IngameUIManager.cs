@@ -14,22 +14,35 @@ public class IngameUIManager : MonoBehaviour
 
     [Header("HUD Elements")]
     [SerializeField] private Canvas IngameCanvas;
-    [SerializeField] private TextMeshProUGUI instructionText;
-    [SerializeField] private TextMeshProUGUI missionText;
-    [SerializeField] private TextMeshProUGUI feedBackText;
-    [SerializeField] private Image actionGauge;
 
     [Header("Panels")]
     [SerializeField] private GameObject cautionPanel;
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject instructionPanel;
     [SerializeField] private GameObject progressPanel;
+    [SerializeField] private GameObject pressurePanel;
 
-    [Header("progress UI Elements")]
+    [Header("Panels UI Elements")]
+    [SerializeField] private TextMeshProUGUI instructionText;
+    [SerializeField] private TextMeshProUGUI missionText;
+    [SerializeField] private TextMeshProUGUI feedBackText;
+
     [SerializeField] private TextMeshProUGUI progressMissionText;
     [SerializeField] public TextMeshProUGUI progressText;
     [SerializeField] public Slider barSlider;
     [SerializeField] public Image[] tipsImage;
+
+    [SerializeField] private TextMeshProUGUI pressureStateText;
+    private readonly string[] PressureState = new string[]
+    {
+        "정상 (Safe)",        // Level 0
+        "주의 (Caution)",     // Level 1
+        "경고 (Warning)",     // Level 2
+        "위험 (Critical)",    // Level 3
+        "압박 (Pressure)",    // Level 4
+        "최대 위험 (DANGER)"  // Level 5
+    };
+    [SerializeField] public Image[] pressureGaugeImages;
 
     [Header("Effects")]
     [SerializeField] private Volume postProcessVolume;
@@ -44,11 +57,11 @@ public class IngameUIManager : MonoBehaviour
     private void Start()
     {
         // 초기화
-        if (actionGauge) actionGauge.fillAmount = 0f;
         if (pausePanel) pausePanel.SetActive(false);
         if (instructionPanel) instructionPanel.SetActive(false);
         if (outtroManager) outtroManager.gameObject.SetActive(false);
         if (progressPanel) progressPanel.SetActive(false);
+        HideAllTipsImages();
 
         if (postProcessVolume && postProcessVolume.profile.TryGet(out vignette))
         {
@@ -138,17 +151,6 @@ public class IngameUIManager : MonoBehaviour
         }
     }
 
-    public void OpenProgressPanel(string missionText)
-    {
-        if (progressMissionText) progressMissionText.text = missionText;
-        if (progressPanel) progressPanel.SetActive(true);
-    }
-
-    public void CloseProgressPanel()
-    {
-        if (progressPanel) progressPanel.SetActive(false);
-    }
-
     // --- UI 제어 메서드 (GameStepManager에서 호출) ---
     public void OpenCautionPanel()
     {
@@ -173,6 +175,26 @@ public class IngameUIManager : MonoBehaviour
         UpdateInstruction("");
         UpdateMission("");
         UpdateFeedBack("");
+    }
+    public void OpenProgressPanel(string missionText)
+    {
+        if (progressMissionText) progressMissionText.text = missionText;
+        if (progressPanel) progressPanel.SetActive(true);
+    }
+
+    public void CloseProgressPanel()
+    {
+        if (progressPanel) progressPanel.SetActive(false);
+        HideAllTipsImages();
+    }
+    public void OpenPressurePanel()
+    {
+        if (pressurePanel) pressurePanel.SetActive(true);
+    }
+
+    public void ClosePressurePanel()
+    {
+        if (pressurePanel) pressurePanel.SetActive(false);
     }
 
     public void UpdateInstruction(string text)
@@ -202,11 +224,6 @@ public class IngameUIManager : MonoBehaviour
         return isDisplayPanel;
     }
 
-    public void UpdateActionGauge(float ratio)
-    {
-        if (actionGauge) actionGauge.fillAmount = ratio;
-    }
-
     public void SetPressureIntensity(float intensity)
     {
         if (vignette != null)
@@ -216,23 +233,32 @@ public class IngameUIManager : MonoBehaviour
         }
     }
 
-    public void SetCameraShake(bool isShaking)
+    // Tips 이미지를 순서(페이지)에 맞게 표시
+    public void DisplayTipsImage(int pageIndex)
     {
-        if (cameraOffset == null) return;
-        if (isShaking) StartCoroutine(ShakeRoutine());
-        else
+        if (tipsImage == null || tipsImage.Length == 0) return;
+
+        for (int i = 0; i < tipsImage.Length; i++)
         {
-            StopAllCoroutines();
-            cameraOffset.localPosition = Vector3.zero;
+            if (tipsImage[i] != null)
+            {
+                // 인덱스가 일치하는 이미지만 활성화 (페이지 표시)
+                tipsImage[i].gameObject.SetActive(i == pageIndex);
+            }
         }
     }
 
-    private IEnumerator ShakeRoutine()
+    // Tips 이미지를 모두 비활성화
+    public void HideAllTipsImages()
     {
-        while (true)
+        if (tipsImage == null || tipsImage.Length == 0) return;
+
+        foreach (var img in tipsImage)
         {
-            cameraOffset.localPosition = Random.insideUnitSphere * 0.05f;
-            yield return null;
+            if (img != null)
+            {
+                img.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -248,6 +274,28 @@ public class IngameUIManager : MonoBehaviour
         {
             outtroManager.gameObject.SetActive(true);
             outtroManager.Initialize();
+        }
+    }
+
+    public void UpdatePressureGauge(int level)
+    {
+        if (pressureGaugeImages == null || pressureGaugeImages.Length == 0) return;
+
+        // 게이지 이미지 활성화/비활성화
+        for (int i = 0; i < pressureGaugeImages.Length; i++)
+        {
+            if (pressureGaugeImages[i] != null)
+            {
+                // level이 0이면 모두 비활성화, level이 1이면 0번만, level이 6이면 0~5번 모두 활성화
+                pressureGaugeImages[i].gameObject.SetActive(i < level);
+
+            }
+        }
+
+        // 상태 텍스트 업데이트
+        if (pressureStateText)
+        {
+            pressureStateText.text = PressureState[level];
         }
     }
 
