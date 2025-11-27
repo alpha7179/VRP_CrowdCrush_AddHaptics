@@ -1,16 +1,37 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
-public class ClimbHandle : UnityEngine.XR.Interaction.Toolkit.Interactables.XRBaseInteractable
+public class ClimbHandle : UnityEngine.XR.Interaction.Toolkit.Locomotion.Climbing.ClimbInteractable
 {
-    // XRI의 Climb Provider가 있다면 이 스크립트 대신
-    // 컴포넌트 추가 -> [Climb Interactable]을 사용하는 것을 권장합니다.
-    // 이 스크립트는 커스텀 로직이 필요할 때만 사용하세요.
+    // 현재 잡혀있는 핸들의 총 개수 (전역 변수)
+    public static int ActiveGrabCount = 0;
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
-        base.OnSelectEntered(args);
-        Debug.Log("Climb Handle Grabbed");
-        // GameStepManager에 잡았다는 신호를 보낼 수도 있음
+        base.OnSelectEntered(args); // 부모(등반 기능)의 로직 실행
+
+        // 잡힐 때마다 카운트 증가
+        ActiveGrabCount++;
+        Debug.Log($"Climb Handle Grabbed. Count: {ActiveGrabCount}");
+    }
+
+    protected override void OnSelectExited(SelectExitEventArgs args)
+    {
+        base.OnSelectExited(args); // 부모(등반 기능)의 로직 실행
+
+        // 놓을 때마다 카운트 감소
+        ActiveGrabCount--;
+        if (ActiveGrabCount < 0) ActiveGrabCount = 0;
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        if (isSelected)
+        {
+            ActiveGrabCount--;
+            if (ActiveGrabCount < 0) ActiveGrabCount = 0;
+        }
     }
 }

@@ -1,9 +1,9 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections;
+using TMPro;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 /// <summary>
 /// 인게임 UI 매니저
@@ -23,6 +23,13 @@ public class IngameUIManager : MonoBehaviour
     [SerializeField] private GameObject cautionPanel;
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject instructionPanel;
+    [SerializeField] private GameObject progressPanel;
+
+    [Header("progress UI Elements")]
+    [SerializeField] private TextMeshProUGUI progressMissionText;
+    [SerializeField] public TextMeshProUGUI progressText;
+    [SerializeField] public Slider barSlider;
+    [SerializeField] public Image[] tipsImage;
 
     [Header("Effects")]
     [SerializeField] private Volume postProcessVolume;
@@ -41,6 +48,7 @@ public class IngameUIManager : MonoBehaviour
         if (pausePanel) pausePanel.SetActive(false);
         if (instructionPanel) instructionPanel.SetActive(false);
         if (outtroManager) outtroManager.gameObject.SetActive(false);
+        if (progressPanel) progressPanel.SetActive(false);
 
         if (postProcessVolume && postProcessVolume.profile.TryGet(out vignette))
         {
@@ -90,6 +98,7 @@ public class IngameUIManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.TogglePause();
+            SetDisplayPanel(true);
         }
     }
 
@@ -129,11 +138,42 @@ public class IngameUIManager : MonoBehaviour
         }
     }
 
+    public void OpenProgressPanel(string missionText)
+    {
+        if (progressMissionText) progressMissionText.text = missionText;
+        if (progressPanel) progressPanel.SetActive(true);
+    }
+
+    public void CloseProgressPanel()
+    {
+        if (progressPanel) progressPanel.SetActive(false);
+    }
+
     // --- UI 제어 메서드 (GameStepManager에서 호출) ---
-    public void OpenCautionPanel() => cautionPanel.SetActive(true);
-    public void CloseCautionPanel() => cautionPanel.SetActive(false);
-    public void OpenInstructionPanel() => instructionPanel.SetActive(true);
-    public void CloseInstructionPanel() => instructionPanel.SetActive(false);
+    public void OpenCautionPanel()
+    {
+        cautionPanel.SetActive(true);
+        SetDisplayPanel(true);
+    }
+    public void CloseCautionPanel()
+    {
+        cautionPanel.SetActive(false);
+        SetDisplayPanel(false);
+    }
+
+    public void OpenInstructionPanel()
+    {
+        instructionPanel.SetActive(true);
+        SetDisplayPanel(true);
+    }
+    public void CloseInstructionPanel()
+    {
+        instructionPanel.SetActive(false);
+        SetDisplayPanel(false);
+        UpdateInstruction("");
+        UpdateMission("");
+        UpdateFeedBack("");
+    }
 
     public void UpdateInstruction(string text)
     {
@@ -209,5 +249,49 @@ public class IngameUIManager : MonoBehaviour
             outtroManager.gameObject.SetActive(true);
             outtroManager.Initialize();
         }
+    }
+
+    public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null)
+    {
+        float currentTime = totalTime;
+        float timeSpent = 0f;
+
+        if (progressCalculator != null && progressText) progressText.text = $"0 %";
+        else if (progressText) progressText.text = $"{totalTime} s";
+
+        OpenProgressPanel(missionText);
+
+        while (!isMissionCompleteCondition.Invoke())
+        {
+
+            // 1. 시간 업데이트
+            currentTime -= Time.deltaTime;
+            timeSpent += Time.deltaTime;
+
+            // 2. UI 업데이트 (로직 개선)
+
+            if (progressCalculator != null)
+            {
+                // 퍼센트 모드
+                float currentProgress = progressCalculator.Invoke();
+
+                if (progressText) progressText.text = $"{(currentProgress * 100f).ToString("F0")} %";
+                if (barSlider) barSlider.value = currentProgress;
+            }
+            else
+            {
+                // [B] 타이머 모드
+                if (progressText) progressText.text = $"{Mathf.CeilToInt(currentTime).ToString()} s";
+                else if (progressText) progressText.text = $"{Mathf.CeilToInt(currentTime).ToString()} s";
+
+                // 슬라이더: 줄어듦 (1 -> 0)
+                if (barSlider) barSlider.value = currentTime / totalTime;
+            }
+
+            yield return null;
+        }
+
+        CloseProgressPanel();
+        yield return timeSpent;
     }
 }

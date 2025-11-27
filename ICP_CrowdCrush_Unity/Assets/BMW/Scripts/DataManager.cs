@@ -60,6 +60,12 @@ public class DataManager : MonoBehaviour
         AudioListener.volume = MasterVolume;
     }
 
+    public void AddPlayTime(float timeToAdd)
+    {
+        PlayTime += timeToAdd;
+        Debug.Log($"[DataManager] PlayTime updated: {PlayTime:F2} seconds");
+    }
+
     public void SetVolume(float volume)
     {
         MasterVolume = volume;
