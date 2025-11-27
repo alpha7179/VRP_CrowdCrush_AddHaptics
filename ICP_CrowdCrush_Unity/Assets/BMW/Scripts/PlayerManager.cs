@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 플레이어 이동 제어 매니저
+/// [플레이어 이동 제어 매니저
+/// - 외부에서 SetLocomotion(bool)을 호출하여 이동 기능을 켜고 끌 수 있음
+/// - 씬 로드 시 자동으로 XR Origin을 찾아 초기화함
 /// </summary>
 public class PlayerManager : MonoBehaviour
 {
@@ -13,11 +15,15 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private string locomotionKeyword = "Locomotion";
     [SerializeField] private string[] moveKeywords = { "Move", "Turn", "Teleport" };
 
+    // 현재 씬의 XR Origin을 기억하기 위한 변수 (매번 찾지 않도록 최적화)
+    private GameObject currentXROrigin;
+
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            // 부모가 있다면 연결을 끊고 최상위 루트로 이동 (DontDestroyOnLoad 작동 보장)
             transform.parent = null;
             DontDestroyOnLoad(gameObject);
         }
@@ -29,7 +35,6 @@ public class PlayerManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // GameManager 의존성을 줄이기 위해 직접 구독하거나 GameManager 경유
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -40,23 +45,38 @@ public class PlayerManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 1. XR Origin 찾기 (이름으로 검색)
-        GameObject xrOrigin = FindXROrigin();
+        // 씬 로드 시 플레이어 찾아서 저장
+        currentXROrigin = FindXROrigin();
 
-        if (xrOrigin == null)
+        if (currentXROrigin == null)
         {
-            Debug.LogWarning($"[PlayerManager2] '{scene.name}' 씬에서 '{originKeyword}'을 찾을 수 없습니다.");
+            Debug.LogWarning($"[PlayerManage] '{scene.name}' 씬에서 '{originKeyword}'을 찾을 수 없습니다.");
             return;
         }
 
-        // 2. IntroScene이면 이동 제한, 아니면 허용
+        // 기본 설정: 인트로 씬에서는 이동 금지, 그 외에는 허용
         bool allowLocomotion = !scene.name.Equals("IntroScene", System.StringComparison.OrdinalIgnoreCase);
-
-        ControlLocomotion(xrOrigin, allowLocomotion);
+        ControlLocomotion(currentXROrigin, allowLocomotion);
         Debug.Log($"[PlayerManager] Scene: {scene.name}, Locomotion Allowed: {allowLocomotion}");
     }
 
-    // 씬 루트 객체 중에서 XROrigin 키워드로 시작하는 객체 검색 (대소문자 무시)
+    // 외부에서 플레이어의 이동 기능을 끄거나 켤 때 호출하는 함수
+
+    public void SetLocomotion(bool isEnabled)
+    {
+        // 만약 저장된 참조가 없으면 다시 찾기 시도
+        if (currentXROrigin == null) currentXROrigin = FindXROrigin();
+
+        if (currentXROrigin != null)
+        {
+            ControlLocomotion(currentXROrigin, isEnabled);
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerManager] XR Origin을 찾을 수 없어 이동 제어에 실패했습니다.");
+        }
+    }
+
     private GameObject FindXROrigin()
     {
         var rootObjs = SceneManager.GetActiveScene().GetRootGameObjects();
@@ -70,16 +90,12 @@ public class PlayerManager : MonoBehaviour
         return null;
     }
 
-    // XROrigin -> Locomotion -> Move/Turn/Teleport 순으로 찾아 활성/비활성화
- 
     private void ControlLocomotion(GameObject xrOrigin, bool isEnabled)
     {
-        // 1. Locomotion 객체 찾기 (자식 전체 재귀 검색)
         Transform locomotionTr = FindChildRecursive(xrOrigin.transform, locomotionKeyword);
 
         if (locomotionTr != null)
         {
-            // 2. 하위의 Move, Turn, Teleport 객체들을 찾아 끄거나 킴
             foreach (string keyword in moveKeywords)
             {
                 Transform targetTr = FindChildRecursive(locomotionTr, keyword);
@@ -95,7 +111,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    // 이름에 특정 키워드가 포함된 자식을 재귀적으로 검색
     private Transform FindChildRecursive(Transform parent, string namePart)
     {
         foreach (Transform child in parent)

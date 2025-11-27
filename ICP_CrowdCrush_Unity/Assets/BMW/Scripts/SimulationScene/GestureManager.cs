@@ -13,10 +13,19 @@ public class GestureManager : MonoBehaviour
     [SerializeField] private Transform rightHand; // Right Controller Attach Point
 
     [Header("Detection Settings")]
-    [SerializeField] private float chestDistanceThreshold = 0.45f; // 가슴(머리)과 손의 거리 허용치 (단위: m)
-    [SerializeField] private float handsDistanceThreshold = 0.30f; // 양손 사이의 거리 허용치 (단위: m)
+    [Tooltip("머리에서 아래로 얼마만큼 내려간 곳을 가슴으로 칠 것인가 (미터)")]
+    [SerializeField] private float chestYOffset = 0.35f; // 가슴 추정 오프셋 (35cm 아래)
 
-    // 내부 상태 확인용 (Inspector 디버깅)
+    [Tooltip("가슴(추정 위치)과 손의 거리 허용치 (미터)")]
+    [SerializeField] private float chestDistanceThreshold = 0.5f; // 조금 더 여유롭게 0.45 -> 0.5
+
+    [Tooltip("양손 사이의 거리 허용치 (미터)")]
+    [SerializeField] private float handsDistanceThreshold = 0.35f; // 조금 더 여유롭게 0.30 -> 0.35
+
+    [Header("Debug Info (Read Only)")]
+    [SerializeField] private float currentHandDist; // 현재 양손 거리
+    [SerializeField] private float currentLeftDist; // 현재 왼손-가슴 거리
+    [SerializeField] private float currentRightDist; // 현재 오른손-가슴 거리
     [SerializeField] private bool isGestureDetected;
     [SerializeField] private bool isButtonOverride;
 
@@ -28,8 +37,7 @@ public class GestureManager : MonoBehaviour
         // 1. 제스처 판정
         isGestureDetected = CheckGestureGeometry();
 
-        // 2. 버튼 판정 (ControllerInputManager 싱글톤 사용)
-        // 안전장치: 센서가 튀거나 인식이 안 될 때 버튼으로 대체
+        // 2. 버튼 판정 (안전장치)
         if (ControllerInputManager.Instance != null)
         {
             isButtonOverride = ControllerInputManager.Instance.IsLeftTriggerHeld &&
@@ -44,29 +52,76 @@ public class GestureManager : MonoBehaviour
     {
         if (head == null || leftHand == null || rightHand == null) return false;
 
-        // 양손이 서로 가까운가?
-        float handsDist = Vector3.Distance(leftHand.position, rightHand.position);
+        // [핵심 수정] 가슴 위치 추정
+        // 머리 위치에서 단순히 Y축으로 조금 내린 지점을 가슴으로 가정합니다.
+        // HMD가 바라보는 방향과 상관없이 '아래쪽'이 가슴입니다.
+        Vector3 chestPosition = head.position - new Vector3(0, chestYOffset, 0);
 
-        // 손이 머리(가슴) 근처에 있는가?
-        // (HMD는 머리에 있으므로, Y축을 조금 아래로 보정해서 가슴 위치를 추정할 수 있음)
-        // 여기서는 단순화를 위해 HMD와의 직선 거리를 체크합니다.
-        float lDist = Vector3.Distance(head.position, leftHand.position);
-        float rDist = Vector3.Distance(head.position, rightHand.position);
+        // 거리 계산
+        currentHandDist = Vector3.Distance(leftHand.position, rightHand.position);
+        currentLeftDist = Vector3.Distance(chestPosition, leftHand.position);
+        currentRightDist = Vector3.Distance(chestPosition, rightHand.position);
 
-        return (handsDist < handsDistanceThreshold) &&
-               (lDist < chestDistanceThreshold) &&
-               (rDist < chestDistanceThreshold);
+        // 판정
+        bool handsClose = currentHandDist < handsDistanceThreshold;
+        bool leftClose = currentLeftDist < chestDistanceThreshold;
+        bool rightClose = currentRightDist < chestDistanceThreshold;
+
+        return handsClose && leftClose && rightClose;
     }
 
-    // 진행률에 따라 컨트롤러에 햅틱 진동을 발생시킵니다.
-    /// <param name="intensity">0.0 ~ 1.0 (진행률)</param>
     public void TriggerHapticFeedback(float intensity)
     {
-        // 진동 세기: 진행될수록 강하게 (0.1 ~ 0.8)
-        float amplitude = Mathf.Lerp(0.1f, 0.8f, intensity);
-        float duration = 0.1f;
+        // 진동 구현이 필요하다면 여기에 XR Toolkit Haptic 코드를 넣으세요.
+    }
 
-        // XR Input System을 사용하여 햅틱 전송 (구현 필요 시 추가)
-        // 예시: ControllerInputManager2.Instance.SendHaptic(amplitude, duration);
+    public bool IsHoldingClimbHandle()
+    {
+        if (ControllerInputManager.Instance != null)
+        {
+            // 조건 1: 양손 그립 버튼이 모두 눌려있는가? (&& 연산자 사용)
+            bool areBothGripsPressed = ControllerInputManager.Instance.IsLeftGripHeld &&
+                                       ControllerInputManager.Instance.IsRightGripHeld;
+
+            // 조건 2: 실제로 ClimbHandle 컴포넌트가 달린 물체를 2개 이상 잡고 있는가?
+            // ClimbHandle.ActiveGrabCount가 2 이상이어야 함 (양손 그랩)
+            bool isGrabbingTwoHandles = ClimbHandle.ActiveGrabCount >= 2;
+
+            // 두 조건이 모두 참이어야 true 반환
+            return areBothGripsPressed && isGrabbingTwoHandles;
+        }
+        return false;
+    }
+
+    // [디버깅용] 씬 뷰에서 인식 범위를 눈으로 확인하는 기능
+    private void OnDrawGizmos()
+    {
+        if (head == null) return;
+
+        // 가상 가슴 위치
+        Vector3 chestPos = head.position - new Vector3(0, chestYOffset, 0);
+
+        // 1. 가슴 범위 (초록색 구)
+        Gizmos.color = new Color(0, 1, 0, 0.3f); // 반투명 초록
+        Gizmos.DrawSphere(chestPos, chestDistanceThreshold);
+
+        // 가슴 중심점
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(chestPos, 0.05f);
+
+        // 2. 현재 손 위치가 범위 안에 들어왔는지 선으로 표시
+        if (leftHand != null)
+        {
+            float dist = Vector3.Distance(chestPos, leftHand.position);
+            Gizmos.color = dist < chestDistanceThreshold ? Color.green : Color.red;
+            Gizmos.DrawLine(chestPos, leftHand.position);
+        }
+
+        if (rightHand != null)
+        {
+            float dist = Vector3.Distance(chestPos, rightHand.position);
+            Gizmos.color = dist < chestDistanceThreshold ? Color.green : Color.red;
+            Gizmos.DrawLine(chestPos, rightHand.position);
+        }
     }
 }
