@@ -30,16 +30,15 @@ public class ZoneTrigger : MonoBehaviour
                 if (isGoal)
                 {
                     Debug.Log($"[ZoneTrigger] Goal Reached: {gameObject.name}");
-                    // 매니저에게 도착 신호 보냄
                     stepManager.SetZoneReached(true);
 
-                    // 재진입 방지 및 시각적 처리를 위해 비활성화 (선택사항)
-                    gameObject.SetActive(false);
                 }
                 else if (isDanger)
                 {
                     Debug.Log($"[ZoneTrigger] Danger Zone Entered: {gameObject.name}");
-                    // TODO: 위험 구역 진입 시 경고음이나 비네팅 일시 증가 로직 추가 가능
+                    DataManager.Instance.AddMistakeCount();
+                    stepManager.ReturnToSavedPosition();
+
                 }
             }
             else

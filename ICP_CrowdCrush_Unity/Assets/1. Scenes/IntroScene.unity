@@ -283,6 +283,9 @@ MonoBehaviour:
   - Move
   - Turn
   - Teleport
+  interactionKeywords:
+  - Direct Interactor
+  - UI&Teleport Ray Interactor
 --- !u!114 &1578603657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,7 +315,8 @@ MonoBehaviour:
   MasterVolume: 1
   IsAntiMotionSicknessMode: 0
   SuccessCount: 0
-  PlayTime: 0
+  MistakeCount: 0
+  PlayTime: 0.01
   SelectedMap: Street
 --- !u!114 &1578603659
 MonoBehaviour:

@@ -8,6 +8,8 @@ using System;
 /// </summary>
 public class GameStepManager : MonoBehaviour
 {
+    [Header("player")]
+    [SerializeField] private Transform PlayerTransform;
 
     [Header("Linked Managers")]
     [Tooltip("UI 제어를 담당하는 매니저")]
@@ -32,7 +34,6 @@ public class GameStepManager : MonoBehaviour
     [Header("Zone Objects")]
     [Tooltip("각 단계에서 활성화될 목표 지점 0:Tutorial, 1:Move1, 2:Move2, 3:Escape")]
     [SerializeField] private GameObject[] TargerZone;
-    private int targetIndex;
 
     [SerializeField] private enum GamePhase { Caution, Tutorial, Move1, ABCPose, Move2, HoldPillar, ClimbUp, Escape, Finished }
     
@@ -47,6 +48,8 @@ public class GameStepManager : MonoBehaviour
     private bool isZoneReached = false;
     private float currentActionHoldTimer = 0f;
     private bool isActionCompleted = false;
+    private int targetIndex;
+    private Vector3 startPosition;
 
     // =================================================================================
     // Unity 생명 주기 메서드
@@ -151,6 +154,51 @@ public class GameStepManager : MonoBehaviour
         }
     }
 
+    public void SavePlayerPosition()
+    {
+        startPosition = PlayerTransform.position;
+        Debug.Log($"[GameStepManager] Player position saved: {startPosition}");
+    }
+
+    /// <summary>
+    /// 플레이어를 저장된 위치로 되돌리고 경고 피드백을 표시합니다.
+    /// </summary>
+    public void ReturnToSavedPosition()
+    {
+        // 이미 되돌리기 코루틴이 실행 중이라면 중복 실행 방지
+        StopCoroutine(ReturnToSavedPositionRoutine());
+        StartCoroutine(ReturnToSavedPositionRoutine());
+    }
+
+    private IEnumerator ReturnToSavedPositionRoutine()
+    {
+        // 1. 플레이어 이동 잠금
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.SetLocomotion(false);
+        }
+
+        // 2. 피드백 표시 (잘못된 선택에 대한 경고)
+        yield return StartCoroutine(ShowFeedbackAndDelay("경고: 잘못된 경로 입니다."));
+
+        // 3. 플레이어 위치 이동
+        if (startPosition != Vector3.zero)
+        {
+            PlayerTransform.position = startPosition;
+            Debug.Log($"[GameStepManager] Player returned to saved position: {startPosition}");
+        }
+        else
+        {
+            Debug.LogWarning("[GameStepManager] Saved position is invalid (Vector3.zero). Cannot return.");
+        }
+
+        // 4. 플레이어 이동 재활성화
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.SetLocomotion(true);
+        }
+    }
+
     #endregion
 
     #region Logic Helper Coroutines
@@ -192,6 +240,8 @@ public class GameStepManager : MonoBehaviour
     /// </summary>
     private IEnumerator ScenarioRoutine()
     {
+        DataManager.Instance.InitializeSessionData();
+
         if (PlayerManager.Instance != null)
         {
             PlayerManager.Instance.SetLocomotion(false);
@@ -234,6 +284,8 @@ public class GameStepManager : MonoBehaviour
         ));
         // 미션 종료 -> 이동 불가
 
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(false);
+
         isZoneReached = false;
         yield return StartCoroutine(ShowFeedbackAndDelay("튜토리얼을 완수하셨습니다!"));
         yield return new WaitForSeconds(nextStepDuration);
@@ -244,6 +296,8 @@ public class GameStepManager : MonoBehaviour
         currentPhase = GamePhase.Move1;
         uiManager.UpdatePressureGauge(3);
         uiManager.OpenPressurePanel();
+        SavePlayerPosition();
+
         yield return StartCoroutine(ShowStepTextAndDelay(
             "행사로 인해 거리에 인파가 몰리고 있습니다.\n이동 속도가 느려지면 탈출해야 합니다.",
             "사람이 많은 곳은 피해서, 가장자리로 계속 이동하세요.")
@@ -258,6 +312,8 @@ public class GameStepManager : MonoBehaviour
             () => isZoneReached
         ));
         isZoneReached = false;
+
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(false);
 
         uiManager.UpdatePressureGauge(2);
         yield return StartCoroutine(ShowFeedbackAndDelay("잘하셨습니다. 가장자리는 비교적 안전합니다."));
@@ -300,6 +356,8 @@ public class GameStepManager : MonoBehaviour
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Move2;
         uiManager.UpdatePressureGauge(4);
+        SavePlayerPosition();
+
         yield return StartCoroutine(ShowStepTextAndDelay(
             "다시 인파가 몰리고 있습니다.\n즉시 탈출해야 합니다.",
             "사람이 많은 곳은 피해서, 가장자리로 계속 이동하세요.")
@@ -314,6 +372,8 @@ public class GameStepManager : MonoBehaviour
             () => isZoneReached
         ));
         isZoneReached = false;
+
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(false);
 
         uiManager.UpdatePressureGauge(3);
         yield return StartCoroutine(ShowFeedbackAndDelay("잘하셨습니다. 가장자리는 비교적 안전합니다."));
@@ -397,6 +457,8 @@ public class GameStepManager : MonoBehaviour
             () => isZoneReached
         ));
         isZoneReached = false;
+
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(false);
 
         uiManager.UpdatePressureGauge(0);
         uiManager.ClosePressurePanel();

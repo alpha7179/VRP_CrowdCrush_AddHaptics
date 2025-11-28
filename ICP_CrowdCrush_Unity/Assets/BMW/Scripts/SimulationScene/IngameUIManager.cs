@@ -41,10 +41,10 @@ public class IngameUIManager : MonoBehaviour
     [Tooltip("비네팅이 변하는 속도")]
     [SerializeField] private float vignetteSmoothTime = 0.5f;
     [Tooltip("UI가 페이드되는 시간")]
-    [SerializeField] private float uiFadeDuration = 0.3f;
+    [SerializeField] private float imageFadeDuration = 0.3f;
 
     [Header("Gauge Pulse Settings")]
-    [SerializeField] private float pulseSpeed = 5.0f;
+    [SerializeField] private float pulseSpeed = 3.0f;
     [SerializeField] private float minPulseAlpha = 0.2f;
 
     [Header("UI Fade Settings")]
@@ -59,7 +59,6 @@ public class IngameUIManager : MonoBehaviour
 
     // 각 게이지 이미지별로 돌아가는 코루틴을 관리하기 위한 딕셔너리
     private Dictionary<Image, Coroutine> imageCoroutines = new Dictionary<Image, Coroutine>();
-
     private float cachedOriginalAlpha = 1.0f; // 펄스용 알파값 저장
 
     [Header("External References")]
@@ -252,7 +251,7 @@ public class IngameUIManager : MonoBehaviour
         if (outtroManager)
         {
             outtroManager.gameObject.SetActive(true);
-            outtroManager.Initialize();
+            StartCoroutine(outtroManager.InitializeRoutine());
         }
     }
 
@@ -303,7 +302,7 @@ public class IngameUIManager : MonoBehaviour
     }
 
     // =================================================================================
-    // 코루틴: 이미지 페이드 및 펄스 효과
+    // 코루틴: 페이드 및 펄스 효과
     // =================================================================================
 
     private void FadePanel(GameObject panel, bool show)
@@ -375,10 +374,10 @@ public class IngameUIManager : MonoBehaviour
         float elapsed = 0f;
 
         // 1. 페이드 애니메이션
-        while (elapsed < uiFadeDuration)
+        while (elapsed < imageFadeDuration)
         {
             elapsed += Time.deltaTime;
-            float newAlpha = Mathf.Lerp(startAlpha, targetAlpha, elapsed / uiFadeDuration);
+            float newAlpha = Mathf.Lerp(startAlpha, targetAlpha, elapsed / imageFadeDuration);
             targetImage.color = new Color(color.r, color.g, color.b, newAlpha);
             yield return null;
         }
@@ -424,7 +423,7 @@ public class IngameUIManager : MonoBehaviour
     }
 
     // =================================================================================
-    // 코루틴: 미션 타이머 (기존 유지)
+    // 코루틴: 미션 타이머
     // =================================================================================
 
     public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null)
@@ -456,6 +455,8 @@ public class IngameUIManager : MonoBehaviour
 
             yield return null;
         }
+        DataManager.Instance.AddSuccessCount();
+        DataManager.Instance.AddPlayTime(timeSpent);
 
         CloseProgressPanel();
         yield return timeSpent;
