@@ -2068,7 +2068,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6708537939665365196
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3599,7 +3599,7 @@ GameObject:
   - component: {fileID: 5183355151102671809}
   - component: {fileID: 8181710344653299638}
   m_Layer: 5
-  m_Name: MainCanvas
+  m_Name: IntroCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -5570,7 +5570,7 @@ GameObject:
   - component: {fileID: 4172642453037334969}
   m_Layer: 0
   m_Name: XROrigin
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

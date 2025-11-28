@@ -5126,9 +5126,10 @@ MonoBehaviour:
   - {fileID: 8520859483784088284}
   pressureVignette: {fileID: 0}
   vignetteSmoothTime: 0.5
-  uiFadeDuration: 0.3
+  imageFadeDuration: 0.3
   pulseSpeed: 5
   minPulseAlpha: 0.2
+  panelFadeDuration: 0.2
   outtroManager: {fileID: 0}
 --- !u!1 &8155832090906564862
 GameObject:

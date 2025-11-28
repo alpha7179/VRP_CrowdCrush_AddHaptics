@@ -86,6 +86,17 @@ public class SceneTransitionManager : MonoBehaviour
     public void LoadScene(string sceneName)
     {
         if (isFading) return;
+
+        if (sceneName == "IntroScene")
+        {
+            Debug.Log("[SceneTransitionManager] Destroying Manager instance before loading Intro scene.");
+            if(DataManager.Instance != null) Destroy(DataManager.Instance.gameObject);
+            if(GameManager.Instance != null) Destroy(GameManager.Instance.gameObject);
+            if(ControllerInputManager.Instance != null) Destroy(ControllerInputManager.Instance.gameObject);
+            if(PlayerManager.Instance != null) Destroy(PlayerManager.Instance.gameObject);
+            
+        }
+
         StartCoroutine(TransitionRoutine(sceneName));
     }
 
