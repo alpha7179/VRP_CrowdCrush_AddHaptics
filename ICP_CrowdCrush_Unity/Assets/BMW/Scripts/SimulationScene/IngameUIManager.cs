@@ -1,18 +1,13 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 /// <summary>
-/// 인게임 UI 매니저: HUD 요소, 각종 패널, 포스트 프로세싱 효과 등을 관리합니다.
+/// 인게임 UI 매니저: HUD 요소, 각종 패널 관리 및 XR Vignette 기반 압박 효과 제어
 /// </summary>
 public class IngameUIManager : MonoBehaviour
 {
-    // =================================================================================
-    // Inspector Field (직렬화된 변수)
-    // =================================================================================
 
     [Header("HUD Elements")]
     [SerializeField] private Canvas IngameCanvas; // 최상위 UI 캔버스
@@ -38,22 +33,23 @@ public class IngameUIManager : MonoBehaviour
     // 압박 상태 문자열 배열
     private readonly string[] PressureState = new string[]
     {
-        "정상 (Safe)", "주의 (Caution)", "경고 (Warning)", "위험 (Critical)", "압박 (Pressure)", "최대 위험 (DANGER)"
+        "정상", "주의", "경고", "압박", "위험", "최대 위험"
     };
     [SerializeField] public Image[] pressureGaugeImages;      // 압박 게이지 이미지 배열
 
     [Header("Effects")]
-    [SerializeField] private Volume postProcessVolume; // 포스트 프로세싱 볼륨
-    [SerializeField] private Transform cameraOffset;    // (사용되지 않음 - 카메라 관련 오프셋용으로 보임)
+    [SerializeField] private PressureVignette pressureVignette;
+    [SerializeField] private float pulseSpeed = 5.0f; // 깜빡임 속도
+    [SerializeField] private float minPulseAlpha = 0.2f; // 최소 투명도 (0~1)
+    private Coroutine gaugePulseCoroutine; // 현재 돌아가는 깜빡임 코루틴 저장용
+    private Image currentPulsingImage;     // 현재 깜빡이고 있는 이미지 저장용
+    private float cachedOriginalAlpha;
 
     [Header("External References")]
     [SerializeField] private OuttroUIManager outtroManager; // 게임 종료 UI 관리자
 
-    // =================================================================================
-    // 내부 상태 변수
-    // =================================================================================
-    private Vignette vignette;              // 포스트 프로세싱의 비네팅 효과 (압박 시 빨간색/강도 조절)
     private bool isDisplayPanel = false;    // 현재 UI 패널이 열려있는지 여부 (입력 제어용)
+
 
     // =================================================================================
     // Unity 생명 주기 메서드
@@ -68,10 +64,10 @@ public class IngameUIManager : MonoBehaviour
         if (progressPanel) progressPanel.SetActive(false);
         HideAllTipsImages();
 
-        // 비네팅 효과 초기화 및 참조
-        if (postProcessVolume && postProcessVolume.profile.TryGet(out vignette))
+        // 압박 효과 초기화 (0으로 설정)
+        if (pressureProvider != null)
         {
-            vignette.intensity.value = 0f;
+            pressureProvider.SetPressure(0f);
         }
 
         // GameManager의 일시정지 이벤트 구독
@@ -135,13 +131,13 @@ public class IngameUIManager : MonoBehaviour
             Time.timeScale = 1f;
             GameManager.Instance.LoadScene("IntroScene");
         }
-        // 2. 안내 패널이 떠있음: 닫기 (ShowStepTextAndDelay의 조기 종료를 유발)
+        // 2. 안내 패널이 떠있음: 닫기
         else if (instructionPanel != null && instructionPanel.activeSelf)
         {
             CloseInstructionPanel();
             SetDisplayPanel(false);
         }
-        // 3. 주의사항 패널: 닫기 (ScenarioRoutine의 대기 상태를 해제)
+        // 3. 주의사항 패널: 닫기
         else if (cautionPanel != null && cautionPanel.activeSelf)
         {
             CloseCautionPanel();
@@ -152,7 +148,7 @@ public class IngameUIManager : MonoBehaviour
     // [B 버튼] 상황별 동작
     private void HandleBButtonInput()
     {
-        // 1. 일시정지 상태: 게임 재개 (TogglePause 호출)
+        // 1. 일시정지 상태: 게임 재개
         if (pausePanel.activeSelf)
         {
             if (GameManager.Instance != null) GameManager.Instance.TogglePause();
@@ -208,14 +204,14 @@ public class IngameUIManager : MonoBehaviour
     public void SetDisplayPanel(bool state) { isDisplayPanel = state; }
     public bool GetDisplayPanel() { return isDisplayPanel; }
 
-    // 비네팅(압박) 효과 강도 설정
+    //  비네팅(압박) 효과 강도 설정 (Provider 호출)
     public void SetPressureIntensity(float intensity)
     {
-        if (vignette != null)
+
+        // Tunneling Vignette Provider 호출
+        if (pressureProvider != null)
         {
-            vignette.intensity.value = intensity;
-            // 강도에 따라 색상을 검은색에서 빨간색으로 보간
-            vignette.color.value = Color.Lerp(Color.black, Color.red, intensity);
+            pressureProvider.SetPressure(intensity);
         }
     }
 
@@ -227,7 +223,7 @@ public class IngameUIManager : MonoBehaviour
         {
             if (tipsImage[i] != null)
             {
-                tipsImage[i].gameObject.SetActive(i == pageIndex); // 해당 인덱스 이미지만 활성화
+                tipsImage[i].gameObject.SetActive(i == pageIndex);
             }
         }
     }
@@ -260,9 +256,23 @@ public class IngameUIManager : MonoBehaviour
     // 압박 게이지 UI 업데이트
     public void UpdatePressureGauge(int level)
     {
+        // 1. 이전에 깜빡이던 게 있다면 멈추고 '원래 알파값'으로 복구
+        if (gaugePulseCoroutine != null)
+        {
+            StopCoroutine(gaugePulseCoroutine);
+        }
+
+        if (currentPulsingImage != null)
+        {
+            Color c = currentPulsingImage.color;
+            // [수정] 1.0f가 아니라 저장해둔 cachedOriginalAlpha로 복구
+            currentPulsingImage.color = new Color(c.r, c.g, c.b, cachedOriginalAlpha);
+            currentPulsingImage = null;
+        }
+
+        // 2. 게이지 이미지 활성화/비활성화 (기존 로직 유지)
         if (pressureGaugeImages == null || pressureGaugeImages.Length == 0) return;
 
-        // 게이지 이미지 활성화 (level만큼 채워짐)
         for (int i = 0; i < pressureGaugeImages.Length; i++)
         {
             if (pressureGaugeImages[i] != null)
@@ -271,11 +281,31 @@ public class IngameUIManager : MonoBehaviour
             }
         }
 
-        // 상태 텍스트 업데이트
+        // 3. 텍스트 및 비네팅 업데이트 (기존 로직 유지)
         if (pressureStateText)
         {
-            // level은 PressureState 배열의 인덱스로 사용됨
-            pressureStateText.text = PressureState[level];
+            int stateIndex = Mathf.Clamp(level, 0, PressureState.Length - 1);
+            pressureStateText.text = PressureState[stateIndex];
+        }
+
+        float maxLevel = 5.0f;
+        float intensity = Mathf.Clamp01((float)level / maxLevel);
+        SetPressureIntensity(intensity);
+
+        // 4. 새로운 타겟 이미지 설정 및 '현재 알파값 저장'
+        int targetIndex = level - 1;
+
+        if (targetIndex >= 0 && targetIndex < pressureGaugeImages.Length)
+        {
+            currentPulsingImage = pressureGaugeImages[targetIndex];
+
+            if (currentPulsingImage.gameObject.activeSelf)
+            {
+                // 깜빡이기 시작하기 전, 지금의 알파값을 저장해둠!
+                cachedOriginalAlpha = currentPulsingImage.color.a;
+
+                gaugePulseCoroutine = StartCoroutine(PulseImageRoutine(currentPulsingImage));
+            }
         }
     }
 
@@ -283,25 +313,16 @@ public class IngameUIManager : MonoBehaviour
     // 코루틴: 미션 타이머/진행 상황 표시
     // =================================================================================
 
-    /// <summary>
-    /// 미션 타이머를 시작하고, 조건이 충족될 때까지 UI를 업데이트합니다.
-    /// </summary>
-    /// <param name="missionText">진행 상황 패널에 표시할 미션 텍스트</param>
-    /// <param name="totalTime">총 제한 시간</param>
-    /// <param name="isMissionCompleteCondition">미션 완료 조건 함수</param>
-    /// <param name="progressCalculator">진행 상황(0~1)을 계산하는 함수 (null이면 타이머 모드)</param>
     public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null)
     {
         float currentTime = totalTime;
         float timeSpent = 0f;
 
-        // 초기 텍스트 설정 (진행 계산기가 있으면 퍼센트, 없으면 시간)
         if (progressCalculator != null && progressText) progressText.text = $"0 %";
         else if (progressText) progressText.text = $"{totalTime} s";
 
-        OpenProgressPanel(missionText); // 진행 상황 패널 열기
+        OpenProgressPanel(missionText);
 
-        // 미션 완료 조건이 충족될 때까지 반복
         while (!isMissionCompleteCondition.Invoke())
         {
             currentTime -= Time.deltaTime;
@@ -309,19 +330,13 @@ public class IngameUIManager : MonoBehaviour
 
             if (progressCalculator != null)
             {
-                // **1. 퍼센트/게이지 모드 (특정 액션 유지)**
                 float currentProgress = progressCalculator.Invoke();
-
                 if (progressText) progressText.text = $"{(currentProgress * 100f).ToString("F0")} %";
-                if (barSlider) barSlider.value = currentProgress; // 슬라이더: 0 -> 1
+                if (barSlider) barSlider.value = currentProgress;
             }
             else
             {
-                // **2. 타이머 모드 (목표 지점 도달 등)**
-                // 남은 시간 표시
                 if (progressText) progressText.text = $"{Mathf.CeilToInt(currentTime).ToString()} s";
-
-                // 슬라이더: 줄어듦 (1 -> 0)
                 if (barSlider) barSlider.value = currentTime / totalTime;
             }
 
@@ -329,7 +344,25 @@ public class IngameUIManager : MonoBehaviour
         }
 
         CloseProgressPanel();
-        // 미션 완료까지 걸린 시간 반환
         yield return timeSpent;
+    }
+
+    // 특정 이미지를 계속 깜빡이게 하는 코루틴
+    private IEnumerator PulseImageRoutine(Image targetImage)
+    {
+        Color originalColor = targetImage.color;
+
+        while (true)
+        {
+            // Time.time을 이용해 -1 ~ 1 사이의 값을 0 ~ 1 사이로 변환하여 Alpha값 계산
+            float alphaRatio = (Mathf.Sin(Time.time * pulseSpeed) + 1.0f) / 2.0f;
+
+            // 최소 투명도 ~ 1.0 사이에서 보간
+            float targetAlpha = Mathf.Lerp(minPulseAlpha, cachedOriginalAlpha, alphaRatio);
+
+            targetImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, targetAlpha);
+
+            yield return null; // 다음 프레임까지 대기
+        }
     }
 }
