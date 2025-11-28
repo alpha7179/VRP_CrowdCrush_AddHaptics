@@ -13,12 +13,13 @@ public class DataManager : MonoBehaviour
 
     [Header("Session Data")]
     public int SuccessCount = 0;
+    public int MistakeCount = 0;
     public float PlayTime = 0f;
     public string SelectedMap = "Street";
 
     // PlayerPrefs Keys
-    private const string KEY_VOLUME = "MasterVolume";
-    private const string KEY_MOTION_SICKNESS = "MotionSickness";
+    //private const string KEY_VOLUME = "MasterVolume";
+    //private const string KEY_MOTION_SICKNESS = "MotionSickness";
 
     private void Awake()
     {
@@ -27,7 +28,7 @@ public class DataManager : MonoBehaviour
             Instance = this;
             transform.parent = null;
             DontDestroyOnLoad(gameObject);
-            LoadSettings();
+            //LoadSettings();
         }
         else
         {
@@ -38,12 +39,35 @@ public class DataManager : MonoBehaviour
     public void InitializeSessionData()
     {
         SuccessCount = 0;
+        MistakeCount = 0;
         PlayTime = 0f;
     }
 
     public void AddSuccessCount()
     {
         SuccessCount++;
+    }
+
+    public void AddMistakeCount()
+    {
+        MistakeCount++;
+    }
+
+    public void AddPlayTime(float timeToAdd)
+    {
+        PlayTime += timeToAdd;
+        Debug.Log($"[DataManager] PlayTime updated: {PlayTime:F2} seconds");
+    }
+    /*
+    public void SetVolume(float volume)
+    {
+        MasterVolume = volume;
+        AudioListener.volume = MasterVolume;
+    }
+
+    public void SetMotionSicknessMode(bool isEnabled)
+    {
+        IsAntiMotionSicknessMode = isEnabled;
     }
 
     public void SaveSettings()
@@ -59,21 +83,5 @@ public class DataManager : MonoBehaviour
         IsAntiMotionSicknessMode = PlayerPrefs.GetInt(KEY_MOTION_SICKNESS, 0) == 1;
         AudioListener.volume = MasterVolume;
     }
-
-    public void AddPlayTime(float timeToAdd)
-    {
-        PlayTime += timeToAdd;
-        Debug.Log($"[DataManager] PlayTime updated: {PlayTime:F2} seconds");
-    }
-
-    public void SetVolume(float volume)
-    {
-        MasterVolume = volume;
-        AudioListener.volume = MasterVolume;
-    }
-
-    public void SetMotionSicknessMode(bool isEnabled)
-    {
-        IsAntiMotionSicknessMode = isEnabled;
-    }
+    */
 }
