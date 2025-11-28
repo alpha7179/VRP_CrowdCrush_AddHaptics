@@ -30,13 +30,16 @@ public class GameStepManager : MonoBehaviour
     [SerializeField] private float nextStepDuration = 1.0f;
 
     [Header("Zone Objects")]
-    [Tooltip("마지막 탈출 단계에서 활성화될 목표 지점")]
-    [SerializeField] private GameObject escapeZone;
+    [Tooltip("각 단계에서 활성화될 목표 지점 0:Tutorial, 1:Move1, 2:Move2, 3:Escape")]
+    [SerializeField] private GameObject[] TargerZone;
+    private int targetIndex;
 
-    public enum GamePhase { Caution, Tutorial, Move1, ABCPose, Move2, HoldPillar, ClimbUp, Escape, Finished }
+    [SerializeField] private enum GamePhase { Caution, Tutorial, Move1, ABCPose, Move2, HoldPillar, ClimbUp, Escape, Finished }
+    
+
 
     [Header("Debug Info")]
-    [SerializeField] private GamePhase currentPhase = GamePhase.Caution;
+    [SerializeField] private GamePhase currentPhase;
 
     // =================================================================================
     // 내부 상태 변수
@@ -125,7 +128,10 @@ public class GameStepManager : MonoBehaviour
     {
         // 미션 시작 -> 이동 허용!
         if (PlayerManager.Instance != null)
+        {
             PlayerManager.Instance.SetLocomotion(true);
+            PlayerManager.Instance.SetInteraction(true);
+        }
 
         // IngameUIManager의 타이머 코루틴 실행 및 대기
         Coroutine timerCoroutine = uiManager.StartCoroutine(uiManager.StartMissionTimer(
@@ -139,7 +145,10 @@ public class GameStepManager : MonoBehaviour
 
         // 미션 종료 -> 이동 잠금!
         if (PlayerManager.Instance != null)
+        {
             PlayerManager.Instance.SetLocomotion(false);
+            PlayerManager.Instance.SetInteraction(false);
+        }
     }
 
     #endregion
@@ -184,7 +193,10 @@ public class GameStepManager : MonoBehaviour
     private IEnumerator ScenarioRoutine()
     {
         if (PlayerManager.Instance != null)
+        {
             PlayerManager.Instance.SetLocomotion(false);
+            PlayerManager.Instance.SetInteraction(false);
+        }
 
         // ---------------------------------------------------------------------------------
         // Intro: 주의사항 패널
@@ -211,6 +223,9 @@ public class GameStepManager : MonoBehaviour
             "튜토리얼: 바닥의 화살표를 따라 목표 지점으로 이동하세요.", " ")
         );
 
+        targetIndex = 0;
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(true);
+
         uiManager.DisplayTipsImage(0);
         // 미션 시작 -> 이동 가능 (ShowTimedMission 내부에서 처리)
         yield return StartCoroutine(ShowTimedMission(
@@ -233,6 +248,9 @@ public class GameStepManager : MonoBehaviour
             "행사로 인해 거리에 인파가 몰리고 있습니다.\n이동 속도가 느려지면 탈출해야 합니다.",
             "사람이 많은 곳은 피해서, 가장자리로 계속 이동하세요.")
         );
+
+        targetIndex = 1;
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(true);
 
         uiManager.DisplayTipsImage(0);
         yield return StartCoroutine(ShowTimedMission(
@@ -286,6 +304,9 @@ public class GameStepManager : MonoBehaviour
             "다시 인파가 몰리고 있습니다.\n즉시 탈출해야 합니다.",
             "사람이 많은 곳은 피해서, 가장자리로 계속 이동하세요.")
         );
+
+        targetIndex = 2;
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(true);
 
         uiManager.DisplayTipsImage(0);
         yield return StartCoroutine(ShowTimedMission(
@@ -366,6 +387,9 @@ public class GameStepManager : MonoBehaviour
             "인파가 밀집 공간에서 벗어났습니다.\n이제 안전한 곳으로 이동하세요.",
             "경찰/구조대가 있는 안전 구역으로 이동하세요.")
         );
+
+        targetIndex = 3;
+        if (TargerZone.Length > targetIndex) TargerZone[targetIndex].SetActive(true);
 
         uiManager.DisplayTipsImage(0);
         yield return StartCoroutine(ShowTimedMission(

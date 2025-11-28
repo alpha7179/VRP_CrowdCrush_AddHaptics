@@ -31,10 +31,7 @@ public class IngameUIManager : MonoBehaviour
     [SerializeField] public Image[] tipsImage;
 
     [SerializeField] private TextMeshProUGUI pressureStateText;
-    private readonly string[] PressureState = new string[]
-    {
-        "정상", "주의", "경고", "압박", "위험", "최대 위험"
-    };
+    private readonly string[] PressureState = new string[] {"정상", "주의", "경고", "압박", "위험", "최대 위험"};
     [SerializeField] public Image[] pressureGaugeImages;
 
     [Header("Effects")]
@@ -49,6 +46,12 @@ public class IngameUIManager : MonoBehaviour
     [Header("Gauge Pulse Settings")]
     [SerializeField] private float pulseSpeed = 5.0f;
     [SerializeField] private float minPulseAlpha = 0.2f;
+
+    [Header("UI Fade Settings")]
+    [SerializeField] private float panelFadeDuration = 0.2f; // 패널 페이드 시간
+
+    // 패널별 실행 중인 코루틴 관리 (중복 실행 방지)
+    private Dictionary<GameObject, Coroutine> panelCoroutines = new Dictionary<GameObject, Coroutine>();
 
     // 내부 관리용 변수
     private float currentVignetteValue = 0f; // 현재 비네팅 강도 추적용
@@ -164,32 +167,25 @@ public class IngameUIManager : MonoBehaviour
     // UI 제어 메서드
     // =================================================================================
 
-    public void OpenCautionPanel() { cautionPanel.SetActive(true); SetDisplayPanel(true); }
-    public void CloseCautionPanel() { cautionPanel.SetActive(false); SetDisplayPanel(false); }
+    public void OpenCautionPanel() { FadePanel(cautionPanel,true); SetDisplayPanel(true); }
+    public void CloseCautionPanel() { FadePanel(cautionPanel, false); SetDisplayPanel(false); }
 
-    public void OpenInstructionPanel() { instructionPanel.SetActive(true); SetDisplayPanel(true); }
-    public void CloseInstructionPanel()
-    {
-        instructionPanel.SetActive(false);
-        SetDisplayPanel(false);
-        UpdateInstruction("");
-        UpdateMission("");
-        UpdateFeedBack("");
-    }
+    public void OpenInstructionPanel() { FadePanel(instructionPanel, true); SetDisplayPanel(true); }
+    public void CloseInstructionPanel() { FadePanel(instructionPanel, false); SetDisplayPanel(false); UpdateInstruction(""); UpdateMission(""); UpdateFeedBack(""); }
 
     public void OpenProgressPanel(string missionText)
     {
         if (progressMissionText) progressMissionText.text = missionText;
-        if (progressPanel) progressPanel.SetActive(true);
+        if (progressPanel) FadePanel(progressPanel, true);
     }
     public void CloseProgressPanel()
     {
-        if (progressPanel) progressPanel.SetActive(false);
+        if (progressPanel) FadePanel(progressPanel, false);
         HideAllTipsImages();
     }
 
-    public void OpenPressurePanel() { if (pressurePanel) pressurePanel.SetActive(true); }
-    public void ClosePressurePanel() { if (pressurePanel) pressurePanel.SetActive(false); }
+    public void OpenPressurePanel() { if (pressurePanel) FadePanel(pressurePanel, true); }
+    public void ClosePressurePanel() { if (pressurePanel) FadePanel(pressurePanel, false); }
 
     public void UpdateInstruction(string text) { if (instructionText) instructionText.text = text; }
     public void UpdateMission(string text)
@@ -310,9 +306,54 @@ public class IngameUIManager : MonoBehaviour
     // 코루틴: 이미지 페이드 및 펄스 효과
     // =================================================================================
 
-    /// <summary>
-    /// 이미지를 서서히 켜거나 끄는 코루틴. 완료 후 Pulse로 넘어갈 수도 있음.
-    /// </summary>
+    private void FadePanel(GameObject panel, bool show)
+    {
+        if (panel == null) return;
+
+        // CanvasGroup이 없으면 추가 (안전장치)
+        CanvasGroup cg = panel.GetComponent<CanvasGroup>();
+        if (cg == null) cg = panel.AddComponent<CanvasGroup>();
+
+        // 이미 실행 중인 코루틴이 있다면 중지
+        if (panelCoroutines.ContainsKey(panel) && panelCoroutines[panel] != null)
+        {
+            StopCoroutine(panelCoroutines[panel]);
+        }
+
+        // 코루틴 시작
+        panelCoroutines[panel] = StartCoroutine(FadePanelRoutine(panel, cg, show));
+    }
+
+    private IEnumerator FadePanelRoutine(GameObject panel, CanvasGroup cg, bool show)
+    {
+        float targetAlpha = show ? 1.0f : 0.0f;
+        float startAlpha = cg.alpha;
+        float elapsed = 0f;
+
+        // 켤 때는 먼저 Active true
+        if (show)
+        {
+            panel.SetActive(true);
+            cg.alpha = 0f; // 깜빡임 방지 (혹시 1로 남아있을까봐)
+            startAlpha = 0f;
+        }
+
+        while (elapsed < panelFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            cg.alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsed / panelFadeDuration);
+            yield return null;
+        }
+
+        cg.alpha = targetAlpha;
+
+        // 끌 때는 페이드 끝난 후 Active false
+        if (!show)
+        {
+            panel.SetActive(false);
+        }
+    }
+
     private IEnumerator FadeImageRoutine(Image targetImage, float targetAlpha, bool activeState, bool startPulseAfterFade)
     {
         // 켜는 거라면 먼저 Active부터 켜준다
