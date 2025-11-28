@@ -4,7 +4,7 @@ using System;
 using System.Collections;
 
 /// <summary>
-/// 게임의 전체 생명주기, 씬 전환, 전역 상태(일시정지 등)를 관리하는 최상위 매니저
+/// 게임의 전체 생명주기, 씬 전환, 전역 상태(일시정지 등)를 관리하는 최상위 매니저원
 /// </summary>
 public class GameManager : MonoBehaviour
 {
@@ -35,7 +35,6 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // 이미 인스턴스가 존재하면 중복된 객체는 파괴
             Destroy(gameObject);
         }
     }
@@ -46,7 +45,18 @@ public class GameManager : MonoBehaviour
         CurrentSceneName = SceneManager.GetActiveScene().name;
     }
 
-    // 게임 일시정지/재개 토글 (ControllerInputManager의 메뉴 버튼에서 호출)
+    // [추가] 유니티 내장 씬 로드 이벤트를 구독하여, 누가 로드하든 확실하게 상태를 리셋함
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += HandleSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= HandleSceneLoaded;
+    }
+
+    // 게임 일시정지/재개 토글
     public void TogglePause()
     {
         // 인트로 씬 등 일시정지가 필요 없는 씬 예외 처리
@@ -57,61 +67,73 @@ public class GameManager : MonoBehaviour
         // 물리 연산 및 시간 정지/재개 (TimeScale 조절)
         Time.timeScale = IsPaused ? 0f : 1f;
 
-        // 이벤트 발생 -> GameUIManager 등이 구독하여 팝업 처리
+        // 이벤트 발생
         OnPauseStateChanged?.Invoke(IsPaused);
 
-        if(isDebug) Debug.Log($"[GameManager] Pause State: {IsPaused}");
+        if (isDebug) Debug.Log($"[GameManager] Pause State: {IsPaused}");
     }
 
-    // 특정 씬으로 비동기 전환 (로딩 화면 처리 가능)
-    // <param name="sceneName">이동할 씬의 정확한 이름</param>
+    // 씬 전환 요청 (SceneTransitionManager에 위임)
     public void LoadScene(string sceneName)
     {
-        StartCoroutine(LoadSceneRoutine(sceneName));
+        // 페이드 매니저가 있으면 페이드 효과와 함께 전환
+        if (SceneTransitionManager.Instance != null)
+        {
+            if (isDebug) Debug.Log($"[GameManager] Requesting Fade Transition to: {sceneName}");
+            SceneTransitionManager.Instance.LoadScene(sceneName);
+        }
+        else
+        {
+            // 없으면 기존 방식대로 직접 전환 (비상용 Fallback)
+            if (isDebug) Debug.LogWarning("[GameManager] SceneTransitionManager not found. Loading directly.");
+            StartCoroutine(LoadSceneRoutine(sceneName));
+        }
     }
 
+    // 비상용 직접 로드 루틴 (SceneTransitionManager가 없을 때만 사용됨)
     private IEnumerator LoadSceneRoutine(string sceneName)
     {
-        if(isDebug) Debug.Log($"[GameManager] Loading Scene: {sceneName}...");
-
-        // 비동기 로딩 시작
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
-
-        // 로딩이 끝날 때까지 대기
         while (!asyncLoad.isDone)
         {
             yield return null;
         }
-
-        // 씬 전환 후 상태 초기화
-        CurrentSceneName = sceneName;
-        Time.timeScale = 1f; // 시간 정상화
-        IsPaused = false;
-
-        // 씬 로드 완료 이벤트 전파 (PlayerManager, UIManager 초기화)
-        OnSceneLoaded?.Invoke(sceneName);
-
-        if(isDebug) Debug.Log($"[GameManager] Scene Loaded Complete: {sceneName}");
+        // 로드 완료 처리는 HandleSceneLoaded 이벤트에서 일괄 처리됨
     }
 
-    // 게임 클리어 (탈출 성공) 처리 -> OuttroUIManager 호출용
+    // 씬 로드가 완료되면 자동으로 호출되는 콜백 함수
+    private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        CurrentSceneName = scene.name;
+
+        // 씬 전환 시 무조건 게임 상태 초기화
+        Time.timeScale = 1f;
+        IsPaused = false;
+
+        // 씬 로드 완료 이벤트 전파
+        OnSceneLoaded?.Invoke(scene.name);
+
+        if (isDebug) Debug.Log($"[GameManager] Scene Loaded & State Reset: {scene.name}");
+    }
+
+    // 게임 클리어 처리
     public void TriggerGameClear()
     {
-        if(isDebug) Debug.Log("[GameManager] Mission Clear!");
+        if (isDebug) Debug.Log("[GameManager] Mission Clear!");
         OnGameClear?.Invoke();
     }
 
-    // 게임 오버 (실패) 처리
+    // 게임 오버 처리
     public void TriggerGameOver()
     {
-        if(isDebug) Debug.Log("[GameManager] Game Over!");
+        if (isDebug) Debug.Log("[GameManager] Game Over!");
         OnGameOver?.Invoke();
     }
 
     // 애플리케이션 종료
     public void QuitGame()
     {
-        if(isDebug) Debug.Log("[GameManager] Quitting Application...");
+        if (isDebug) Debug.Log("[GameManager] Quitting Application...");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
