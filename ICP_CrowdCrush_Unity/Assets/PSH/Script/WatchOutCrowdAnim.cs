@@ -8,10 +8,11 @@ public class WatchOutCrowdAnim : MonoBehaviour
     public string[] clipNames =
         {"Breathing Idle_Anim",
         "Scary Clown Idle_Anim",
-        "Look Around_Anim",
-        "Nervously Look Around_Anim",
-        "Scary Clown Idle_Anim",
-        "BackReaction_Anim"
+        "Talking_Anim",
+        "Talking (1)_Anim",
+        "Talking On A Cell Phone_Anim",
+        "Angry_Anim",
+        "Scary Clown Idle_Anim"
 
     };
 

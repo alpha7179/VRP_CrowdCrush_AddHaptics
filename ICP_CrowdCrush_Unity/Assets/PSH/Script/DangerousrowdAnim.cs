@@ -6,11 +6,11 @@ public class DangerousCrowdAnim : MonoBehaviour
     public Animator animator;
     [Tooltip("Animator 안에 등록한 State 이름들")]
     public string[] clipNames =
-        {"BackReaction_Anim",
+        {"Breathing Idle_Anim",
         "Scary Clown Idle_Anim",
-        "ShoveReaction_Anim",
+        "Nervously Look Around_Anim",
         "Agony_Anim",
-        "Reaction_Anim",
+        "Angry_Anim",
         "Standing Arguing_Anim",
         "Waving_Anim"
 
@@ -33,7 +33,7 @@ public class DangerousCrowdAnim : MonoBehaviour
         lastIndex = newIndex;
 
         string clip = clipNames[newIndex];
-        Debug.Log($"{name} Play: {clip}"); // 어떤 애니가 선택됐는지 로그
+       // Debug.Log($"{name} Play: {clip}"); // 어떤 애니가 선택됐는지 로그
         animator.CrossFadeInFixedTime(clip, 0.25f, 0, Random.value);
     }
 
