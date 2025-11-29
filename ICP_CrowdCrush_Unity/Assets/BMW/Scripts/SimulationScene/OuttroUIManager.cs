@@ -77,12 +77,18 @@ public class OuttroUIManager : MonoBehaviour
     /// </summary>
     private void HandleAButtonInput()
     {
-        if (resultPanel.activeSelf)
+        // [중요] 스크립트가 붙은 게임오브젝트 자체가 파괴되었거나 꺼져있다면 무시
+        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+
+        // 1. resultPanel이 실제로 존재하는지(null이 아닌지) 먼저 확인합니다.
+        // 유니티 오브젝트는 '!= null' 체크로 파괴 여부를 알 수 있습니다.
+        if (resultPanel != null && resultPanel.activeSelf)
         {
             // 결과 화면 -> 요약 보기
             ShowSummary();
         }
-        else if (summaryPanel.activeSelf)
+        // 2. summaryPanel도 마찬가지로 존재하는지 확인합니다.
+        else if (summaryPanel != null && summaryPanel.activeSelf)
         {
             // 요약 화면 -> 메인으로 돌아가기 (인트로)
             if (currentPageIndex == summaryPages.Length - 1)
