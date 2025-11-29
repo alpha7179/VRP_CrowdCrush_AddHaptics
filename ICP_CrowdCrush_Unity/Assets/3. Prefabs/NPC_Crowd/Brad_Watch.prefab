@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8818859633751678325
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 6.02
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.133
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 6.26
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_Name
+      value: Brad_Watch
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 6347bb271180e4745ba1b1282aee5c36, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7795284471765028587}
+  m_SourcePrefab: {fileID: 100100000, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+--- !u!95 &3100859963422826724 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+  m_PrefabInstance: {fileID: 8818859633751678325}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8548830231165788196 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4f164ffdcfd98ee47bf2ad8eefbde678, type: 3}
+  m_PrefabInstance: {fileID: 8818859633751678325}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7795284471765028587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8548830231165788196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ace4b5e8c3ed60b4fbcace137bf076da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 3100859963422826724}
+  clipNames:
+  - Breathing Idle_Anim
+  - Scary Clown Idle_Anim
+  - Talking_Anim
+  - Talking (1)_Anim
+  - Talking On A Cell Phone_Anim
+  - Angry_Anim
+  - Scary Clown Idle_Anim
