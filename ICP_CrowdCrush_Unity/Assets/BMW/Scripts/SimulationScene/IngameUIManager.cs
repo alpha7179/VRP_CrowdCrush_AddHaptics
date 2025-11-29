@@ -127,6 +127,8 @@ public class IngameUIManager : MonoBehaviour
 
     private void HandleYButtonInput()
     {
+        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.TogglePause();
@@ -136,6 +138,8 @@ public class IngameUIManager : MonoBehaviour
 
     private void HandleAButtonInput()
     {
+        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+
         if (pausePanel != null && pausePanel.activeSelf)
         {
             Time.timeScale = 1f;
@@ -155,6 +159,8 @@ public class IngameUIManager : MonoBehaviour
 
     private void HandleBButtonInput()
     {
+        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+
         if (pausePanel.activeSelf)
         {
             if (GameManager.Instance != null) GameManager.Instance.TogglePause();
