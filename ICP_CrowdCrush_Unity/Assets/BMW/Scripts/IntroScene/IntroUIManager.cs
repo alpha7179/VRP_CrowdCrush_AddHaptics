@@ -25,18 +25,28 @@ public class IntroUIManager : MonoBehaviour
     [Header("Sub Panels (Inside StartPanel)")]
     [Tooltip("장소 선택 패널")]
     [SerializeField] private GameObject placePanel;
+    [SerializeField] private Image placeButton;
     [Tooltip("조작 설명 패널")]
     [SerializeField] private GameObject manualPanel;
+    [SerializeField] private Image manualButton;
     [Tooltip("팁(도움말) 패널")]
     [SerializeField] private GameObject tipsPanel;
+    [SerializeField] private Image tipsButton;
     [Tooltip("환경 설정 패널")]
     [SerializeField] private GameObject settingPanel;
+    [SerializeField] private Image settingButton;
+
+    [Header("Place Panels Elements")]
+    [SerializeField] private GameObject place1Panel;
+    [SerializeField] private GameObject place2Panel;
+    [SerializeField] private Image place1Image;
+    [SerializeField] private Image place2Image;
 
     #endregion
 
     #region Inspector Settings (UI Elements)
 
-    [Header("Tips UI Elements")]
+    [Header("Tips Panels Elements")]
     [SerializeField] private GameObject tip1;
     [SerializeField] private GameObject tip2;
     [SerializeField] private GameObject tip3;
@@ -45,7 +55,7 @@ public class IntroUIManager : MonoBehaviour
     [Tooltip("현재 팁 페이지 번호를 표시할 텍스트")]
     [SerializeField] private TextMeshProUGUI tipPageText;
 
-    [Header("Settings UI Elements")]
+    [Header("Settings Panels Elements")]
     [Tooltip("오디오 볼륨 슬라이더")]
     [SerializeField] private Slider audioSlider;
     [Tooltip("오디오 볼륨 수치 텍스트 (0-100)")]
@@ -65,6 +75,7 @@ public class IntroUIManager : MonoBehaviour
 
     private GameObject currentTopPanel;
     private GameObject currentMainPanel;
+    private Image currentMainButton;
 
     private int tipPageNum = 1;
 
@@ -146,7 +157,7 @@ public class IntroUIManager : MonoBehaviour
         SwitchTopPanel(startPanel);
 
         // StartPanel 진입 시 기본으로 '장소 선택' 패널을 보여줌
-        SwitchMainPanel(placePanel);
+        SwitchMainPanel(placePanel, placeButton);
     }
 
     /// <summary>
@@ -154,7 +165,7 @@ public class IntroUIManager : MonoBehaviour
     /// </summary>
     public void OnClickPlaceButton()
     {
-        SwitchMainPanel(placePanel);
+        SwitchMainPanel(placePanel, placeButton);
     }
 
     /// <summary>
@@ -162,7 +173,7 @@ public class IntroUIManager : MonoBehaviour
     /// </summary>
     public void OnClickManualButton()
     {
-        SwitchMainPanel(manualPanel);
+        SwitchMainPanel(manualPanel, manualButton);
     }
 
     /// <summary>
@@ -170,7 +181,7 @@ public class IntroUIManager : MonoBehaviour
     /// </summary>
     public void OnClickSettingButton()
     {
-        SwitchMainPanel(settingPanel);
+        SwitchMainPanel(settingPanel, settingButton);
     }
 
     /// <summary>
@@ -178,8 +189,43 @@ public class IntroUIManager : MonoBehaviour
     /// </summary>
     public void OnClickTipsButton()
     {
-        SwitchMainPanel(tipsPanel);
+        SwitchMainPanel(tipsPanel, tipsButton);
         ResetTipPage();
+    }
+
+    /// <summary>
+    /// [장소 선택 버튼] 이미지 홠성화됩니다.
+    /// </summary>
+    public void OnClickPlace1Panel()
+    {
+        if (place2Image != null && place2Panel != null && place1Image != null && place1Panel != null)
+        {
+            place2Panel.SetActive(false);
+            Color currentColor = place2Image.color;
+            currentColor.a = 0.0f;
+            place2Image.color = currentColor;
+
+            place1Panel.SetActive(true);
+            currentColor = place1Image.color; 
+            currentColor.a = 1.0f;
+            place1Image.color = currentColor;
+        }
+    }
+
+    public void OnClickPlace2Panel()
+    {
+        if (place2Image != null && place2Panel != null && place1Image != null && place1Panel != null)
+        {
+            place1Panel.SetActive(false);
+            Color currentColor = place1Image.color;
+            currentColor.a = 0.0f;
+            place1Image.color = currentColor;
+
+            place2Panel.SetActive(true);
+            currentColor = place2Image.color;
+            currentColor.a = 1.0f;
+            place2Image.color = currentColor;
+        }
     }
 
     /// <summary>
@@ -304,7 +350,7 @@ public class IntroUIManager : MonoBehaviour
         currentTopPanel = panelToActivate;
     }
 
-    private void SwitchMainPanel(GameObject panelToActivate)
+    private void SwitchMainPanel(GameObject panelToActivate, Image buttonToActivate)
     {
         if (currentMainPanel == panelToActivate) return;
 
@@ -319,9 +365,22 @@ public class IntroUIManager : MonoBehaviour
         }
 
         if (currentMainPanel != null) currentMainPanel.SetActive(false);
+        if (currentMainButton != null)
+        {
+            Color currentColor = currentMainButton.color;
+            currentColor.a = 0.0f;
+            currentMainButton.color = currentColor;
+        }
 
+        
         panelToActivate.SetActive(true);
         currentMainPanel = panelToActivate;
+
+        Color newColor = buttonToActivate.color;
+        newColor.a = 1.0f;
+        buttonToActivate.color = newColor;
+        currentMainButton = buttonToActivate;
+
     }
 
     #endregion
