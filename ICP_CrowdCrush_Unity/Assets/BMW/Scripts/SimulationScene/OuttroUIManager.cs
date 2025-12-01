@@ -5,50 +5,100 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// [V5] 게임 종료 후 결과 및 요약 UI 매니저 (V2 - 버튼/조이스틱 조작 버전).
-/// B 버튼: [결과 -> 요약] 또는 [요약 -> 메인] 이동.
-/// R 조이스틱: 요약 페이지 좌우 넘김.
+/// 게임 종료 후 결과(Result) 및 요약(Summary) 화면의 UI 흐름과 연출을 관리하는 매니저입니다.
+/// <para>
+/// 1. DataManager의 데이터를 기반으로 별점을 계산하고 애니메이션(펄스)을 재생합니다.<br/>
+/// 2. 컨트롤러 입력(A버튼, 조이스틱)을 통해 페이지를 넘기거나 메인으로 이동합니다.<br/>
+/// 3. 페이드(Fade) 및 펄스(Pulse) 효과를 코루틴으로 처리하여 시각적 피드백을 제공합니다.
+/// </para>
 /// </summary>
 public class OuttroUIManager : MonoBehaviour
 {
+    #region Inspector Settings (Panels)
+
     [Header("Panels")]
+    [Tooltip("게임 결과(별점)를 보여주는 패널")]
     [SerializeField] private GameObject resultPanel;
+
+    [Tooltip("게임 요약(페이지)을 보여주는 패널")]
     [SerializeField] private GameObject summaryPanel;
 
+    #endregion
+
+    #region Inspector Settings (Result UI)
+
     [Header("Result Elements")]
+    [Tooltip("별점 아이콘 배열 (순서대로 1점, 2점, 3점)")]
     [SerializeField] private GameObject[] starIcons;
+
+    [Tooltip("점수 텍스트 (사용하지 않을 경우 비워두세요)")]
     [SerializeField] private TextMeshProUGUI scoreText;
 
+    #endregion
+
+    #region Inspector Settings (Summary UI)
+
     [Header("Summary Elements")]
+    [Tooltip("요약 화면의 페이지들")]
     [SerializeField] private GameObject[] summaryPages;
+
+    [Tooltip("페이지 번호 표시 오브젝트 (마지막 페이지에선 숨김)")]
     [SerializeField] private GameObject pageNumber;
-    [SerializeField] private GameObject IntroButton;
+
+    [Tooltip("인트로(메인)로 돌아가는 버튼 오브젝트")]
+    [SerializeField] private GameObject introButton;
+
+    [Tooltip("현재 페이지 번호 텍스트")]
     [SerializeField] private TextMeshProUGUI pageNumberText;
 
-    // 버튼들은 시각적 피드백용으로 남겨둘 수 있지만, 실제 입력은 조이스틱으로 처리
+    [Header("Visual Feedback")]
+    [Tooltip("이전 페이지 버튼 비주얼 (입력은 조이스틱으로 처리)")]
     [SerializeField] private GameObject prevBtnVisual;
+
+    [Tooltip("다음 페이지 버튼 비주얼 (입력은 조이스틱으로 처리)")]
     [SerializeField] private GameObject nextBtnVisual;
+
+    #endregion
+
+    #region Inspector Settings (Animation)
+
+    [Header("UI Fade & Pulse Settings")]
+    [Tooltip("패널이 켜지고 꺼지는 페이드 시간(초)")]
+    [SerializeField] private float panelFadeDuration = 0.2f;
+
+    [Tooltip("이미지(별) 페이드 시간(초)")]
+    [SerializeField] private float imageFadeDuration = 0.3f;
+
+    [Tooltip("펄스(두근거림) 효과 속도")]
+    [SerializeField] private float pulseSpeed = 5.0f;
+
+    [Tooltip("펄스 효과 시 최소 알파값")]
+    [SerializeField] private float minPulseAlpha = 0.2f;
+
+    #endregion
+
+    #region Internal State
 
     private int currentPageIndex = 0;
 
-    // 조이스틱 중복 입력 방지용 플래그
+    // 조이스틱 중복 입력 방지용
     private bool isJoystickReady = true;
-    [SerializeField] private float joystickThreshold = 0.5f;
+    private const float JoystickThreshold = 0.5f;
 
-    [Header("UI Fade, Pulse Settings")]
-    [SerializeField] private float panelFadeDuration = 0.2f; // 패널 페이드 시간
-    [SerializeField] private float imageFadeDuration = 0.3f;
-    [SerializeField] private float pulseSpeed = 5.0f;
-    [SerializeField] private float minPulseAlpha = 0.2f;
-
-    // 패널별 실행 중인 코루틴 관리 (중복 실행 방지)
+    // 코루틴 관리 (중복 실행 방지)
     private Dictionary<GameObject, Coroutine> panelCoroutines = new Dictionary<GameObject, Coroutine>();
     private Dictionary<Image, Coroutine> imageCoroutines = new Dictionary<Image, Coroutine>();
-    private float cachedOriginalAlpha = 1.0f; // 펄스용 알파값 저장
+
+    // 펄스 효과용 원본 알파값 캐싱
+    private float cachedOriginalAlpha = 1.0f;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void OnEnable()
     {
-        // ControllerInputManage의 A버튼 이벤트 구독
+        // 컨트롤러 입력 이벤트 구독
         if (ControllerInputManager.Instance != null)
         {
             ControllerInputManager.Instance.OnAButtonDown += HandleAButtonInput;
@@ -65,32 +115,34 @@ public class OuttroUIManager : MonoBehaviour
 
     private void Update()
     {
-        // 요약 패널이 켜져 있을 때만 조이스틱 입력 체크
+        // 요약 패널이 활성화된 상태에서만 조이스틱 입력 처리
         if (summaryPanel.activeSelf)
         {
             HandleJoystickInput();
         }
     }
 
+    #endregion
+
+    #region Input Handlers
+
     /// <summary>
-    /// B 버튼 입력 처리 (상태 전환)
+    /// A 버튼 입력 처리: [결과 -> 요약] 또는 [요약 -> 메인]으로 상태 전환
     /// </summary>
     private void HandleAButtonInput()
     {
-        // [중요] 스크립트가 붙은 게임오브젝트 자체가 파괴되었거나 꺼져있다면 무시
-        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+        // 오브젝트가 비활성화 상태라면 입력 무시
+        if (this == null || !gameObject.activeInHierarchy) return;
 
-        // 1. resultPanel이 실제로 존재하는지(null이 아닌지) 먼저 확인합니다.
-        // 유니티 오브젝트는 '!= null' 체크로 파괴 여부를 알 수 있습니다.
+        // 1. 결과 화면인 경우 -> 요약 화면으로 전환
         if (resultPanel != null && resultPanel.activeSelf)
         {
-            // 결과 화면 -> 요약 보기
             ShowSummary();
         }
-        // 2. summaryPanel도 마찬가지로 존재하는지 확인합니다.
+        // 2. 요약 화면인 경우 -> 메인으로 이동
         else if (summaryPanel != null && summaryPanel.activeSelf)
         {
-            // 요약 화면 -> 메인으로 돌아가기 (인트로)
+            // 마지막 페이지에서만 홈으로 이동 가능
             if (currentPageIndex == summaryPages.Length - 1)
             {
                 GoHome();
@@ -99,7 +151,7 @@ public class OuttroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 오른쪽 조이스틱 좌우 입력 처리 (페이지 넘김)
+    /// 오른쪽 조이스틱 좌우 입력 처리: 페이지 넘김
     /// </summary>
     private void HandleJoystickInput()
     {
@@ -107,35 +159,41 @@ public class OuttroUIManager : MonoBehaviour
 
         Vector2 input = ControllerInputManager.Instance.RightJoystickValue;
 
-        // 조이스틱이 충분히 기울어졌고, 입력 가능한 상태일 때
+        // 입력 대기 상태이고, 임계값을 넘었을 때 동작
         if (isJoystickReady)
         {
-            if (input.x > joystickThreshold) // 오른쪽 -> 다음 페이지
+            if (input.x > JoystickThreshold) // 오른쪽 -> 다음
             {
                 NextPage();
                 isJoystickReady = false; // 입력 잠금
             }
-            else if (input.x < -joystickThreshold) // 왼쪽 -> 이전 페이지
+            else if (input.x < -JoystickThreshold) // 왼쪽 -> 이전
             {
                 PrevPage();
                 isJoystickReady = false; // 입력 잠금
             }
         }
 
-        // 조이스틱이 중앙으로 돌아왔을 때 입력 잠금 해제 (Deadzone 처리)
+        // 조이스틱이 중앙(Deadzone)으로 돌아오면 다시 입력 가능 상태로 변경
         if (Mathf.Abs(input.x) < 0.1f)
         {
             isJoystickReady = true;
         }
     }
 
-    // --- Logic Methods ---
+    #endregion
 
+    #region Logic Methods (Initialization & Navigation)
+
+    /// <summary>
+    /// 결과 화면 초기화 코루틴: 데이터를 불러와 별점을 계산하고 애니메이션을 재생합니다.
+    /// </summary>
     public IEnumerator InitializeRoutine()
     {
-        FadePanel(resultPanel,true);
-        FadePanel(summaryPanel,false);
+        FadePanel(resultPanel, true);
+        FadePanel(summaryPanel, false);
 
+        // 1. 데이터 불러오기
         int successCount = 0;
         int mistakeCount = 0;
         float playTime = 0f;
@@ -147,79 +205,57 @@ public class OuttroUIManager : MonoBehaviour
             playTime = DataManager.Instance.PlayTime;
         }
 
-        // =========================================================================
-        // 별점 계산 로직
-        // =========================================================================
+        // 2. 별점 계산 로직
+        int starCount = CalculateStarCount(successCount, mistakeCount, playTime);
 
-        int starCount = 0;
-
-        // 1. 기본 점수: 성공 횟수 (총 7페이즈 중 성공 페이즈 수. 여기서는 최대 7)
-        // 모든 페이즈를 완료해야 하므로 successCount는 7로 간주하고 로직을 짭니다.
-        // 만약 successCount가 7이 아니면 별점 0개로 시작할 수도 있습니다.
-
-        // 2. 실수 횟수(MistakeCount)에 따른 페널티
-        // 실수 횟수 1~2회: 별점 1개 감점
-        // 실수 횟수 3회 이상: 별점 2개 감점
-        int mistakePenalty = 0;
-        if (mistakeCount >= 3)
-        {
-            mistakePenalty = 2;
-        }
-        else if (mistakeCount >= 1)
-        {
-            mistakePenalty = 1;
-        }
-
-        // 3. 시간(PlayTime) 조건에 따른 보너스/페널티
-        // 총 제한 시간: 7 페이즈 * 60초 = 420초 (튜토리얼은 시간 제한 없음으로 가정하고 6 * 60 = 360초를 기준으로 하거나, 전체 미션 완료 시간을 기준으로 합니다.)
-        float timeLimitForMaxStar = 300f; // 예시: 5분 (300초) 이내 완료 시 시간 보너스
-        float timeLimitForMinStar = 420f; // 예시: 7분 (420초) 초과 시 시간 페널티 (총 제한 시간)
-
-        int timeBonus = 0;
-        if (playTime <= timeLimitForMaxStar)
-        {
-            timeBonus = 1; // 빠르게 완료 시 별점 1개 보너스
-        }
-        else if (playTime > timeLimitForMinStar)
-        {
-            timeBonus = -1; // 너무 오래 걸릴 시 별점 1개 페널티
-        }
-
-        // 4. 최종 별점 계산
-        // 최대 별 3개 기준으로 시작하고, 실수/시간 페널티를 적용합니다.
-        // (별 아이콘이 3개라고 가정)
-        starCount = 3;
-        starCount -= mistakePenalty;
-        starCount += timeBonus;
-
-        // 별점은 0개 ~ starIcons.Length (최대 3)개 사이로 제한
-        starCount = Mathf.Clamp(starCount, 0, starIcons.Length);
-
-        // 모든 별을 일단 비활성화
+        // 3. 별 애니메이션 재생 (초기화 -> 순차적 켜짐)
         foreach (var star in starIcons)
         {
-            // 끄는 코루틴 실행
-            StopPulseAndFadeOutStar(star);
+            StopPulseAndFadeOutStar(star); // 일단 모두 끔
         }
 
-        // 잠시 대기 (모든 별이 꺼지는 시간을 확보)
         yield return new WaitForSeconds(panelFadeDuration);
 
-        // 계산된 starCount만큼 순차적으로 켜고 펄스 효과 적용
+        // 계산된 별점만큼 순차적으로 켜기
         for (int i = 0; i < starCount; i++)
         {
-            // 별 켜기 및 펄스 시작
-            FadeInAndPulseStar(starIcons[i]);
-
-            // 다음 별이 켜지기 전에 잠시 딜레이를 주어 순차적 느낌 연출
-            yield return new WaitForSeconds(0.2f);
+            if (i < starIcons.Length)
+            {
+                FadeInAndPulseStar(starIcons[i]);
+                yield return new WaitForSeconds(0.2f); // 순차적 딜레이
+            }
         }
+    }
+
+    /// <summary>
+    /// 성공 횟수, 실수, 시간을 기반으로 별점(0~3)을 계산합니다.
+    /// </summary>
+    private int CalculateStarCount(int successCount, int mistakeCount, float playTime)
+    {
+        // 기준: 기본 3점 만점 시작 -> 감점 방식 적용
+        int starCount = 3;
+
+        // 페널티 1: 실수 횟수
+        if (mistakeCount >= 3) starCount -= 2;
+        else if (mistakeCount >= 1) starCount -= 1;
+
+        // 보너스/페널티 2: 플레이 시간
+        // 예: 5분(300초) 이내 완료 시 보너스, 7분(420초) 초과 시 감점
+        float timeLimitForMaxStar = 300f;
+        float timeLimitForMinStar = 420f;
+
+        if (playTime <= timeLimitForMaxStar) starCount += 1;
+        else if (playTime > timeLimitForMinStar) starCount -= 1;
+
+        // 최종 클램핑 (0 ~ 최대 별 개수)
+        return Mathf.Clamp(starCount, 0, starIcons.Length);
     }
 
     private void ShowSummary()
     {
-        FadePanel(resultPanel,false);
-        FadePanel(summaryPanel,true);
+        FadePanel(resultPanel, false);
+        FadePanel(summaryPanel, true);
+
         currentPageIndex = 0;
         UpdateSummaryPage();
     }
@@ -229,6 +265,11 @@ public class OuttroUIManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.LoadScene("IntroScene");
+        }
+        else
+        {
+            // Fallback
+            UnityEngine.SceneManagement.SceneManager.LoadScene("IntroScene");
         }
     }
 
@@ -252,52 +293,49 @@ public class OuttroUIManager : MonoBehaviour
 
     private void UpdateSummaryPage()
     {
+        // 해당 페이지만 활성화
         for (int i = 0; i < summaryPages.Length; i++)
         {
             if (summaryPages[i] != null)
                 summaryPages[i].SetActive(i == currentPageIndex);
         }
 
+        // 페이지 번호 갱신
         if (pageNumberText)
         {
             pageNumberText.text = $"{currentPageIndex + 1} / {summaryPages.Length}";
         }
 
-        // 시각적 피드백 (화살표 활성/비활성)
+        // 시각적 피드백 (화살표)
         if (prevBtnVisual) prevBtnVisual.SetActive(currentPageIndex > 0);
         if (nextBtnVisual) nextBtnVisual.SetActive(currentPageIndex < summaryPages.Length - 1);
 
-        if (currentPageIndex == summaryPages.Length - 1)
-        {
-            pageNumber.SetActive(false);
-            IntroButton.SetActive(true);
-        }
-        else
-        {
-            pageNumber.SetActive(true);
-            IntroButton.SetActive(false);
-        }
+        // 마지막 페이지 처리 (Intro 버튼 표시)
+        bool isLastPage = (currentPageIndex == summaryPages.Length - 1);
+        if (pageNumber) pageNumber.SetActive(!isLastPage);
+        if (introButton) introButton.SetActive(isLastPage);
     }
 
-    // =================================================================================
-    // 코루틴: 페이드 효과
-    // =================================================================================
+    #endregion
 
+    #region Visual Effects (Coroutines)
+
+    /// <summary>
+    /// 패널의 CanvasGroup Alpha를 조절하여 페이드 인/아웃 합니다.
+    /// </summary>
     private void FadePanel(GameObject panel, bool show)
     {
         if (panel == null) return;
 
-        // CanvasGroup이 없으면 추가 (안전장치)
         CanvasGroup cg = panel.GetComponent<CanvasGroup>();
         if (cg == null) cg = panel.AddComponent<CanvasGroup>();
 
-        // 이미 실행 중인 코루틴이 있다면 중지
+        // 중복 실행 방지
         if (panelCoroutines.ContainsKey(panel) && panelCoroutines[panel] != null)
         {
             StopCoroutine(panelCoroutines[panel]);
         }
 
-        // 코루틴 시작
         panelCoroutines[panel] = StartCoroutine(FadePanelRoutine(panel, cg, show));
     }
 
@@ -307,11 +345,10 @@ public class OuttroUIManager : MonoBehaviour
         float startAlpha = cg.alpha;
         float elapsed = 0f;
 
-        // 켤 때는 먼저 Active true
         if (show)
         {
             panel.SetActive(true);
-            cg.alpha = 0f; // 깜빡임 방지 (혹시 1로 남아있을까봐)
+            cg.alpha = 0f;
             startAlpha = 0f;
         }
 
@@ -324,26 +361,26 @@ public class OuttroUIManager : MonoBehaviour
 
         cg.alpha = targetAlpha;
 
-        // 끌 때는 페이드 끝난 후 Active false
         if (!show)
         {
             panel.SetActive(false);
         }
     }
 
+    /// <summary>
+    /// 이미지(별)의 투명도를 조절하고, 완료 후 펄스 효과를 실행할지 결정합니다.
+    /// </summary>
     private IEnumerator FadeImageRoutine(Image targetImage, float targetAlpha, bool activeState, bool startPulseAfterFade)
     {
-        // 켜는 거라면 먼저 Active부터 켜준다
+        // 활성화 처리
         if (activeState && !targetImage.gameObject.activeSelf)
         {
             targetImage.gameObject.SetActive(true);
-            // 시작할 때 투명하게 시작 (부드러운 등장을 위해)
-            Color startCol = targetImage.color;
-            targetImage.color = new Color(startCol.r, startCol.g, startCol.b, 0f);
+            Color c = targetImage.color;
+            targetImage.color = new Color(c.r, c.g, c.b, 0f);
         }
         else if (!activeState && !targetImage.gameObject.activeSelf)
         {
-            // 이미 꺼져있는데 또 끄라고 하면 그냥 종료
             yield break;
         }
 
@@ -360,27 +397,22 @@ public class OuttroUIManager : MonoBehaviour
             yield return null;
         }
 
-        // 값 확정
         targetImage.color = new Color(color.r, color.g, color.b, targetAlpha);
 
-        // 2. 종료 처리
+        // 2. 후처리 (비활성화 또는 펄스 시작)
         if (!activeState)
         {
-            // 끄는 경우: 페이드 아웃 끝났으니 비활성화
             targetImage.gameObject.SetActive(false);
         }
         else if (startPulseAfterFade)
         {
-            // 켜는 경우인데, 이 녀석이 주인공(Pulse 대상)이라면 -> 펄스 코루틴 시작
-            // Pulse 시작 전 기준 알파값 저장 (보통 1.0f일 것임)
             cachedOriginalAlpha = targetAlpha;
-            // 딕셔너리에 펄스 코루틴을 저장해서 나중에 멈출 수 있게 함
             imageCoroutines[targetImage] = StartCoroutine(PulseImageRoutine(targetImage));
         }
     }
 
     /// <summary>
-    /// 이미지를 두근거리는(Pulse) 코루틴
+    /// 이미지를 주기적으로 깜빡이게(Pulse) 합니다.
     /// </summary>
     private IEnumerator PulseImageRoutine(Image targetImage)
     {
@@ -388,36 +420,31 @@ public class OuttroUIManager : MonoBehaviour
 
         while (true)
         {
-            // 0 ~ 1 사이의 사인파
+            // Sine 파동 (0~1)
             float alphaRatio = (Mathf.Sin(Time.time * pulseSpeed) + 1.0f) / 2.0f;
 
-            // 최소 ~ 원래 알파값 사이 반복
+            // Min ~ Original Alpha 사이 보간
             float targetAlpha = Mathf.Lerp(minPulseAlpha, cachedOriginalAlpha, alphaRatio);
 
             targetImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, targetAlpha);
-
             yield return null;
         }
     }
 
+    // --- Star Effect Helpers ---
+
     private void FadeInAndPulseStar(GameObject starObject)
     {
         if (starObject == null) return;
-
-        // 1. Image 컴포넌트 가져오기
         Image starImage = starObject.GetComponent<Image>();
         if (starImage == null) return;
 
-        // 2. 이미 실행 중인 코루틴이 있다면 중지
         if (imageCoroutines.ContainsKey(starImage) && imageCoroutines[starImage] != null)
         {
             StopCoroutine(imageCoroutines[starImage]);
             imageCoroutines.Remove(starImage);
         }
 
-        // 3. FadeImageRoutine 코루틴 시작: 
-        //    targetAlpha=1.0f, activeState=true, startPulseAfterFade=true 설정
-        //    **코루틴 딕셔너리에 저장하지 않고 바로 실행**합니다. (FadeImageRoutine 내부에서 펄스를 저장함)
         StartCoroutine(FadeImageRoutine(starImage, 1.0f, true, true));
     }
 
@@ -427,14 +454,14 @@ public class OuttroUIManager : MonoBehaviour
         Image starImage = starObject.GetComponent<Image>();
         if (starImage == null) return;
 
-        // 1. Pulse 중지 (Pulse 코루틴이 있다면)
         if (imageCoroutines.ContainsKey(starImage) && imageCoroutines[starImage] != null)
         {
             StopCoroutine(imageCoroutines[starImage]);
             imageCoroutines.Remove(starImage);
         }
 
-        // 2. Fade Out 시작 (targetAlpha=0.0f, activeState=false, startPulseAfterFade=false)
         StartCoroutine(FadeImageRoutine(starImage, 0.0f, false, false));
     }
+
+    #endregion
 }

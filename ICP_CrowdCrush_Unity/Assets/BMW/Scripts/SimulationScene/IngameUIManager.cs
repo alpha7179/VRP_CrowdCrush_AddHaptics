@@ -1,96 +1,123 @@
 using System.Collections;
-using System.Collections.Generic; // Dictionary 사용을 위해 추가
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 인게임 UI 매니저: HUD 요소, 각종 패널 관리 및 XR Vignette 기반 압박 효과 제어
+/// 인게임 UI(HUD), 팝업 패널, 압박 효과(Vignette) 및 미션 진행 상황을 총괄하는 매니저입니다.
+/// <para>
+/// 1. HUD 요소(텍스트, 게이지)를 갱신하고 안내/일시정지/경고 패널을 제어합니다.<br/>
+/// 2. PressureVignette와 연동하여 게임 내 압박감(시각적 왜곡)을 조절합니다.<br/>
+/// 3. 컨트롤러 입력을 받아 일시정지(Y버튼), 패널 닫기(A버튼) 등의 상호작용을 처리합니다.
+/// </para>
 /// </summary>
 public class IngameUIManager : MonoBehaviour
 {
+    #region Inspector Settings (Panels)
 
     [Header("HUD Elements")]
+    [Tooltip("인게임 HUD 전체를 포함하는 캔버스")]
     [SerializeField] private Canvas IngameCanvas;
 
-    [Header("Panels")]
+    [Header("Popup Panels")]
+    [Tooltip("주의 사항(경고) 패널")]
     [SerializeField] private GameObject cautionPanel;
+    [Tooltip("일시정지 메뉴 패널")]
     [SerializeField] private GameObject pausePanel;
+    [Tooltip("조작 설명 및 안내 패널")]
     [SerializeField] private GameObject instructionPanel;
+    [Tooltip("미션 진행도(프로그레스 바) 패널")]
     [SerializeField] private GameObject progressPanel;
+    [Tooltip("압박감 상태를 보여주는 패널")]
     [SerializeField] private GameObject pressurePanel;
 
-    [Header("Panels UI Elements")]
+    #endregion
+
+    #region Inspector Settings (UI Elements)
+
+    [Header("Text Elements")]
+    [Tooltip("안내 패널의 본문 텍스트")]
     [SerializeField] private TextMeshProUGUI instructionText;
+    [Tooltip("현재 수행 중인 미션 목표 텍스트")]
     [SerializeField] private TextMeshProUGUI missionText;
+    [Tooltip("피드백/결과 텍스트")]
     [SerializeField] private TextMeshProUGUI feedBackText;
 
+    [Header("Progress Elements")]
+    [Tooltip("진행도 패널의 미션 설명 텍스트")]
     [SerializeField] private TextMeshProUGUI progressMissionText;
+    [Tooltip("진행도 퍼센트/시간 텍스트")]
     [SerializeField] public TextMeshProUGUI progressText;
+    [Tooltip("진행도 슬라이더")]
     [SerializeField] public Slider barSlider;
+    [Tooltip("진행 단계별 팁 이미지 배열")]
     [SerializeField] public Image[] tipsImage;
 
+    [Header("Pressure Elements")]
+    [Tooltip("압박감 상태 텍스트 (정상 ~ 위험)")]
     [SerializeField] private TextMeshProUGUI pressureStateText;
-    private readonly string[] PressureState = new string[] {"정상", "주의", "경고", "압박", "위험", "최대 위험"};
+    [Tooltip("압박감 단계별 게이지 이미지 배열")]
     [SerializeField] public Image[] pressureGaugeImages;
 
-    [Header("Effects")]
+    private readonly string[] PressureState = new string[] { "정상", "주의", "경고", "압박", "위험", "최대 위험" };
+
+    #endregion
+
+    #region Inspector Settings (Effects & Settings)
+
+    [Header("Visual Effects")]
+    [Tooltip("화면 가장자리 비네팅 효과 제어 스크립트")]
     [SerializeField] private PressureVignette pressureVignette;
 
-    [Header("Visual Settings (Smoothness)")]
-    [Tooltip("비네팅이 변하는 속도")]
+    [Header("Animation Settings")]
+    [Tooltip("비네팅 강도가 변경될 때 걸리는 시간(초)")]
     [SerializeField] private float vignetteSmoothTime = 0.5f;
-    [Tooltip("UI가 페이드되는 시간")]
+    [Tooltip("UI 이미지(게이지 등) 페이드 시간")]
     [SerializeField] private float imageFadeDuration = 0.3f;
+    [Tooltip("패널이 켜지고 꺼지는 페이드 시간")]
+    [SerializeField] private float panelFadeDuration = 0.2f;
 
-    [Header("Gauge Pulse Settings")]
+    [Header("Pulse Settings")]
+    [Tooltip("게이지 깜빡임(펄스) 속도")]
     [SerializeField] private float pulseSpeed = 3.0f;
+    [Tooltip("펄스 효과 시 최소 알파값")]
     [SerializeField] private float minPulseAlpha = 0.2f;
 
-    [Header("UI Fade Settings")]
-    [SerializeField] private float panelFadeDuration = 0.2f; // 패널 페이드 시간
+    #endregion
 
-    // 패널별 실행 중인 코루틴 관리 (중복 실행 방지)
-    private Dictionary<GameObject, Coroutine> panelCoroutines = new Dictionary<GameObject, Coroutine>();
-
-    // 내부 관리용 변수
-    private float currentVignetteValue = 0f; // 현재 비네팅 강도 추적용
-    private Coroutine vignetteCoroutine; // 비네팅 코루틴
-
-    // 각 게이지 이미지별로 돌아가는 코루틴을 관리하기 위한 딕셔너리
-    private Dictionary<Image, Coroutine> imageCoroutines = new Dictionary<Image, Coroutine>();
-    private float cachedOriginalAlpha = 1.0f; // 펄스용 알파값 저장
+    #region External References
 
     [Header("External References")]
+    [Tooltip("게임 종료 화면 매니저")]
     [SerializeField] private OuttroUIManager outtroManager;
 
+    #endregion
+
+    #region Internal State
+
+    // 현재 패널이 열려있는지 여부 (입력 제어용)
     private bool isDisplayPanel = false;
 
+    // 코루틴 관리 (중복 실행 방지)
+    private Dictionary<GameObject, Coroutine> panelCoroutines = new Dictionary<GameObject, Coroutine>();
+    private Dictionary<Image, Coroutine> imageCoroutines = new Dictionary<Image, Coroutine>();
 
-    // =================================================================================
-    // Unity 생명 주기 메서드
-    // =================================================================================
+    // 비네팅 제어 변수
+    private float currentVignetteValue = 0f;
+    private Coroutine vignetteCoroutine;
+
+    // 펄스 효과용 캐싱 변수
+    private float cachedOriginalAlpha = 1.0f;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Start()
     {
-        // 초기 UI 상태 설정
-        if (pausePanel) pausePanel.SetActive(false);
-        if (instructionPanel) instructionPanel.SetActive(false);
-        if (outtroManager) outtroManager.gameObject.SetActive(false);
-        if (progressPanel) progressPanel.SetActive(false);
-        HideAllTipsImages();
-
-        // 압박 효과 초기화
-        if (pressureVignette != null)
-        {
-            pressureVignette.SetIntensity(0f);
-        }
-
-        // GameManager 이벤트 구독
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnPauseStateChanged += HandlePauseState;
-        }
+        InitializeUI();
+        InitializeEvents();
     }
 
     private void OnEnable()
@@ -121,35 +148,73 @@ public class IngameUIManager : MonoBehaviour
         }
     }
 
-    // =================================================================================
-    // 입력 핸들러 (Input Handlers)
-    // =================================================================================
+    #endregion
 
+    #region Initialization
+
+    private void InitializeUI()
+    {
+        // 모든 팝업 패널 비활성화
+        if (pausePanel) pausePanel.SetActive(false);
+        if (instructionPanel) instructionPanel.SetActive(false);
+        if (progressPanel) progressPanel.SetActive(false);
+        if (outtroManager) outtroManager.gameObject.SetActive(false);
+
+        HideAllTipsImages();
+
+        // 압박 효과 초기화 (0)
+        if (pressureVignette != null)
+        {
+            pressureVignette.SetIntensity(0f);
+        }
+    }
+
+    private void InitializeEvents()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnPauseStateChanged += HandlePauseState;
+        }
+    }
+
+    #endregion
+
+    #region Input Handlers
+
+    /// <summary>
+    /// Y 버튼: 일시정지 토글
+    /// </summary>
     private void HandleYButtonInput()
     {
-        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+        if (this == null || !gameObject.activeInHierarchy) return;
 
         if (GameManager.Instance != null)
         {
             GameManager.Instance.TogglePause();
-            SetDisplayPanel(true);
+            SetDisplayPanel(true); // 일시정지 시 패널 상태 true
         }
     }
 
+    /// <summary>
+    /// A 버튼: 확인 / 패널 닫기 / 메인으로 이동
+    /// </summary>
     private void HandleAButtonInput()
     {
-        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+        if (this == null || !gameObject.activeInHierarchy) return;
 
+        // 1. 일시정지 상태라면 -> 인트로(메인)로 이동
         if (pausePanel != null && pausePanel.activeSelf)
         {
-            Time.timeScale = 1f;
+            Time.timeScale = 1f; // 시간 정상화 후 이동
             GameManager.Instance.LoadScene("IntroScene");
         }
+        // 2. 안내 패널이 열려있다면 -> 닫기
         else if (instructionPanel != null && instructionPanel.activeSelf)
         {
             CloseInstructionPanel();
             SetDisplayPanel(false);
         }
+        // 3. 주의 패널이 열려있다면 -> 닫기
         else if (cautionPanel != null && cautionPanel.activeSelf)
         {
             CloseCautionPanel();
@@ -157,32 +222,44 @@ public class IngameUIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// B 버튼: 취소 / 게임 재개
+    /// </summary>
     private void HandleBButtonInput()
     {
-        if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
+        if (this == null || !gameObject.activeInHierarchy) return;
 
-        if (pausePanel.activeSelf)
+        // 일시정지 상태라면 -> 게임 재개
+        if (pausePanel != null && pausePanel.activeSelf)
         {
             if (GameManager.Instance != null) GameManager.Instance.TogglePause();
             SetDisplayPanel(false);
         }
     }
 
-    // =================================================================================
-    // UI 제어 메서드
-    // =================================================================================
+    #endregion
 
-    public void OpenCautionPanel() { FadePanel(cautionPanel,true); SetDisplayPanel(true); }
+    #region Public UI API (Panel Control)
+
+    public void OpenCautionPanel() { FadePanel(cautionPanel, true); SetDisplayPanel(true); }
     public void CloseCautionPanel() { FadePanel(cautionPanel, false); SetDisplayPanel(false); }
 
     public void OpenInstructionPanel() { FadePanel(instructionPanel, true); SetDisplayPanel(true); }
-    public void CloseInstructionPanel() { FadePanel(instructionPanel, false); SetDisplayPanel(false); UpdateInstruction(""); UpdateMission(""); UpdateFeedBack(""); }
+    public void CloseInstructionPanel()
+    {
+        FadePanel(instructionPanel, false);
+        SetDisplayPanel(false);
+        UpdateInstruction("");
+        UpdateMission("");
+        UpdateFeedBack("");
+    }
 
     public void OpenProgressPanel(string missionText)
     {
         if (progressMissionText) progressMissionText.text = missionText;
         if (progressPanel) FadePanel(progressPanel, true);
     }
+
     public void CloseProgressPanel()
     {
         if (progressPanel) FadePanel(progressPanel, false);
@@ -192,28 +269,65 @@ public class IngameUIManager : MonoBehaviour
     public void OpenPressurePanel() { if (pressurePanel) FadePanel(pressurePanel, true); }
     public void ClosePressurePanel() { if (pressurePanel) FadePanel(pressurePanel, false); }
 
+    // 게임 종료 화면 표시 (Canvas 끄고 OuttroManager 활성화)
+    public void ShowOuttroUI()
+    {
+        if (IngameCanvas) IngameCanvas.enabled = false;
+        if (outtroManager)
+        {
+            outtroManager.gameObject.SetActive(true);
+            StartCoroutine(outtroManager.InitializeRoutine());
+        }
+    }
+
+    #endregion
+
+    #region Public UI API (Content Updates)
+
     public void UpdateInstruction(string text) { if (instructionText) instructionText.text = text; }
+
     public void UpdateMission(string text)
     {
         if (missionText) missionText.text = text;
-        if (feedBackText) feedBackText.text = "";
+        if (feedBackText) feedBackText.text = ""; // 새로운 미션 시작 시 피드백 초기화
     }
+
     public void UpdateFeedBack(string text) { if (feedBackText) feedBackText.text = text; }
 
     public void SetDisplayPanel(bool state) { isDisplayPanel = state; }
     public bool GetDisplayPanel() { return isDisplayPanel; }
 
-    // [부드러운 전환 적용] 비네팅 효과 강도 설정
+    public void DisplayTipsImage(int pageIndex)
+    {
+        if (tipsImage == null || tipsImage.Length == 0) return;
+        for (int i = 0; i < tipsImage.Length; i++)
+        {
+            if (tipsImage[i] != null) tipsImage[i].gameObject.SetActive(i == pageIndex);
+        }
+    }
+
+    public void HideAllTipsImages()
+    {
+        if (tipsImage == null) return;
+        foreach (var img in tipsImage) if (img != null) img.gameObject.SetActive(false);
+    }
+
+    #endregion
+
+    #region Pressure & Vignette Logic
+
+    /// <summary>
+    /// 비네팅 강도를 부드럽게 변경합니다.
+    /// </summary>
     public void SetPressureIntensity(float targetIntensity)
     {
         if (pressureVignette == null) return;
 
-        // 기존 코루틴 중지하고 새로운 부드러운 전환 시작
+        // 기존 코루틴 중지하고 새로운 전환 시작
         if (vignetteCoroutine != null) StopCoroutine(vignetteCoroutine);
         vignetteCoroutine = StartCoroutine(SmoothVignetteRoutine(targetIntensity));
     }
 
-    // 비네팅 값을 서서히 변경하는 코루틴
     private IEnumerator SmoothVignetteRoutine(float target)
     {
         float start = currentVignetteValue;
@@ -231,37 +345,9 @@ public class IngameUIManager : MonoBehaviour
         pressureVignette.SetIntensity(target);
     }
 
-
-    public void DisplayTipsImage(int pageIndex)
-    {
-        if (tipsImage == null || tipsImage.Length == 0) return;
-        for (int i = 0; i < tipsImage.Length; i++)
-        {
-            if (tipsImage[i] != null) tipsImage[i].gameObject.SetActive(i == pageIndex);
-        }
-    }
-    public void HideAllTipsImages()
-    {
-        if (tipsImage == null) return;
-        foreach (var img in tipsImage) if (img != null) img.gameObject.SetActive(false);
-    }
-
-    private void HandlePauseState(bool isPaused)
-    {
-        if (pausePanel) pausePanel.SetActive(isPaused);
-    }
-
-    public void ShowOuttroUI()
-    {
-        if (IngameCanvas) IngameCanvas.enabled = false;
-        if (outtroManager)
-        {
-            outtroManager.gameObject.SetActive(true);
-            StartCoroutine(outtroManager.InitializeRoutine());
-        }
-    }
-
-    // [부드러운 전환 적용] 압박 게이지 UI 업데이트
+    /// <summary>
+    /// 압박 게이지 UI를 레벨(1~6)에 맞춰 업데이트하고, 해당 단계까지 이미지를 켜거나 펄스 효과를 줍니다.
+    /// </summary>
     public void UpdatePressureGauge(int level)
     {
         // 1. 텍스트 및 비네팅 업데이트
@@ -275,57 +361,114 @@ public class IngameUIManager : MonoBehaviour
         float intensity = Mathf.Clamp01((float)level / maxLevel);
         SetPressureIntensity(intensity);
 
-        // 2. 게이지 이미지 페이드 효과 처리
+        // 2. 게이지 이미지 시각 효과
         if (pressureGaugeImages == null || pressureGaugeImages.Length == 0) return;
 
-        int targetIndex = level - 1; // 현재 레벨의 마지막 게이지 인덱스 (0부터 시작하므로 -1)
+        int targetIndex = level - 1; // 현재 레벨 (0-based index)
 
         for (int i = 0; i < pressureGaugeImages.Length; i++)
         {
             Image img = pressureGaugeImages[i];
             if (img == null) continue;
 
-            // 기존에 돌던 코루틴이 있으면 정지
+            // 중복 실행 방지
             if (imageCoroutines.ContainsKey(img) && imageCoroutines[img] != null)
             {
                 StopCoroutine(imageCoroutines[img]);
             }
 
-            bool shouldBeOn = (i < level); // 이 게이지가 켜져야 하는가?
-            bool isPulseTarget = (i == targetIndex); // 이 게이지가 깜빡여야 하는가?
+            bool shouldBeOn = (i < level); // 현재 레벨 이하의 게이지는 켜짐
+            bool isPulseTarget = (i == targetIndex); // 현재 레벨의 게이지는 깜빡임
 
             if (shouldBeOn)
             {
-                // 켜져야 함 (Fade In) -> 다 켜지면 Pulse 할지 결정
+                // 켜기 (Fade In -> Pulse if target)
                 imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 1.0f, true, isPulseTarget));
             }
             else
             {
-                // 꺼져야 함 (Fade Out) -> 다 꺼지면 비활성화
+                // 끄기 (Fade Out)
                 imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 0.0f, false, false));
             }
         }
     }
 
-    // =================================================================================
-    // 코루틴: 페이드 및 펄스 효과
-    // =================================================================================
+    #endregion
 
+    #region Mission Timer Logic
+
+    /// <summary>
+    /// 미션 타이머 코루틴. 지정된 시간 동안 진행도를 갱신하며 대기합니다.
+    /// </summary>
+    /// <param name="missionText">진행 패널에 표시할 텍스트</param>
+    /// <param name="totalTime">총 제한 시간</param>
+    /// <param name="isMissionCompleteCondition">미션 완료 조건 함수 (true 반환 시 즉시 종료)</param>
+    /// <param name="progressCalculator">진행도(0~1) 계산 함수 (null이면 시간 기준)</param>
+    public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null)
+    {
+        float currentTime = totalTime;
+        float timeSpent = 0f;
+
+        // 초기 텍스트 설정
+        if (progressCalculator != null && progressText) progressText.text = "0 %";
+        else if (progressText) progressText.text = $"{totalTime} s";
+
+        OpenProgressPanel(missionText);
+
+        // 완료 조건이 충족될 때까지 루프
+        while (!isMissionCompleteCondition.Invoke())
+        {
+            currentTime -= Time.deltaTime;
+            timeSpent += Time.deltaTime;
+
+            // 진행도 갱신
+            if (progressCalculator != null)
+            {
+                float currentProgress = progressCalculator.Invoke();
+                if (progressText) progressText.text = $"{(currentProgress * 100f):F0} %";
+                if (barSlider) barSlider.value = currentProgress;
+            }
+            else
+            {
+                // 시간 기준 진행도 (남은 시간 표시)
+                if (progressText) progressText.text = $"{Mathf.CeilToInt(currentTime)} s";
+                if (barSlider) barSlider.value = currentTime / totalTime;
+            }
+
+            yield return null;
+        }
+
+        // 미션 완료 후 데이터 갱신
+        if (DataManager.Instance != null)
+        {
+            DataManager.Instance.AddSuccessCount();
+            DataManager.Instance.AddPlayTime(timeSpent);
+        }
+
+        CloseProgressPanel();
+    }
+
+    #endregion
+
+    #region Visual Effects (Fades & Pulse)
+
+    private void HandlePauseState(bool isPaused)
+    {
+        if (pausePanel) pausePanel.SetActive(isPaused);
+    }
+
+    // --- Panel Fade ---
     private void FadePanel(GameObject panel, bool show)
     {
         if (panel == null) return;
 
-        // CanvasGroup이 없으면 추가 (안전장치)
         CanvasGroup cg = panel.GetComponent<CanvasGroup>();
         if (cg == null) cg = panel.AddComponent<CanvasGroup>();
 
-        // 이미 실행 중인 코루틴이 있다면 중지
         if (panelCoroutines.ContainsKey(panel) && panelCoroutines[panel] != null)
         {
             StopCoroutine(panelCoroutines[panel]);
         }
-
-        // 코루틴 시작
         panelCoroutines[panel] = StartCoroutine(FadePanelRoutine(panel, cg, show));
     }
 
@@ -335,11 +478,10 @@ public class IngameUIManager : MonoBehaviour
         float startAlpha = cg.alpha;
         float elapsed = 0f;
 
-        // 켤 때는 먼저 Active true
         if (show)
         {
             panel.SetActive(true);
-            cg.alpha = 0f; // 깜빡임 방지 (혹시 1로 남아있을까봐)
+            cg.alpha = 0f;
             startAlpha = 0f;
         }
 
@@ -349,29 +491,22 @@ public class IngameUIManager : MonoBehaviour
             cg.alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsed / panelFadeDuration);
             yield return null;
         }
-
         cg.alpha = targetAlpha;
 
-        // 끌 때는 페이드 끝난 후 Active false
-        if (!show)
-        {
-            panel.SetActive(false);
-        }
+        if (!show) panel.SetActive(false);
     }
 
+    // --- Image Fade & Pulse ---
     private IEnumerator FadeImageRoutine(Image targetImage, float targetAlpha, bool activeState, bool startPulseAfterFade)
     {
-        // 켜는 거라면 먼저 Active부터 켜준다
         if (activeState && !targetImage.gameObject.activeSelf)
         {
             targetImage.gameObject.SetActive(true);
-            // 시작할 때 투명하게 시작 (부드러운 등장을 위해)
-            Color startCol = targetImage.color;
-            targetImage.color = new Color(startCol.r, startCol.g, startCol.b, 0f);
+            Color c = targetImage.color;
+            targetImage.color = new Color(c.r, c.g, c.b, 0f);
         }
         else if (!activeState && !targetImage.gameObject.activeSelf)
         {
-            // 이미 꺼져있는데 또 끄라고 하면 그냥 종료
             yield break;
         }
 
@@ -379,7 +514,6 @@ public class IngameUIManager : MonoBehaviour
         float startAlpha = color.a;
         float elapsed = 0f;
 
-        // 1. 페이드 애니메이션
         while (elapsed < imageFadeDuration)
         {
             elapsed += Time.deltaTime;
@@ -388,83 +522,30 @@ public class IngameUIManager : MonoBehaviour
             yield return null;
         }
 
-        // 값 확정
         targetImage.color = new Color(color.r, color.g, color.b, targetAlpha);
 
-        // 2. 종료 처리
         if (!activeState)
         {
-            // 끄는 경우: 페이드 아웃 끝났으니 비활성화
             targetImage.gameObject.SetActive(false);
         }
         else if (startPulseAfterFade)
         {
-            // 켜는 경우인데, 이 녀석이 주인공(Pulse 대상)이라면 -> 펄스 코루틴 시작
-            // Pulse 시작 전 기준 알파값 저장 (보통 1.0f일 것임)
             cachedOriginalAlpha = targetAlpha;
-            // 딕셔너리에 펄스 코루틴을 저장해서 나중에 멈출 수 있게 함
             imageCoroutines[targetImage] = StartCoroutine(PulseImageRoutine(targetImage));
         }
     }
 
-    /// <summary>
-    /// 이미지를 두근거리는(Pulse) 코루틴
-    /// </summary>
     private IEnumerator PulseImageRoutine(Image targetImage)
     {
         Color originalColor = targetImage.color;
-
         while (true)
         {
-            // 0 ~ 1 사이의 사인파
             float alphaRatio = (Mathf.Sin(Time.time * pulseSpeed) + 1.0f) / 2.0f;
-
-            // 최소 ~ 원래 알파값 사이 반복
             float targetAlpha = Mathf.Lerp(minPulseAlpha, cachedOriginalAlpha, alphaRatio);
-
             targetImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, targetAlpha);
-
             yield return null;
         }
     }
 
-    // =================================================================================
-    // 코루틴: 미션 타이머
-    // =================================================================================
-
-    public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null)
-    {
-        float currentTime = totalTime;
-        float timeSpent = 0f;
-
-        if (progressCalculator != null && progressText) progressText.text = $"0 %";
-        else if (progressText) progressText.text = $"{totalTime} s";
-
-        OpenProgressPanel(missionText);
-
-        while (!isMissionCompleteCondition.Invoke())
-        {
-            currentTime -= Time.deltaTime;
-            timeSpent += Time.deltaTime;
-
-            if (progressCalculator != null)
-            {
-                float currentProgress = progressCalculator.Invoke();
-                if (progressText) progressText.text = $"{(currentProgress * 100f).ToString("F0")} %";
-                if (barSlider) barSlider.value = currentProgress;
-            }
-            else
-            {
-                if (progressText) progressText.text = $"{Mathf.CeilToInt(currentTime).ToString()} s";
-                if (barSlider) barSlider.value = currentTime / totalTime;
-            }
-
-            yield return null;
-        }
-        DataManager.Instance.AddSuccessCount();
-        DataManager.Instance.AddPlayTime(timeSpent);
-
-        CloseProgressPanel();
-        yield return timeSpent;
-    }
+    #endregion
 }
