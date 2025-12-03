@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.InputSystem.HID.HID;
 
 /// <summary>
 /// 인게임 UI(HUD), 팝업 패널, 압박 효과(Vignette) 및 미션 진행 상황을 총괄하는 매니저입니다.
@@ -23,6 +25,8 @@ public class IngameUIManager : MonoBehaviour
     [Header("Popup Panels")]
     [Tooltip("주의 사항(경고) 패널")]
     [SerializeField] private GameObject cautionPanel;
+    [Tooltip("안내 사항 패널")]
+    [SerializeField] private GameObject situationPanel;
     [Tooltip("일시정지 메뉴 패널")]
     [SerializeField] private GameObject pausePanel;
     [Tooltip("조작 설명 및 안내 패널")]
@@ -38,11 +42,13 @@ public class IngameUIManager : MonoBehaviour
 
     [Header("Text Elements")]
     [Tooltip("안내 패널의 본문 텍스트")]
-    [SerializeField] private TextMeshProUGUI instructionText;
-    [Tooltip("현재 수행 중인 미션 목표 텍스트")]
-    [SerializeField] private TextMeshProUGUI missionText;
+    [SerializeField] private GameObject[] instruction;
+    private int currentInstruction = 0;
     [Tooltip("피드백/결과 텍스트")]
-    [SerializeField] private TextMeshProUGUI feedBackText;
+    [SerializeField] private GameObject[] feedback;
+    [SerializeField] private GameObject[] negativeFeedback;
+    private int currentFeedback = 0;
+    private int currentNegativeFeedback = 0;
 
     [Header("Progress Elements")]
     [Tooltip("진행도 패널의 미션 설명 텍스트")]
@@ -50,7 +56,7 @@ public class IngameUIManager : MonoBehaviour
     [Tooltip("진행도 퍼센트/시간 텍스트")]
     [SerializeField] public TextMeshProUGUI progressText;
     [Tooltip("진행도 슬라이더")]
-    [SerializeField] public Slider barSlider;
+    [SerializeField] public Image barSlider;
     [Tooltip("진행 단계별 팁 이미지 배열")]
     [SerializeField] public Image[] tipsImage;
 
@@ -59,6 +65,7 @@ public class IngameUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI pressureStateText;
     [Tooltip("압박감 단계별 게이지 이미지 배열")]
     [SerializeField] public Image[] pressureGaugeImages;
+    [SerializeField] public Image[] pressureHighlightImages;
 
     private readonly string[] PressureState = new string[] { "정상", "주의", "경고", "압박", "위험", "최대 위험" };
 
@@ -155,6 +162,8 @@ public class IngameUIManager : MonoBehaviour
     private void InitializeUI()
     {
         // 모든 팝업 패널 비활성화
+        if (cautionPanel) cautionPanel.SetActive(true);
+        if (situationPanel) situationPanel.SetActive(false);
         if (pausePanel) pausePanel.SetActive(false);
         if (instructionPanel) instructionPanel.SetActive(false);
         if (progressPanel) progressPanel.SetActive(false);
@@ -206,7 +215,7 @@ public class IngameUIManager : MonoBehaviour
         if (pausePanel != null && pausePanel.activeSelf)
         {
             Time.timeScale = 1f; // 시간 정상화 후 이동
-            GameManager.Instance.LoadScene("IntroScene");
+            GameManager.Instance.LoadScene("Main_Intro");
         }
         // 2. 안내 패널이 열려있다면 -> 닫기
         else if (instructionPanel != null && instructionPanel.activeSelf)
@@ -218,6 +227,12 @@ public class IngameUIManager : MonoBehaviour
         else if (cautionPanel != null && cautionPanel.activeSelf)
         {
             CloseCautionPanel();
+            SetDisplayPanel(false);
+        }
+        // 4. 상황 패널이 열려있다면 -> 닫기
+        else if (situationPanel != null && situationPanel.activeSelf)
+        {
+            CloseSituationPanel();
             SetDisplayPanel(false);
         }
     }
@@ -244,14 +259,16 @@ public class IngameUIManager : MonoBehaviour
     public void OpenCautionPanel() { FadePanel(cautionPanel, true); SetDisplayPanel(true); }
     public void CloseCautionPanel() { FadePanel(cautionPanel, false); SetDisplayPanel(false); }
 
+    public void OpenSituationPanel() { FadePanel(situationPanel, true); SetDisplayPanel(true); }
+    public void CloseSituationPanel() { FadePanel(situationPanel, false); SetDisplayPanel(false); }
+
     public void OpenInstructionPanel() { FadePanel(instructionPanel, true); SetDisplayPanel(true); }
     public void CloseInstructionPanel()
     {
         FadePanel(instructionPanel, false);
         SetDisplayPanel(false);
-        UpdateInstruction("");
-        UpdateMission("");
-        UpdateFeedBack("");
+        CloseInstruction();
+        CloseFeedBack();
     }
 
     public void OpenProgressPanel(string missionText)
@@ -284,15 +301,33 @@ public class IngameUIManager : MonoBehaviour
 
     #region Public UI API (Content Updates)
 
-    public void UpdateInstruction(string text) { if (instructionText) instructionText.text = text; }
+    public void UpdateInstruction(int instructionNum)
+    { 
+        if(instruction[currentInstruction].activeSelf ) instruction[currentInstruction].SetActive(false); 
+        instruction[instructionNum].SetActive(true);
+        currentInstruction = instructionNum;
+    }
+    public void CloseInstruction() { instruction[currentInstruction].SetActive(false); }
 
-    public void UpdateMission(string text)
+    public void UpdateFeedBack(int FeedbackNum)
     {
-        if (missionText) missionText.text = text;
-        if (feedBackText) feedBackText.text = ""; // 새로운 미션 시작 시 피드백 초기화
+        if (feedback[currentFeedback].activeSelf) feedback[currentFeedback].SetActive(false);
+        feedback[FeedbackNum].SetActive(true);
+        currentFeedback = FeedbackNum;
     }
 
-    public void UpdateFeedBack(string text) { if (feedBackText) feedBackText.text = text; }
+    public void UpdateNegativeFeedback(int FeedbackNum)
+    {
+        if (negativeFeedback[currentNegativeFeedback].activeSelf) negativeFeedback[currentNegativeFeedback].SetActive(false);
+        negativeFeedback[FeedbackNum].SetActive(true);
+        currentNegativeFeedback = FeedbackNum;
+    }
+
+    public void CloseFeedBack()
+    {
+        if (feedback[currentFeedback].activeSelf) feedback[currentFeedback].SetActive(false);
+        if (negativeFeedback[currentNegativeFeedback].activeSelf) negativeFeedback[currentNegativeFeedback].SetActive(false);
+    }
 
     public void SetDisplayPanel(bool state) { isDisplayPanel = state; }
     public bool GetDisplayPanel() { return isDisplayPanel; }
@@ -362,19 +397,24 @@ public class IngameUIManager : MonoBehaviour
         SetPressureIntensity(intensity);
 
         // 2. 게이지 이미지 시각 효과
-        if (pressureGaugeImages == null || pressureGaugeImages.Length == 0) return;
+        if (pressureGaugeImages == null || pressureGaugeImages.Length == 0 || pressureHighlightImages == null || pressureHighlightImages.Length == 0) return;
 
         int targetIndex = level - 1; // 현재 레벨 (0-based index)
 
         for (int i = 0; i < pressureGaugeImages.Length; i++)
         {
             Image img = pressureGaugeImages[i];
-            if (img == null) continue;
+            Image highlightImg = pressureHighlightImages[i];
+            if (img == null || highlightImg == null) continue;
 
             // 중복 실행 방지
             if (imageCoroutines.ContainsKey(img) && imageCoroutines[img] != null)
             {
                 StopCoroutine(imageCoroutines[img]);
+            }
+            if (imageCoroutines.ContainsKey(highlightImg) && imageCoroutines[highlightImg] != null)
+            {
+                StopCoroutine(imageCoroutines[highlightImg]);
             }
 
             bool shouldBeOn = (i < level); // 현재 레벨 이하의 게이지는 켜짐
@@ -383,12 +423,23 @@ public class IngameUIManager : MonoBehaviour
             if (shouldBeOn)
             {
                 // 켜기 (Fade In -> Pulse if target)
-                imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 1.0f, true, isPulseTarget));
+                imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 1.0f, true, false));
             }
             else
             {
                 // 끄기 (Fade Out)
                 imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 0.0f, false, false));
+            }
+
+            if (isPulseTarget)
+            {
+                // 켜기 (Fade In -> Pulse if target)
+                imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 1.0f, true, isPulseTarget));
+            }
+            else
+            {
+                // 끄기 (Fade Out)
+                imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 0.0f, false, false));
             }
         }
     }
@@ -423,16 +474,16 @@ public class IngameUIManager : MonoBehaviour
 
             // 진행도 갱신
             if (progressCalculator != null)
-            {
+            { 
                 float currentProgress = progressCalculator.Invoke();
                 if (progressText) progressText.text = $"{(currentProgress * 100f):F0} %";
-                if (barSlider) barSlider.value = currentProgress;
+                if (barSlider) barSlider.fillAmount = currentProgress;
             }
             else
             {
                 // 시간 기준 진행도 (남은 시간 표시)
                 if (progressText) progressText.text = $"{Mathf.CeilToInt(currentTime)} s";
-                if (barSlider) barSlider.value = currentTime / totalTime;
+                if (barSlider) barSlider.fillAmount = currentTime / totalTime;
             }
 
             yield return null;
