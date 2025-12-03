@@ -633,8 +633,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGoal: 1
   isDanger: 0
-  isDebug: 1
   playerTag: Player
+  isDebug: 1
 --- !u!136 &212219999
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -881,8 +881,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGoal: 1
   isDanger: 0
-  isDebug: 1
   playerTag: Player
+  isDebug: 1
 --- !u!136 &383543293
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1449,8 +1449,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGoal: 1
   isDanger: 0
-  isDebug: 1
   playerTag: Player
+  isDebug: 1
 --- !u!136 &823569887
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1782,8 +1782,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGoal: 0
   isDanger: 1
-  isDebug: 1
   playerTag: Player
+  isDebug: 1
 --- !u!136 &1055940042
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2320,8 +2320,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGoal: 1
   isDanger: 0
-  isDebug: 1
   playerTag: Player
+  isDebug: 1
 --- !u!136 &1397431097
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2589,8 +2589,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isGoal: 0
   isDanger: 1
-  isDebug: 1
   playerTag: Player
+  isDebug: 1
 --- !u!136 &1515295898
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2974,14 +2974,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1006781965952629172, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1377083837001505371, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1480610475448343701, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
       propertyPath: targetHead
       value: 
@@ -2990,14 +2982,6 @@ PrefabInstance:
       propertyPath: teleportationProvider
       value: 
       objectReference: {fileID: 1771185791}
-    - target: {fileID: 2299856766790963865, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2963637714387221010, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5844178584234618761, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
       propertyPath: m_Camera
       value: 
@@ -3010,10 +2994,6 @@ PrefabInstance:
       propertyPath: pressureVignette
       value: 
       objectReference: {fileID: 2653616335327422225}
-    - target: {fileID: 7114677592188599285, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
-      propertyPath: panelFadeDuration
-      value: 0.2
-      objectReference: {fileID: 0}
     - target: {fileID: 8059588476082423050, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
       propertyPath: m_Name
       value: IngameCanvas
@@ -3044,11 +3024,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8240975216355800973, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1280
+      value: 1920
       objectReference: {fileID: 0}
     - target: {fileID: 8240975216355800973, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 720
+      value: 1080
       objectReference: {fileID: 0}
     - target: {fileID: 8240975216355800973, guid: c1a40a34fad794248ae5dce5bca51251, type: 3}
       propertyPath: m_LocalPosition.x
