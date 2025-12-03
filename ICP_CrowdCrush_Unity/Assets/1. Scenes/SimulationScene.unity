@@ -3925,6 +3925,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: XROrigin
       objectReference: {fileID: 0}
+    - target: {fileID: 6600928015569340212, guid: 51ee37014c327474ea078ba8f063faba, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

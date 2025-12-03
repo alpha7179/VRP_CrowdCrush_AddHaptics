@@ -631,7 +631,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4878923460417501195
 RectTransform:
   m_ObjectHideFlags: 0
@@ -761,7 +761,7 @@ MonoBehaviour:
   - {fileID: 1862579211781184336}
   - {fileID: 2954406212949027318}
   - {fileID: 5896253489073263427}
-  pageNumber: {fileID: 3370991105211370571}
+  pageNumber: {fileID: 6868740118929632662}
   introButton: {fileID: 4842691453522969249}
   pageNumberText: {fileID: 7160375283167220736}
   prevBtnVisual: {fileID: 5187541365707602225}
@@ -787,7 +787,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &9097712587101445578
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2705,7 +2705,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &8999933314463827359
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2782,7 +2782,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8963568118201045689
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3558,7 +3558,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5299557523858033631
 RectTransform:
   m_ObjectHideFlags: 0

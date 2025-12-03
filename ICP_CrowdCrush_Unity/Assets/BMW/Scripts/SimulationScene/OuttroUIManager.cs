@@ -211,7 +211,7 @@ public class OuttroUIManager : MonoBehaviour
         // 3. 별 애니메이션 재생 (초기화 -> 순차적 켜짐)
         foreach (var star in starIcons)
         {
-            StopPulseAndFadeOutStar(star); // 일단 모두 끔
+            star.SetActive(false); // 일단 모두 끔
         }
 
         yield return new WaitForSeconds(panelFadeDuration);
@@ -236,8 +236,7 @@ public class OuttroUIManager : MonoBehaviour
         int starCount = 3;
 
         // 페널티 1: 실수 횟수
-        if (mistakeCount >= 3) starCount -= 2;
-        else if (mistakeCount >= 1) starCount -= 1;
+        if (mistakeCount >= 3) starCount -= 1;
 
         // 보너스/페널티 2: 플레이 시간
         // 예: 5분(300초) 이내 완료 시 보너스, 7분(420초) 초과 시 감점

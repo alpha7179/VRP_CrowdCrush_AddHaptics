@@ -37,10 +37,10 @@ public class IntroUIManager : MonoBehaviour
     [SerializeField] private Image settingButton;
 
     [Header("Place Panels Elements")]
+    [SerializeField] private GameObject place1Border;
     [SerializeField] private GameObject place1Panel;
+    [SerializeField] private GameObject place2Border;
     [SerializeField] private GameObject place2Panel;
-    [SerializeField] private Image place1Image;
-    [SerializeField] private Image place2Image;
 
     #endregion
 
@@ -166,6 +166,7 @@ public class IntroUIManager : MonoBehaviour
     public void OnClickPlaceButton()
     {
         SwitchMainPanel(placePanel, placeButton);
+
     }
 
     /// <summary>
@@ -196,35 +197,31 @@ public class IntroUIManager : MonoBehaviour
     /// <summary>
     /// [장소 선택 버튼] 이미지 홠성화됩니다.
     /// </summary>
-    public void OnClickPlace1Panel()
+    public void OnClickPlace1()
     {
-        if (place2Image != null && place2Panel != null && place1Image != null && place1Panel != null)
+        if (place2Panel != null && place2Border != null && place1Panel != null && place1Border != null)
         {
-            place2Panel.SetActive(false);
-            Color currentColor = place2Image.color;
-            currentColor.a = 0.0f;
-            place2Image.color = currentColor;
+            place2Panel.SetActive(true);
+            place2Border.SetActive(false);
 
-            place1Panel.SetActive(true);
-            currentColor = place1Image.color; 
-            currentColor.a = 1.0f;
-            place1Image.color = currentColor;
+            place1Panel.SetActive(false);
+            place1Border.SetActive(true);
+
+            DataManager.Instance.SelectedMap = "Subway";
         }
     }
 
-    public void OnClickPlace2Panel()
+    public void OnClickPlace2()
     {
-        if (place2Image != null && place2Panel != null && place1Image != null && place1Panel != null)
+        if (place2Panel != null && place2Border != null && place1Panel != null && place1Border != null)
         {
-            place1Panel.SetActive(false);
-            Color currentColor = place1Image.color;
-            currentColor.a = 0.0f;
-            place1Image.color = currentColor;
+            place1Panel.SetActive(true);
+            place1Border.SetActive(false);
 
-            place2Panel.SetActive(true);
-            currentColor = place2Image.color;
-            currentColor.a = 1.0f;
-            place2Image.color = currentColor;
+            place2Panel.SetActive(false);
+            place2Border.SetActive(true);
+
+            DataManager.Instance.SelectedMap = "Street";
         }
     }
 
@@ -233,6 +230,8 @@ public class IntroUIManager : MonoBehaviour
     /// </summary>
     public void OnClickPlayButton()
     {
+        if (DataManager.Instance.SelectedMap != "Street") return;
+
         if (isDebug) Debug.Log("체험을 시작합니다.");
 
         // 설정값 저장 (혹시 변경 후 저장이 안 되었을 경우 대비)
@@ -362,6 +361,14 @@ public class IntroUIManager : MonoBehaviour
             if (tip3) tip3.SetActive(false);
             if (tip4) tip4.SetActive(false);
             if (tip5) tip5.SetActive(false);
+        }
+
+        if (currentMainPanel == placePanel)
+        {
+            if (place2Panel) place2Panel.SetActive(true);
+            if (place2Border) place2Border.SetActive(false);
+            if (place1Panel) place1Panel.SetActive(true);
+            if (place1Border) place1Border.SetActive(false);
         }
 
         if (currentMainPanel != null) currentMainPanel.SetActive(false);
