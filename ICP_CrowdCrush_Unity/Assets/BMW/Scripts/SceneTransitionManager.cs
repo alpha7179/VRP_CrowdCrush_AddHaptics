@@ -119,10 +119,11 @@ public class SceneTransitionManager : MonoBehaviour
     /// <param name="sceneName">로드할 씬의 이름</param>
     public void LoadScene(string sceneName)
     {
+        Debug.Log($"return scene : {sceneName}");
         if (isFading) return;
 
         // 인트로(타이틀)로 돌아갈 경우, 게임 상태를 리셋합니다.
-        if (sceneName == "IntroScene")
+        if (sceneName == "Main_Intro")
         {
             ResetGameManagers();
         }

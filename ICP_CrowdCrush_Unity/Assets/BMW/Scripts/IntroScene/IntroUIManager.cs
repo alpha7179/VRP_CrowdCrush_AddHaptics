@@ -243,7 +243,7 @@ public class IntroUIManager : MonoBehaviour
         // 씬 전환
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.LoadScene("SimulationScene");
+            GameManager.Instance.LoadScene("Main_Street");
         }
         else
         {
@@ -251,11 +251,11 @@ public class IntroUIManager : MonoBehaviour
             // (void 함수에는 ?? 연산자를 사용할 수 없으므로 if문으로 분리)
             if (SceneTransitionManager.Instance != null)
             {
-                SceneTransitionManager.Instance.LoadScene("SimulationScene");
+                SceneTransitionManager.Instance.LoadScene("Main_Street");
             }
             else
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("SimulationScene");
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Main_Street");
             }
         }
     }

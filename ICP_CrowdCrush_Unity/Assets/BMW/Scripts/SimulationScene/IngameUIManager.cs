@@ -215,7 +215,7 @@ public class IngameUIManager : MonoBehaviour
         if (pausePanel != null && pausePanel.activeSelf)
         {
             Time.timeScale = 1f; // 시간 정상화 후 이동
-            GameManager.Instance.LoadScene("IntroScene");
+            GameManager.Instance.LoadScene("Main_Intro");
         }
         // 2. 안내 패널이 열려있다면 -> 닫기
         else if (instructionPanel != null && instructionPanel.activeSelf)

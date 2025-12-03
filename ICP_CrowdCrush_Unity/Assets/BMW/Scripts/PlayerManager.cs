@@ -28,6 +28,7 @@ public class PlayerManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
     }
 
     #endregion
@@ -88,14 +89,7 @@ public class PlayerManager : MonoBehaviour
 
         // 2. 씬 타입에 따른 초기 권한 설정
         // 비교 시 대소문자를 무시하여 안전하게 체크 (OrdinalIgnoreCase)
-        if (scene.name.Equals("IntroScene", System.StringComparison.OrdinalIgnoreCase))
-        {
-            // Intro 씬: 메뉴 조작(Interaction)은 필요하지만, 이동(Locomotion)은 제한
-            SetInteraction(true);
-            SetLocomotion(false);
-            Debug.Log("[PlayerManager] Intro Scene: Interaction ON / Locomotion OFF");
-        }
-        else
+        if(scene.name.Equals("Main_Street", System.StringComparison.OrdinalIgnoreCase))
         {
             // Game 씬 (시뮬레이션):
             // 시나리오 매니저(GameStepManager)가 제어권을 가질 때까지 오작동 방지를 위해 모든 기능 잠금
@@ -103,6 +97,14 @@ public class PlayerManager : MonoBehaviour
             SetLocomotion(false);
             Debug.Log("[PlayerManager] Game Scene: All Features Locked (Waiting for GameStepManager)");
         }
+        else
+        {
+            // Intro 씬: 메뉴 조작(Interaction)은 필요하지만, 이동(Locomotion)은 제한
+            SetInteraction(true);
+            SetLocomotion(false);
+            Debug.Log("[PlayerManager] Intro Scene: Interaction ON / Locomotion OFF");
+        }
+        
     }
 
     #endregion

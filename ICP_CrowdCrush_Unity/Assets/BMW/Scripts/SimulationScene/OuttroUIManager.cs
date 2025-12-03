@@ -263,12 +263,12 @@ public class OuttroUIManager : MonoBehaviour
     {
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.LoadScene("IntroScene");
+            GameManager.Instance.LoadScene("Main_Intro");
         }
         else
         {
             // Fallback
-            UnityEngine.SceneManagement.SceneManager.LoadScene("IntroScene");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Main_Intro");
         }
     }
 

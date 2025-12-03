@@ -442,6 +442,9 @@ public class GameStepManager : MonoBehaviour
 
         if (uiManager) uiManager.DisplayTipsImage(1);
 
+        targetIndex = 3;
+        SetZoneActive(targetIndex, true);
+
         yield return StartCoroutine(ShowTimedMission(
             "기둥 잡기",
             () => isActionCompleted,
@@ -449,6 +452,8 @@ public class GameStepManager : MonoBehaviour
         ));
 
         StopCoroutine(monitorCoroutine);
+
+        SetZoneActive(targetIndex, false);
 
         if (uiManager) uiManager.UpdatePressureGauge(3);
         yield return StartCoroutine(ShowFeedbackAndDelay(4));
@@ -463,6 +468,9 @@ public class GameStepManager : MonoBehaviour
         if (uiManager) uiManager.UpdatePressureGauge(4);
 
         yield return StartCoroutine(ShowStepTextAndDelay(5));
+
+        targetIndex = 3;
+        SetZoneActive(targetIndex, true);
 
         // 오르기 판정도 HoldPillar와 유사하게 ClimbHandle을 잡고 있는 것으로 판단
         monitorCoroutine = StartCoroutine(MonitorContinuousAction(
@@ -480,6 +488,8 @@ public class GameStepManager : MonoBehaviour
 
         StopCoroutine(monitorCoroutine);
 
+        SetZoneActive(targetIndex, false);
+
         if (uiManager) uiManager.UpdatePressureGauge(3);
         yield return StartCoroutine(ShowFeedbackAndDelay(5));
 
@@ -495,7 +505,7 @@ public class GameStepManager : MonoBehaviour
 
         yield return StartCoroutine(ShowStepTextAndDelay(6));
 
-        targetIndex = 3;
+        targetIndex = 4;
         SetZoneActive(targetIndex, true);
         if (uiManager) uiManager.DisplayTipsImage(2);
 
