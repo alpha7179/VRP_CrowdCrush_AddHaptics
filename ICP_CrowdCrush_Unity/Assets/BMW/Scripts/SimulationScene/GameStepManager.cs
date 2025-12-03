@@ -120,14 +120,13 @@ public class GameStepManager : MonoBehaviour
     /// <summary>
     /// 미션 안내 텍스트를 화면에 띄우고 일정 시간 대기합니다.
     /// </summary>
-    private IEnumerator ShowStepTextAndDelay(string instructionText, string missionText)
+    private IEnumerator ShowStepTextAndDelay(int instructionText)
     {
         // 1. UI 설정 및 표시
         if (uiManager)
         {
-            uiManager.UpdateFeedBack("");
+            uiManager.CloseFeedBack();
             uiManager.UpdateInstruction(instructionText);
-            uiManager.UpdateMission(missionText);
             uiManager.OpenInstructionPanel();
         }
 
@@ -147,14 +146,14 @@ public class GameStepManager : MonoBehaviour
     /// <summary>
     /// 결과 피드백 텍스트를 띄우고 일정 시간 대기합니다.
     /// </summary>
-    private IEnumerator ShowFeedbackAndDelay(string feedbackText)
+    private IEnumerator ShowFeedbackAndDelay(int feedbackText, bool isNegative = false)
     {
         // 1. UI 설정
         if (uiManager)
         {
-            uiManager.UpdateInstruction("");
-            uiManager.UpdateMission("");
-            uiManager.UpdateFeedBack(feedbackText);
+            uiManager.CloseInstruction();
+            if(!isNegative) uiManager.UpdateFeedBack(feedbackText);
+            else uiManager.UpdateNegativeFeedback(feedbackText);
             uiManager.OpenInstructionPanel();
         }
 
@@ -252,7 +251,7 @@ public class GameStepManager : MonoBehaviour
             PlayerManager.Instance.SetLocomotion(false);
 
         // 2. 경고 피드백 표시
-        yield return StartCoroutine(ShowFeedbackAndDelay("경고: 잘못된 경로입니다."));
+        yield return StartCoroutine(ShowFeedbackAndDelay(0,true));
 
         // 3. 위치 이동
         if (PlayerTransform != null && startPosition != Vector3.zero)
@@ -305,19 +304,27 @@ public class GameStepManager : MonoBehaviour
 
         yield return new WaitForSeconds(nextStepDuration);
 
+        if (uiManager)
+        {
+            uiManager.SetDisplayPanel(true);
+            uiManager.OpenSituationPanel();
+        }
+
+        // 패널이 닫힐 때까지 대기
+        yield return new WaitUntil(() => !uiManager.GetDisplayPanel());
+
+        yield return new WaitForSeconds(nextStepDuration);
+
         // ---------------------------------------------------------------------------------
         // Phase 0: 튜토리얼 (기본 이동)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Tutorial;
 
-        yield return StartCoroutine(ShowStepTextAndDelay(
-            "튜토리얼: 바닥의 화살표를 따라 목표 지점으로 이동하세요.",
-            " "
-        ));
+        yield return StartCoroutine(ShowStepTextAndDelay(0));
 
         targetIndex = 0;
         SetZoneActive(targetIndex, true);
-        if (uiManager) uiManager.DisplayTipsImage(0);
+        if (uiManager) uiManager.DisplayTipsImage(2);
 
         // 미션 실행 (이동 가능)
         yield return StartCoroutine(ShowTimedMission(
@@ -328,7 +335,7 @@ public class GameStepManager : MonoBehaviour
         SetZoneActive(targetIndex, false);
         isZoneReached = false;
 
-        yield return StartCoroutine(ShowFeedbackAndDelay("튜토리얼을 완수하셨습니다!"));
+        yield return StartCoroutine(ShowFeedbackAndDelay(0));
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
@@ -342,14 +349,11 @@ public class GameStepManager : MonoBehaviour
         }
         SavePlayerPosition();
 
-        yield return StartCoroutine(ShowStepTextAndDelay(
-            "행사로 인해 거리에 인파가 몰리고 있습니다.\n이동 속도가 느려지면 탈출해야 합니다.",
-            "사람이 많은 곳은 피해서, 가장자리로 계속 이동하세요."
-        ));
+        yield return StartCoroutine(ShowStepTextAndDelay(1));
 
         targetIndex = 1;
         SetZoneActive(targetIndex, true);
-        if (uiManager) uiManager.DisplayTipsImage(0);
+        if (uiManager) uiManager.DisplayTipsImage(2);
 
         yield return StartCoroutine(ShowTimedMission(
             "대각선으로 이동",
@@ -360,7 +364,7 @@ public class GameStepManager : MonoBehaviour
         isZoneReached = false;
 
         if (uiManager) uiManager.UpdatePressureGauge(2);
-        yield return StartCoroutine(ShowFeedbackAndDelay("잘하셨습니다. 가장자리는 비교적 안전합니다."));
+        yield return StartCoroutine(ShowFeedbackAndDelay(1));
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
@@ -369,10 +373,7 @@ public class GameStepManager : MonoBehaviour
         currentPhase = GamePhase.ABCPose;
         if (uiManager) uiManager.UpdatePressureGauge(4);
 
-        yield return StartCoroutine(ShowStepTextAndDelay(
-            "압박이 느껴지고 있습니다.\n다리는 어깨너비로, 팔은 가슴 앞 공간을 확보하세요.",
-            "가슴 공간 확보 자세(ABC 자세)를 취하세요."
-        ));
+        yield return StartCoroutine(ShowStepTextAndDelay(2));
 
         // 자세 감지 모니터링 시작
         Coroutine monitorCoroutine = StartCoroutine(MonitorContinuousAction(
@@ -380,7 +381,7 @@ public class GameStepManager : MonoBehaviour
             targetHoldTime
         ));
 
-        if (uiManager) uiManager.DisplayTipsImage(1);
+        if (uiManager) uiManager.DisplayTipsImage(0);
 
         yield return StartCoroutine(ShowTimedMission(
             "ABC 자세 취하기",
@@ -396,7 +397,7 @@ public class GameStepManager : MonoBehaviour
             uiManager.SetPressureIntensity(0.0f);
         }
 
-        yield return StartCoroutine(ShowFeedbackAndDelay("잘하셨습니다, 압박이 조금 완화되었습니다."));
+        yield return StartCoroutine(ShowFeedbackAndDelay(2));
 
         isActionCompleted = false;
         yield return new WaitForSeconds(nextStepDuration);
@@ -408,14 +409,11 @@ public class GameStepManager : MonoBehaviour
         if (uiManager) uiManager.UpdatePressureGauge(4);
         SavePlayerPosition();
 
-        yield return StartCoroutine(ShowStepTextAndDelay(
-            "다시 인파가 몰리고 있습니다.\n즉시 탈출해야 합니다.",
-            "사람이 많은 곳은 피해서, 가장자리로 계속 이동하세요."
-        ));
+        yield return StartCoroutine(ShowStepTextAndDelay(3));
 
         targetIndex = 2;
         SetZoneActive(targetIndex, true);
-        if (uiManager) uiManager.DisplayTipsImage(0);
+        if (uiManager) uiManager.DisplayTipsImage(2);
 
         yield return StartCoroutine(ShowTimedMission(
             "대각선으로 이동",
@@ -426,7 +424,7 @@ public class GameStepManager : MonoBehaviour
         isZoneReached = false;
 
         if (uiManager) uiManager.UpdatePressureGauge(3);
-        yield return StartCoroutine(ShowFeedbackAndDelay("잘하셨습니다. 가장자리는 비교적 안전합니다."));
+        yield return StartCoroutine(ShowFeedbackAndDelay(3));
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
@@ -435,17 +433,17 @@ public class GameStepManager : MonoBehaviour
         currentPhase = GamePhase.HoldPillar;
         if (uiManager) uiManager.UpdatePressureGauge(4);
 
-        yield return StartCoroutine(ShowStepTextAndDelay(
-            "사람들이 넘어지고 있습니다.\n중심을 잃지 않도록 가까운 기둥을 잡으세요.",
-            "기둥을 Grab 버튼으로 잡고 3초 이상 유지하세요."
-        ));
+        yield return StartCoroutine(ShowStepTextAndDelay(4));
 
         monitorCoroutine = StartCoroutine(MonitorContinuousAction(
             () => gestureManager.IsHoldingClimbHandle(),
             targetHoldTime
         ));
 
-        if (uiManager) uiManager.DisplayTipsImage(2);
+        if (uiManager) uiManager.DisplayTipsImage(1);
+
+        targetIndex = 3;
+        SetZoneActive(targetIndex, true);
 
         yield return StartCoroutine(ShowTimedMission(
             "기둥 잡기",
@@ -455,22 +453,24 @@ public class GameStepManager : MonoBehaviour
 
         StopCoroutine(monitorCoroutine);
 
+        SetZoneActive(targetIndex, false);
+
         if (uiManager) uiManager.UpdatePressureGauge(3);
-        yield return StartCoroutine(ShowFeedbackAndDelay("잘하셨습니다. 중심을 유지했습니다."));
+        yield return StartCoroutine(ShowFeedbackAndDelay(4));
 
         isActionCompleted = false;
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 5: 구조물 오르기 (숨 확보)
+        // Phase 5: 벽잡기 (숨 확보)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.ClimbUp;
         if (uiManager) uiManager.UpdatePressureGauge(4);
 
-        yield return StartCoroutine(ShowStepTextAndDelay(
-            "탈출로에 가까워질수록 인파가 밀집되고 있습니다.\n구조물을 이용해 잠시 숨을 확보하세요.",
-            "벽을 타고 올라가 3초 이상 유지하세요."
-        ));
+        yield return StartCoroutine(ShowStepTextAndDelay(5));
+
+        targetIndex = 3;
+        SetZoneActive(targetIndex, true);
 
         // 오르기 판정도 HoldPillar와 유사하게 ClimbHandle을 잡고 있는 것으로 판단
         monitorCoroutine = StartCoroutine(MonitorContinuousAction(
@@ -478,18 +478,20 @@ public class GameStepManager : MonoBehaviour
             targetHoldTime
         ));
 
-        if (uiManager) uiManager.DisplayTipsImage(2);
+        if (uiManager) uiManager.DisplayTipsImage(1);
 
         yield return StartCoroutine(ShowTimedMission(
-            "구조물 오르기",
+            "벽 잡기",
             () => isActionCompleted,
             () => currentActionHoldTimer / targetHoldTime
         ));
 
         StopCoroutine(monitorCoroutine);
 
+        SetZoneActive(targetIndex, false);
+
         if (uiManager) uiManager.UpdatePressureGauge(3);
-        yield return StartCoroutine(ShowFeedbackAndDelay("잘하셨습니다, 지금은 잠시 안전합니다. 숨을 고르세요."));
+        yield return StartCoroutine(ShowFeedbackAndDelay(5));
 
         isZoneReached = false;
         isActionCompleted = false;
@@ -501,14 +503,11 @@ public class GameStepManager : MonoBehaviour
         currentPhase = GamePhase.Escape;
         if (uiManager) uiManager.UpdatePressureGauge(2);
 
-        yield return StartCoroutine(ShowStepTextAndDelay(
-            "인파가 밀집 공간에서 벗어났습니다.\n이제 안전한 곳으로 이동하세요.",
-            "경찰/구조대가 있는 안전 구역으로 이동하세요."
-        ));
+        yield return StartCoroutine(ShowStepTextAndDelay(6));
 
-        targetIndex = 3;
+        targetIndex = 4;
         SetZoneActive(targetIndex, true);
-        if (uiManager) uiManager.DisplayTipsImage(0);
+        if (uiManager) uiManager.DisplayTipsImage(2);
 
         yield return StartCoroutine(ShowTimedMission(
             "안전구역으로 이동",

@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
     public void TogglePause()
     {
         // 인트로 씬 등 일시정지가 불필요한 씬 예외 처리
-        if (CurrentSceneName.Equals("IntroScene", StringComparison.OrdinalIgnoreCase)) return;
+        if (CurrentSceneName.Equals("Main_Intro ", StringComparison.OrdinalIgnoreCase)) return;
 
         IsPaused = !IsPaused;
 

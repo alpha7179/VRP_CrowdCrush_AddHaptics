@@ -5026,7 +5026,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Mediator: {fileID: 7296278984110274714}
   m_TransformationPriority: 0
-  m_MoveSpeed: 1
+  m_MoveSpeed: 2
   m_InAirControlModifier: 0.5
   m_EnableStrafe: 1
   m_EnableFly: 0

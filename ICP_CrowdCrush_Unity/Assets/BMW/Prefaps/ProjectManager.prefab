@@ -67,7 +67,7 @@ MonoBehaviour:
   SuccessCount: 0
   MistakeCount: 0
   PlayTime: 0.01
-  SelectedMap: Street
+  SelectedMap: null
 --- !u!114 &3145054975891285994
 MonoBehaviour:
   m_ObjectHideFlags: 0

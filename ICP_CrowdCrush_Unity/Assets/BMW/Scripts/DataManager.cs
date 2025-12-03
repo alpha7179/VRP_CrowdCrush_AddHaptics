@@ -65,7 +65,7 @@ public class DataManager : MonoBehaviour
     public float PlayTime = 0f;
 
     [Tooltip("현재 선택된 맵 이름")]
-    public string SelectedMap = "Street";
+    public string SelectedMap = null;
 
     #endregion
 
