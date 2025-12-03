@@ -2585,7 +2585,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -0, y: 0}
-  m_SizeDelta: {x: 753.6, y: 404.2}
+  m_SizeDelta: {x: 795.8, y: 404.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5775579383688531160
 CanvasRenderer:
@@ -2660,7 +2660,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 5000, y: 3000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2330842727721067668
 CanvasRenderer:
@@ -4424,20 +4424,27 @@ MonoBehaviour:
   introPanel: {fileID: 1781166282293954988}
   startPanel: {fileID: 8503126036421327738}
   placePanel: {fileID: 4641757255238081636}
+  placeButton: {fileID: 0}
   manualPanel: {fileID: 6916198190141994488}
+  manualButton: {fileID: 0}
   tipsPanel: {fileID: 2172957696936202500}
+  tipsButton: {fileID: 0}
   settingPanel: {fileID: 4750213394297195289}
+  settingButton: {fileID: 0}
+  place1Panel: {fileID: 0}
+  place2Panel: {fileID: 0}
+  place1Image: {fileID: 0}
+  place2Image: {fileID: 0}
   tip1: {fileID: 6496980479233236115}
   tip2: {fileID: 0}
   tip3: {fileID: 0}
   tip4: {fileID: 0}
   tip5: {fileID: 0}
   tipPageText: {fileID: 1880622669064715700}
-  manualPageText: {fileID: 1880622669064715700}
-  audioText: {fileID: 8502272144498069172}
   audioSlider: {fileID: 3491945242534969130}
-  modeText: {fileID: 7038767822597221791}
+  audioText: {fileID: 8502272144498069172}
   modeSlider: {fileID: 8476514375604440315}
+  modeText: {fileID: 7038767822597221791}
   isDebug: 1
 --- !u!1 &2443632141254797569
 GameObject:
@@ -13236,8 +13243,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
