@@ -455,7 +455,7 @@ public class IngameUIManager : MonoBehaviour
     /// <param name="totalTime">총 제한 시간</param>
     /// <param name="isMissionCompleteCondition">미션 완료 조건 함수 (true 반환 시 즉시 종료)</param>
     /// <param name="progressCalculator">진행도(0~1) 계산 함수 (null이면 시간 기준)</param>
-    public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null)
+    public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null, bool isDisplyPanel = false)
     {
         float currentTime = totalTime;
         float timeSpent = 0f;
@@ -464,7 +464,7 @@ public class IngameUIManager : MonoBehaviour
         if (progressCalculator != null && progressText) progressText.text = "0 %";
         else if (progressText) progressText.text = $"{totalTime} s";
 
-        OpenProgressPanel(missionText);
+        if(isDisplyPanel) OpenProgressPanel(missionText);
 
         // 완료 조건이 충족될 때까지 루프
         while (!isMissionCompleteCondition.Invoke())
@@ -496,7 +496,7 @@ public class IngameUIManager : MonoBehaviour
             DataManager.Instance.AddPlayTime(timeSpent);
         }
 
-        CloseProgressPanel();
+        if (isDisplyPanel) CloseProgressPanel();
     }
 
     #endregion
