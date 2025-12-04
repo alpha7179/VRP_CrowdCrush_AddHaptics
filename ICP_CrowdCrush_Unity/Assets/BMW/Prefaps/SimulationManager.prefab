@@ -48,16 +48,22 @@ MonoBehaviour:
   PlayerTransform: {fileID: 0}
   uiManager: {fileID: 0}
   gestureManager: {fileID: 5426087713414877824}
-  targetHoldTime: 3
-  phaseTime: 60
-  instructionDuration: 5
-  feedbackDuration: 5
-  nextStepDuration: 2
   TargerZone:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  targetHoldTime: 3
+  phaseTime: 60
+  instructionDuration: 5
+  feedbackDuration: 5
+  nextStepDuration: 2
   currentPhase: 0
 --- !u!114 &5426087713414877824
 MonoBehaviour:

@@ -5610,13 +5610,13 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 1.2
-  m_Radius: 0.3
+  m_Height: 1.5
+  m_Radius: 0.8
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!114 &1981060288823203478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5632,8 +5632,8 @@ MonoBehaviour:
   m_Camera: {fileID: 704194946008688644}
   m_OriginBaseGameObject: {fileID: 5935574410890726126}
   m_CameraFloorOffsetObject: {fileID: 4673962913308014370}
-  m_RequestedTrackingOriginMode: 0
-  m_CameraYOffset: 1.1176
+  m_RequestedTrackingOriginMode: 1
+  m_CameraYOffset: 1.5
 --- !u!114 &6634104839412571405
 MonoBehaviour:
   m_ObjectHideFlags: 0

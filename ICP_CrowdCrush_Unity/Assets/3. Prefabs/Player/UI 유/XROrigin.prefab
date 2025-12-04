@@ -4971,8 +4971,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1171485175186038886}
   - {fileID: 7537545562682915416}
+  - {fileID: 1171485175186038886}
   - {fileID: 4072044687578223210}
   - {fileID: 5052340063339858439}
   - {fileID: 8838297112589130013}
@@ -5059,7 +5059,7 @@ MonoBehaviour:
     m_InputActionReference: {fileID: -8198699208435500284, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     m_ObjectReferenceObject: {fileID: 0}
     m_ManualValue: {x: 0, y: 0}
-  m_UseGravity: 1
+  m_UseGravity: 0
 --- !u!1 &4683034943624245753
 GameObject:
   m_ObjectHideFlags: 0
@@ -7100,9 +7100,9 @@ CharacterController:
   m_Radius: 0.3
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.1
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.8, z: 0}
 --- !u!114 &30834688450074913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7118,8 +7118,8 @@ MonoBehaviour:
   m_Camera: {fileID: 1384403974124136853}
   m_OriginBaseGameObject: {fileID: 6600928015569340212}
   m_CameraFloorOffsetObject: {fileID: 4040383883062278353}
-  m_RequestedTrackingOriginMode: 0
-  m_CameraYOffset: 1.1176
+  m_RequestedTrackingOriginMode: 1
+  m_CameraYOffset: 1.5
 --- !u!114 &682924016363454416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8016,7 +8016,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8945559556603737533}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b46d3c2f9f9a9849840e47b9ddef1b2, type: 3}
   m_Name: 
