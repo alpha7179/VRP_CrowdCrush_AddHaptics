@@ -173,14 +173,16 @@ public class GameStepManager : MonoBehaviour
     /// <summary>
     /// 제한 시간이 있는 미션을 실행합니다. 미션 중에만 이동(Locomotion)이 허용됩니다.
     /// </summary>
-    private IEnumerator ShowTimedMission(string missionText, System.Func<bool> missionCondition, System.Func<float> progressCalculator = null)
+    private IEnumerator ShowTimedMission(string missionText, System.Func<bool> missionCondition, System.Func<float> progressCalculator = null, bool isDisplayPanel = false)
     {
         // [핵심 로직] 미션 시작 -> 이동 허용
+        /*
         if (PlayerManager.Instance != null)
         {
             PlayerManager.Instance.SetLocomotion(true);
             PlayerManager.Instance.SetInteraction(true);
         }
+        */
 
         // UI 매니저의 타이머 코루틴 실행 (조건 달성 시까지 대기)
         if (uiManager)
@@ -189,7 +191,8 @@ public class GameStepManager : MonoBehaviour
                 missionText,
                 phaseTime,
                 missionCondition,
-                progressCalculator
+                progressCalculator,
+                isDisplayPanel
             ));
         }
         else
@@ -199,11 +202,13 @@ public class GameStepManager : MonoBehaviour
         }
 
         // [핵심 로직] 미션 종료 -> 이동 잠금
+        /*
         if (PlayerManager.Instance != null)
         {
             PlayerManager.Instance.SetLocomotion(false);
             PlayerManager.Instance.SetInteraction(false);
         }
+        */
     }
 
     /// <summary>
@@ -247,8 +252,10 @@ public class GameStepManager : MonoBehaviour
     private IEnumerator ReturnToSavedPositionRoutine()
     {
         // 1. 이동 잠금
+        
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.SetLocomotion(false);
+        
 
         // 2. 경고 피드백 표시
         yield return StartCoroutine(ShowFeedbackAndDelay(0,true));
@@ -265,8 +272,10 @@ public class GameStepManager : MonoBehaviour
         }
 
         // 4. 이동 재활성화 (미션 중이므로 다시 켜줌)
+        
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.SetLocomotion(true);
+        
     }
 
     #endregion
@@ -283,8 +292,8 @@ public class GameStepManager : MonoBehaviour
 
         if (PlayerManager.Instance != null)
         {
-            PlayerManager.Instance.SetLocomotion(false);
-            PlayerManager.Instance.SetInteraction(false);
+            PlayerManager.Instance.SetLocomotion(true);
+            PlayerManager.Instance.SetInteraction(true);
         }
 
         // ---------------------------------------------------------------------------------
@@ -342,6 +351,13 @@ public class GameStepManager : MonoBehaviour
         // Phase 1: 1차 이동 (대각선 / 가장자리)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Move1;
+
+        targetIndex = 1;
+        SetZoneActive(targetIndex, true);
+        yield return new WaitUntil(() => isZoneReached);
+        SetZoneActive(targetIndex, false);
+        isZoneReached = false;
+
         if (uiManager)
         {
             uiManager.UpdatePressureGauge(3);
@@ -351,7 +367,7 @@ public class GameStepManager : MonoBehaviour
 
         yield return StartCoroutine(ShowStepTextAndDelay(1));
 
-        targetIndex = 1;
+        targetIndex = 2;
         SetZoneActive(targetIndex, true);
         if (uiManager) uiManager.DisplayTipsImage(2);
 
@@ -371,6 +387,13 @@ public class GameStepManager : MonoBehaviour
         // Phase 2: ABC 자세 (가슴 압박 방지)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.ABCPose;
+
+        targetIndex = 3;
+        SetZoneActive(targetIndex, true);
+        yield return new WaitUntil(() => isZoneReached);
+        SetZoneActive(targetIndex, false);
+        isZoneReached = false;
+
         if (uiManager) uiManager.UpdatePressureGauge(4);
 
         yield return StartCoroutine(ShowStepTextAndDelay(2));
@@ -386,7 +409,8 @@ public class GameStepManager : MonoBehaviour
         yield return StartCoroutine(ShowTimedMission(
             "ABC 자세 취하기",
             () => isActionCompleted,
-            () => currentActionHoldTimer / targetHoldTime
+            () => currentActionHoldTimer / targetHoldTime,
+            true
         ));
 
         StopCoroutine(monitorCoroutine);
@@ -406,12 +430,13 @@ public class GameStepManager : MonoBehaviour
         // Phase 3: 2차 이동 (탈출 지속)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Move2;
+
         if (uiManager) uiManager.UpdatePressureGauge(4);
         SavePlayerPosition();
 
         yield return StartCoroutine(ShowStepTextAndDelay(3));
 
-        targetIndex = 2;
+        targetIndex = 4;
         SetZoneActive(targetIndex, true);
         if (uiManager) uiManager.DisplayTipsImage(2);
 
@@ -431,6 +456,13 @@ public class GameStepManager : MonoBehaviour
         // Phase 4: 기둥 잡기 (넘어짐 방지)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.HoldPillar;
+
+        targetIndex = 5;
+        SetZoneActive(targetIndex, true);
+        yield return new WaitUntil(() => isZoneReached);
+        SetZoneActive(targetIndex, false);
+        isZoneReached = false;
+
         if (uiManager) uiManager.UpdatePressureGauge(4);
 
         yield return StartCoroutine(ShowStepTextAndDelay(4));
@@ -442,13 +474,14 @@ public class GameStepManager : MonoBehaviour
 
         if (uiManager) uiManager.DisplayTipsImage(1);
 
-        targetIndex = 3;
+        targetIndex = 6;
         SetZoneActive(targetIndex, true);
 
         yield return StartCoroutine(ShowTimedMission(
             "기둥 잡기",
             () => isActionCompleted,
-            () => currentActionHoldTimer / targetHoldTime
+            () => currentActionHoldTimer / targetHoldTime,
+            true
         ));
 
         StopCoroutine(monitorCoroutine);
@@ -465,11 +498,18 @@ public class GameStepManager : MonoBehaviour
         // Phase 5: 벽잡기 (숨 확보)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.ClimbUp;
+
+        targetIndex = 7;
+        SetZoneActive(targetIndex, true);
+        yield return new WaitUntil(() => isZoneReached);
+        SetZoneActive(targetIndex, false);
+        isZoneReached = false;
+
         if (uiManager) uiManager.UpdatePressureGauge(4);
 
         yield return StartCoroutine(ShowStepTextAndDelay(5));
 
-        targetIndex = 3;
+        targetIndex = 8;
         SetZoneActive(targetIndex, true);
 
         // 오르기 판정도 HoldPillar와 유사하게 ClimbHandle을 잡고 있는 것으로 판단
@@ -483,7 +523,8 @@ public class GameStepManager : MonoBehaviour
         yield return StartCoroutine(ShowTimedMission(
             "벽 잡기",
             () => isActionCompleted,
-            () => currentActionHoldTimer / targetHoldTime
+            () => currentActionHoldTimer / targetHoldTime,
+            true
         ));
 
         StopCoroutine(monitorCoroutine);
@@ -505,7 +546,7 @@ public class GameStepManager : MonoBehaviour
 
         yield return StartCoroutine(ShowStepTextAndDelay(6));
 
-        targetIndex = 4;
+        targetIndex = 9;
         SetZoneActive(targetIndex, true);
         if (uiManager) uiManager.DisplayTipsImage(2);
 
@@ -521,6 +562,12 @@ public class GameStepManager : MonoBehaviour
         {
             uiManager.UpdatePressureGauge(0);
             uiManager.ClosePressurePanel();
+        }
+
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.SetLocomotion(false);
+            PlayerManager.Instance.SetInteraction(false);
         }
 
         // ---------------------------------------------------------------------------------
