@@ -122,6 +122,8 @@ public class GameStepManager : MonoBehaviour
     /// </summary>
     private IEnumerator ShowStepTextAndDelay(int instructionText)
     {
+        SetInteractionLimit(true);
+
         // 1. UI 설정 및 표시
         if (uiManager)
         {
@@ -141,6 +143,8 @@ public class GameStepManager : MonoBehaviour
         // 3. 패널 닫기
         if (uiManager && uiManager.GetDisplayPanel())
             uiManager.CloseInstructionPanel();
+
+        SetInteractionLimit(false);
     }
 
     /// <summary>
@@ -148,6 +152,8 @@ public class GameStepManager : MonoBehaviour
     /// </summary>
     private IEnumerator ShowFeedbackAndDelay(int feedbackText, bool isNegative = false)
     {
+        SetInteractionLimit(true);
+
         // 1. UI 설정
         if (uiManager)
         {
@@ -168,6 +174,8 @@ public class GameStepManager : MonoBehaviour
         // 3. 패널 닫기
         if (uiManager && uiManager.GetDisplayPanel())
             uiManager.CloseInstructionPanel();
+
+        SetInteractionLimit(false);
     }
 
     /// <summary>
@@ -290,11 +298,7 @@ public class GameStepManager : MonoBehaviour
         // 0. 초기화
         DataManager.Instance.InitializeSessionData();
 
-        if (PlayerManager.Instance != null)
-        {
-            PlayerManager.Instance.SetLocomotion(true);
-            PlayerManager.Instance.SetInteraction(true);
-        }
+        SetInteractionLimit(true);
 
         // ---------------------------------------------------------------------------------
         // Intro: 주의사항 패널
@@ -334,6 +338,8 @@ public class GameStepManager : MonoBehaviour
         targetIndex = 0;
         SetZoneActive(targetIndex, true);
         if (uiManager) uiManager.DisplayTipsImage(2);
+
+        SetInteractionLimit(false);
 
         // 미션 실행 (이동 가능)
         yield return StartCoroutine(ShowTimedMission(
@@ -590,6 +596,15 @@ public class GameStepManager : MonoBehaviour
         if (TargerZone != null && TargerZone.Length > index && TargerZone[index] != null)
         {
             TargerZone[index].SetActive(isActive);
+        }
+    }
+
+    private void SetInteractionLimit(bool isActive)
+    {
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.SetLocomotion(!isActive);
+            PlayerManager.Instance.SetInteraction(!isActive);
         }
     }
 
