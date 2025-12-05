@@ -44,7 +44,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private string locomotionKeyword = "Locomotion";
 
     [Tooltip("제어할 이동 관련 컴포넌트 또는 자식 객체의 키워드 목록 (Move, Turn, Teleport 등)")]
-    [SerializeField] private string[] moveKeywords = { "Move", "Turn", "Teleport" };
+    [SerializeField] private string[] moveKeywords = { "Turn", "Teleport" };
 
     [Header("Interaction Settings")]
     [Tooltip("제어할 상호작용 관련 컴포넌트 또는 자식 객체의 키워드 목록 (Ray Interactor, Direct Interactor 등)")]

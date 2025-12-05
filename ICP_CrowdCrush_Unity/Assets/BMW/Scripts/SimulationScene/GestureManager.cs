@@ -45,6 +45,9 @@ public class GestureManager : MonoBehaviour
     [Tooltip("현재 양손 사이의 거리")]
     [SerializeField] private float currentHandDist;
 
+    [Tooltip("현재 양손 사이의 거리")]
+    [SerializeField] private bool isOnlyButtonDetected = true;
+
     [Tooltip("현재 가슴과 왼손 사이의 거리")]
     [SerializeField] private float currentLeftDist;
 
@@ -79,7 +82,8 @@ public class GestureManager : MonoBehaviour
         }
 
         // 둘 중 하나라도 만족하면 유효한 행동으로 간주
-        return isGestureDetected || isButtonOverride;
+        if (!isOnlyButtonDetected) return isGestureDetected || isButtonOverride;
+        else return isButtonOverride;
     }
 
     /// <summary>
