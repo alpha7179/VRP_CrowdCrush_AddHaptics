@@ -97,7 +97,6 @@ MonoBehaviour:
   originKeyword: XROrigin
   locomotionKeyword: Locomotion
   moveKeywords:
-  - Move
   - Turn
   - Teleport
   interactionKeywords:
