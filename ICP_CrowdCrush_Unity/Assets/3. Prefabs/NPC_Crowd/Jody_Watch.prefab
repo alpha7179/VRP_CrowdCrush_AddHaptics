@@ -10,31 +10,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -11.730167
+      value: 4.73
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.13319099
+      value: 0.158149
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.48290634
+      value: 6.21
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.6474619
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.76209784
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -42,7 +42,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 99.299
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2786e888ff6fc7940a4811862d5a4be2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -93,7 +93,9 @@ MonoBehaviour:
   animator: {fileID: 1248984624638484997}
   clipNames:
   - Breathing Idle_Anim
+  - Scary Clown Idle_Anim
   - Talking_Anim
   - Talking (1)_Anim
   - Talking On A Cell Phone_Anim
   - Angry_Anim
+  - Scary Clown Idle_Anim

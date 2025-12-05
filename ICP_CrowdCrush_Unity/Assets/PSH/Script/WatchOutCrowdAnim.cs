@@ -7,10 +7,12 @@ public class WatchOutCrowdAnim : MonoBehaviour
     [Tooltip("Animator 안에 등록한 State 이름들")]
     public string[] clipNames =
         {"Breathing Idle_Anim",
+        "Scary Clown Idle_Anim",
         "Talking_Anim",
         "Talking (1)_Anim",
         "Talking On A Cell Phone_Anim",
-        "Angry_Anim"
+        "Angry_Anim",
+        "Scary Clown Idle_Anim"
 
     };
 
@@ -31,7 +33,7 @@ public class WatchOutCrowdAnim : MonoBehaviour
         lastIndex = newIndex;
 
         string clip = clipNames[newIndex];
-      //  Debug.Log($"{name} Play: {clip}"); // 어떤 애니가 선택됐는지 로그
+        Debug.Log($"{name} Play: {clip}"); // 어떤 애니가 선택됐는지 로그
         animator.CrossFadeInFixedTime(clip, 0.25f, 0, Random.value);
     }
 
