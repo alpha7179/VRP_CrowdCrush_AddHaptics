@@ -3,11 +3,11 @@ using System.Collections;
 using System;
 
 /// <summary>
-/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½å¸§(Æ©ï¿½ä¸®ï¿½ï¿½ -> ï¿½Ìµï¿½ -> ï¿½×¼ï¿½ -> Å»ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Å´ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.
+/// °ÔÀÓÀÇ ÀüÃ¼ ½Ã³ª¸®¿À Èå¸§(Æ©Åä¸®¾ó -> ÀÌµ¿ -> ¾×¼Ç -> Å»Ãâ)À» ¼øÂ÷ÀûÀ¸·Î Á¦¾îÇÏ´Â ¸ÞÀÎ ¸Å´ÏÀúÀÔ´Ï´Ù.
 /// <para>
-/// 1. ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Phase)ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½Ð¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.<br/>
-/// 2. PlayerManagerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½(Locomotion) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¼ï¿½ ï¿½ß¿ï¿½ï¿½ï¿½ ï¿½Î¿ï¿½ï¿½Õ´Ï´ï¿½.<br/>
-/// 3. IngameUIManagerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½È³ï¿½ ï¿½Ø½ï¿½Æ®, Å¸ï¿½Ì¸ï¿½, ï¿½Çµï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+/// 1. °¢ °ÔÀÓ ÆäÀÌÁî(Phase)º°·Î ¹Ì¼ÇÀ» ºÎ¿©ÇÏ°í ¼º°ø/½ÇÆÐ¸¦ ÆÇÁ¤ÇÕ´Ï´Ù.<br/>
+/// 2. PlayerManager¸¦ ÅëÇØ ÀÌµ¿(Locomotion) ±ÇÇÑÀ» ¹Ì¼Ç Áß¿¡¸¸ ºÎ¿©ÇÕ´Ï´Ù.<br/>
+/// 3. IngameUIManager¿Í ¿¬µ¿ÇÏ¿© ¾È³» ÅØ½ºÆ®, Å¸ÀÌ¸Ó, ÇÇµå¹éÀ» Ç¥½ÃÇÕ´Ï´Ù.
 /// </para>
 /// </summary>
 public class GameStepManager : MonoBehaviour
@@ -15,18 +15,18 @@ public class GameStepManager : MonoBehaviour
     #region Inspector Settings (References)
 
     [Header("Player References")]
-    [Tooltip("ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ Transform (ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½Â¿ï¿½)")]
+    [Tooltip("ÇÃ·¹ÀÌ¾îÀÇ Transform (À§Ä¡ ¸®¼Â¿ë)")]
     [SerializeField] private Transform PlayerTransform;
 
     [Header("Linked Managers")]
-    [Tooltip("ï¿½Î°ï¿½ï¿½ï¿½ UI ï¿½ï¿½ï¿½î¸¦ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Å´ï¿½ï¿½ï¿½")]
+    [Tooltip("ÀÎ°ÔÀÓ UI Á¦¾î¸¦ ´ã´çÇÏ´Â ¸Å´ÏÀú")]
     [SerializeField] private IngameUIManager uiManager;
 
-    [Tooltip("ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ã³ ï¿½ï¿½ ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Å´ï¿½ï¿½ï¿½")]
+    [Tooltip("ÇÃ·¹ÀÌ¾îÀÇ Á¦½ºÃ³ ¹× ÀÔ·Â ÆÇÁ¤À» ´ã´çÇÏ´Â ¸Å´ÏÀú")]
     [SerializeField] private GestureManager gestureManager;
 
     [Header("Zone Objects")]
-    [Tooltip("ï¿½ï¿½ ï¿½Ü°è¿¡ï¿½ï¿½ È°ï¿½ï¿½È­ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ (0:Tutorial, 1:Move1, 2:Move2, 3:Escape)")]
+    [Tooltip("°¢ ´Ü°è¿¡¼­ È°¼ºÈ­µÉ ¸ñÇ¥ ÁöÁ¡ Æ®¸®°Å ¿ÀºêÁ§Æ®µé (0:Tutorial, 1:Move1, 2:Move2, 3:Escape)")]
     [SerializeField] private GameObject[] TargerZone;
 
     #endregion
@@ -34,20 +34,20 @@ public class GameStepManager : MonoBehaviour
     #region Inspector Settings (Game Logic)
 
     [Header("Action Settings")]
-    [Tooltip("ï¿½×¼ï¿½(ï¿½Ú¼ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Ï´ï¿½ ï¿½ï¿½Ç¥ ï¿½Ã°ï¿½ (ï¿½ï¿½)")]
+    [Tooltip("¾×¼Ç(ÀÚ¼¼ À¯Áö, Àâ±â µî)À» ¼º°øÇÏ±â À§ÇØ À¯ÁöÇØ¾ß ÇÏ´Â ¸ñÇ¥ ½Ã°£ (ÃÊ)")]
     [SerializeField] private float targetHoldTime = 3.0f;
 
     [Header("Timing Settings")]
-    [Tooltip("ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½Ì¼ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½")]
+    [Tooltip("°¢ ÆäÀÌÁî(¹Ì¼Ç)ÀÇ Á¦ÇÑ ½Ã°£")]
     [SerializeField] private float phaseTime = 60.0f;
 
-    [Tooltip("ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½È³ï¿½ ï¿½Ø½ï¿½Æ®ï¿½ï¿½ Ç¥ï¿½ÃµÇ´ï¿½ ï¿½Ã°ï¿½")]
+    [Tooltip("¹Ì¼Ç ½ÃÀÛ Àü ¾È³» ÅØ½ºÆ®°¡ Ç¥½ÃµÇ´Â ½Ã°£")]
     [SerializeField] private float instructionDuration = 5.0f;
 
-    [Tooltip("ï¿½Ì¼ï¿½ ï¿½Ï·ï¿½/ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Çµï¿½ï¿½ ï¿½Ø½ï¿½Æ®ï¿½ï¿½ Ç¥ï¿½ÃµÇ´ï¿½ ï¿½Ã°ï¿½")]
+    [Tooltip("¹Ì¼Ç ¿Ï·á/½ÇÆÐ ÈÄ ÇÇµå¹é ÅØ½ºÆ®°¡ Ç¥½ÃµÇ´Â ½Ã°£")]
     [SerializeField] private float feedbackDuration = 5.0f;
 
-    [Tooltip("ï¿½ï¿½ï¿½ï¿½ ï¿½Ü°ï¿½ï¿½ ï¿½Ñ¾î°¡ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½")]
+    [Tooltip("´ÙÀ½ ´Ü°è·Î ³Ñ¾î°¡±â Àü ´ë±â ½Ã°£")]
     [SerializeField] private float nextStepDuration = 1.0f;
 
     #endregion
@@ -62,12 +62,12 @@ public class GameStepManager : MonoBehaviour
     [Header("Debug Info")]
     [SerializeField] private GamePhase currentPhase;
 
-    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-    private bool isZoneReached = false;        // ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-    private bool isActionCompleted = false;    // ï¿½×¼ï¿½(ï¿½Ú¼ï¿½/ï¿½ï¿½ï¿½) ï¿½Ï·ï¿½ ï¿½ï¿½ï¿½ï¿½
-    private float currentActionHoldTimer = 0f; // ï¿½ï¿½ï¿½ï¿½ ï¿½×¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
-    private int targetIndex;                   // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½
-    private Vector3 startPosition;             // ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+    // ³»ºÎ »óÅÂ º¯¼ö
+    private bool isZoneReached = false;        // ¸ñÇ¥ ÁöÁ¡ µµ´Þ ¿©ºÎ
+    private bool isActionCompleted = false;    // ¾×¼Ç(ÀÚ¼¼/Àâ±â) ¿Ï·á ¿©ºÎ
+    private float currentActionHoldTimer = 0f; // ÇöÀç ¾×¼Ç À¯Áö ½Ã°£
+    private int targetIndex;                   // ÇöÀç ¸ñÇ¥ ±¸¿ª ÀÎµ¦½º
+    private Vector3 startPosition;             // À§Ä¡ ¸®¼ÂÀ» À§ÇÑ ÀúÀåµÈ À§Ä¡
 
     #endregion
 
@@ -75,7 +75,7 @@ public class GameStepManager : MonoBehaviour
 
     private void Start()
     {
-        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½
+        // °ÔÀÓ ½ÃÀÛ ½Ã ½Ã³ª¸®¿À ÄÚ·çÆ¾ °¡µ¿
         StartCoroutine(ScenarioRoutine());
     }
 
@@ -84,7 +84,7 @@ public class GameStepManager : MonoBehaviour
     #region Public API
 
     /// <summary>
-    /// ZoneTriggerï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½ï¿½Ï´ï¿½.
+    /// ZoneTrigger¿¡¼­ È£ÃâÇÏ¿© ¸ñÇ¥ ÁöÁ¡¿¡ µµ´ÞÇßÀ½À» ¾Ë¸³´Ï´Ù.
     /// </summary>
     public void SetZoneReached(bool reached)
     {
@@ -92,7 +92,7 @@ public class GameStepManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Ã¼Å©ï¿½ï¿½ï¿½ï¿½Æ®)
+    /// ÇöÀç ÇÃ·¹ÀÌ¾îÀÇ À§Ä¡¸¦ ÀúÀåÇÕ´Ï´Ù. (À§Çè ±¸°£ ÁøÀÔ Àü Ã¼Å©Æ÷ÀÎÆ®)
     /// </summary>
     public void SavePlayerPosition()
     {
@@ -104,11 +104,11 @@ public class GameStepManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ï¿½Ã·ï¿½ï¿½Ì¾î¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Çµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Çµï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// ÇÃ·¹ÀÌ¾î¸¦ ÀúÀåµÈ À§Ä¡·Î µÇµ¹¸®°í °æ°í ÇÇµå¹éÀ» Ç¥½ÃÇÕ´Ï´Ù.
     /// </summary>
     public void ReturnToSavedPosition()
     {
-        // ï¿½ßºï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+        // Áßº¹ ½ÇÇà ¹æÁö¸¦ À§ÇØ ±âÁ¸ ÄÚ·çÆ¾ Á¤Áö ÈÄ Àç½ÇÇà
         StopCoroutine(ReturnToSavedPositionRoutine());
         StartCoroutine(ReturnToSavedPositionRoutine());
     }
@@ -118,11 +118,13 @@ public class GameStepManager : MonoBehaviour
     #region UI & Logic Helper Coroutines
 
     /// <summary>
-    /// ï¿½Ì¼ï¿½ ï¿½È³ï¿½ ï¿½Ø½ï¿½Æ®ï¿½ï¿½ È­ï¿½é¿¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// ¹Ì¼Ç ¾È³» ÅØ½ºÆ®¸¦ È­¸é¿¡ ¶ç¿ì°í ÀÏÁ¤ ½Ã°£ ´ë±âÇÕ´Ï´Ù.
     /// </summary>
     private IEnumerator ShowStepTextAndDelay(int instructionText)
     {
-        // 1. UI ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Ç¥ï¿½ï¿½
+        SetInteractionLimit(true);
+
+        // 1. UI ¼³Á¤ ¹× Ç¥½Ã
         if (uiManager)
         {
             uiManager.CloseFeedBack();
@@ -130,7 +132,7 @@ public class GameStepManager : MonoBehaviour
             uiManager.OpenInstructionPanel();
         }
 
-        // 2. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½Å­ ï¿½ï¿½ï¿½
+        // 2. ÁöÁ¤µÈ ½Ã°£¸¸Å­ ´ë±â
         float timer = 0f;
         while (uiManager.GetDisplayPanel() && timer < instructionDuration)
         {
@@ -138,17 +140,21 @@ public class GameStepManager : MonoBehaviour
             yield return null;
         }
 
-        // 3. ï¿½Ð³ï¿½ ï¿½Ý±ï¿½
+        // 3. ÆÐ³Î ´Ý±â
         if (uiManager && uiManager.GetDisplayPanel())
             uiManager.CloseInstructionPanel();
+
+        SetInteractionLimit(false);
     }
 
     /// <summary>
-    /// ï¿½ï¿½ï¿½ ï¿½Çµï¿½ï¿½ ï¿½Ø½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// °á°ú ÇÇµå¹é ÅØ½ºÆ®¸¦ ¶ç¿ì°í ÀÏÁ¤ ½Ã°£ ´ë±âÇÕ´Ï´Ù.
     /// </summary>
     private IEnumerator ShowFeedbackAndDelay(int feedbackText, bool isNegative = false)
     {
-        // 1. UI ï¿½ï¿½ï¿½ï¿½
+        SetInteractionLimit(true);
+
+        // 1. UI ¼³Á¤
         if (uiManager)
         {
             uiManager.CloseInstruction();
@@ -157,7 +163,7 @@ public class GameStepManager : MonoBehaviour
             uiManager.OpenInstructionPanel();
         }
 
-        // 2. ï¿½ï¿½ï¿½
+        // 2. ´ë±â
         float timer = 0f;
         while (uiManager.GetDisplayPanel() && timer < feedbackDuration)
         {
@@ -165,17 +171,19 @@ public class GameStepManager : MonoBehaviour
             yield return null;
         }
 
-        // 3. ï¿½Ð³ï¿½ ï¿½Ý±ï¿½
+        // 3. ÆÐ³Î ´Ý±â
         if (uiManager && uiManager.GetDisplayPanel())
             uiManager.CloseInstructionPanel();
+
+        SetInteractionLimit(false);
     }
 
     /// <summary>
-    /// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ì¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½. ï¿½Ì¼ï¿½ ï¿½ß¿ï¿½ï¿½ï¿½ ï¿½Ìµï¿½(Locomotion)ï¿½ï¿½ ï¿½ï¿½ï¿½Ë´Ï´ï¿½.
+    /// Á¦ÇÑ ½Ã°£ÀÌ ÀÖ´Â ¹Ì¼ÇÀ» ½ÇÇàÇÕ´Ï´Ù. ¹Ì¼Ç Áß¿¡¸¸ ÀÌµ¿(Locomotion)ÀÌ Çã¿ëµË´Ï´Ù.
     /// </summary>
     private IEnumerator ShowTimedMission(string missionText, System.Func<bool> missionCondition, System.Func<float> progressCalculator = null, bool isDisplayPanel = false)
     {
-        // [ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½] ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½Ìµï¿½ ï¿½ï¿½ï¿½
+        // [ÇÙ½É ·ÎÁ÷] ¹Ì¼Ç ½ÃÀÛ -> ÀÌµ¿ Çã¿ë
         /*
         if (PlayerManager.Instance != null)
         {
@@ -184,7 +192,7 @@ public class GameStepManager : MonoBehaviour
         }
         */
 
-        // UI ï¿½Å´ï¿½ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½Ì¸ï¿½ ï¿½Ú·ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ ï¿½Ã±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½)
+        // UI ¸Å´ÏÀúÀÇ Å¸ÀÌ¸Ó ÄÚ·çÆ¾ ½ÇÇà (Á¶°Ç ´Þ¼º ½Ã±îÁö ´ë±â)
         if (uiManager)
         {
             yield return uiManager.StartCoroutine(uiManager.StartMissionTimer(
@@ -197,11 +205,11 @@ public class GameStepManager : MonoBehaviour
         }
         else
         {
-            // UI ï¿½Å´ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ì¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡ (ï¿½ï¿½ï¿½Ç¸ï¿½ ï¿½ï¿½Ù¸ï¿½)
+            // UI ¸Å´ÏÀú°¡ ¾øÀ» °æ¿ì¸¦ ´ëºñÇÑ ¾ÈÀüÀåÄ¡ (Á¶°Ç¸¸ ±â´Ù¸²)
             yield return new WaitUntil(missionCondition);
         }
 
-        // [ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½] ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½Ìµï¿½ ï¿½ï¿½ï¿½
+        // [ÇÙ½É ·ÎÁ÷] ¹Ì¼Ç Á¾·á -> ÀÌµ¿ Àá±Ý
         /*
         if (PlayerManager.Instance != null)
         {
@@ -212,7 +220,7 @@ public class GameStepManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Æ¯ï¿½ï¿½ ï¿½×¼ï¿½(ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÓµÇ´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+    /// Æ¯Á¤ ¾×¼Ç(Á¶°Ç)ÀÌ ÀÏÁ¤ ½Ã°£ µ¿¾È Áö¼ÓµÇ´ÂÁö °¨½ÃÇÕ´Ï´Ù.
     /// </summary>
     private IEnumerator MonitorContinuousAction(System.Func<bool> actionCondition, float requiredDuration)
     {
@@ -223,7 +231,7 @@ public class GameStepManager : MonoBehaviour
         {
             while (!isActionCompleted)
             {
-                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ Å¸ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½Æ´Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+                // Á¶°ÇÀ» ¸¸Á·ÇÏ¸é Å¸ÀÌ¸Ó Áõ°¡, ¾Æ´Ï¸é °¨¼Ò(ºü¸£°Ô)
                 if (actionCondition.Invoke())
                 {
                     currentActionHoldTimer += Time.deltaTime;
@@ -235,7 +243,7 @@ public class GameStepManager : MonoBehaviour
 
                 currentActionHoldTimer = Mathf.Clamp(currentActionHoldTimer, 0f, requiredDuration);
 
-                // ï¿½ï¿½Ç¥ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ï·ï¿½ Ã³ï¿½ï¿½
+                // ¸ñÇ¥ ½Ã°£ µµ´Þ ½Ã ¿Ï·á Ã³¸®
                 if (currentActionHoldTimer >= requiredDuration)
                 {
                     isActionCompleted = true;
@@ -247,20 +255,20 @@ public class GameStepManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ Ç¥ï¿½Ã¸ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½Ú·ï¿½Æ¾
+    /// ÇÃ·¹ÀÌ¾î À§Ä¡ ¸®¼Â ¹× °æ°í Ç¥½Ã¸¦ Ã³¸®ÇÏ´Â ÄÚ·çÆ¾
     /// </summary>
     private IEnumerator ReturnToSavedPositionRoutine()
     {
-        // 1. ï¿½Ìµï¿½ ï¿½ï¿½ï¿½
+        // 1. ÀÌµ¿ Àá±Ý
         
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.SetLocomotion(false);
         
 
-        // 2. ï¿½ï¿½ï¿½ ï¿½Çµï¿½ï¿½ Ç¥ï¿½ï¿½
+        // 2. °æ°í ÇÇµå¹é Ç¥½Ã
         yield return StartCoroutine(ShowFeedbackAndDelay(0,true));
 
-        // 3. ï¿½ï¿½Ä¡ ï¿½Ìµï¿½
+        // 3. À§Ä¡ ÀÌµ¿
         if (PlayerTransform != null && startPosition != Vector3.zero)
         {
             PlayerTransform.position = startPosition;
@@ -271,7 +279,7 @@ public class GameStepManager : MonoBehaviour
             Debug.LogWarning("[GameStepManager] Cannot return to saved position (Invalid data).");
         }
 
-        // 4. ï¿½Ìµï¿½ ï¿½ï¿½È°ï¿½ï¿½È­ (ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½Ì¹Ç·ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        // 4. ÀÌµ¿ ÀçÈ°¼ºÈ­ (¹Ì¼Ç ÁßÀÌ¹Ç·Î ´Ù½Ã ÄÑÁÜ)
         
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.SetLocomotion(true);
@@ -283,21 +291,17 @@ public class GameStepManager : MonoBehaviour
     #region Main Scenario Coroutine
 
     /// <summary>
-    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ü°èº°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½Æ¾ï¿½Ô´Ï´ï¿½.
+    /// °ÔÀÓÀÇ ÀüÃ¼ ½Ã³ª¸®¿À¸¦ ´Ü°èº°·Î ½ÇÇàÇÏ´Â ¸ÞÀÎ ÄÚ·çÆ¾ÀÔ´Ï´Ù.
     /// </summary>
     private IEnumerator ScenarioRoutine()
     {
-        // 0. ï¿½Ê±ï¿½È­
+        // 0. ÃÊ±âÈ­
         DataManager.Instance.InitializeSessionData();
 
-        if (PlayerManager.Instance != null)
-        {
-            PlayerManager.Instance.SetLocomotion(true);
-            PlayerManager.Instance.SetInteraction(true);
-        }
+        SetInteractionLimit(true);
 
         // ---------------------------------------------------------------------------------
-        // Intro: ï¿½ï¿½ï¿½Ç»ï¿½ï¿½ï¿½ ï¿½Ð³ï¿½
+        // Intro: ÁÖÀÇ»çÇ× ÆÐ³Î
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Caution;
         Debug.Log("[Scenario] Caution Phase Start");
@@ -308,7 +312,7 @@ public class GameStepManager : MonoBehaviour
             uiManager.OpenCautionPanel();
         }
 
-        // ï¿½Ð³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+        // ÆÐ³ÎÀÌ ´ÝÈú ¶§±îÁö ´ë±â
         yield return new WaitUntil(() => !uiManager.GetDisplayPanel());
 
         yield return new WaitForSeconds(nextStepDuration);
@@ -319,13 +323,13 @@ public class GameStepManager : MonoBehaviour
             uiManager.OpenSituationPanel();
         }
 
-        // ï¿½Ð³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+        // ÆÐ³ÎÀÌ ´ÝÈú ¶§±îÁö ´ë±â
         yield return new WaitUntil(() => !uiManager.GetDisplayPanel());
 
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 0: Æ©ï¿½ä¸®ï¿½ï¿½ (ï¿½âº» ï¿½Ìµï¿½)
+        // Phase 0: Æ©Åä¸®¾ó (±âº» ÀÌµ¿)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Tutorial;
 
@@ -335,9 +339,11 @@ public class GameStepManager : MonoBehaviour
         SetZoneActive(targetIndex, true);
         if (uiManager) uiManager.DisplayTipsImage(2);
 
-        // ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½)
+        SetInteractionLimit(false);
+
+        // ¹Ì¼Ç ½ÇÇà (ÀÌµ¿ °¡´É)
         yield return StartCoroutine(ShowTimedMission(
-            "ï¿½ï¿½Ç¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½",
+            "¸ñÇ¥ÁöÁ¡À¸·Î ÀÌµ¿",
             () => isZoneReached
         ));
 
@@ -348,7 +354,7 @@ public class GameStepManager : MonoBehaviour
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 1: 1ï¿½ï¿½ ï¿½Ìµï¿½ (ï¿½ë°¢ï¿½ï¿½ / ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½)
+        // Phase 1: 1Â÷ ÀÌµ¿ (´ë°¢¼± / °¡ÀåÀÚ¸®)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Move1;
 
@@ -372,7 +378,7 @@ public class GameStepManager : MonoBehaviour
         if (uiManager) uiManager.DisplayTipsImage(2);
 
         yield return StartCoroutine(ShowTimedMission(
-            "ï¿½ë°¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½",
+            "´ë°¢¼±À¸·Î ÀÌµ¿",
             () => isZoneReached
         ));
 
@@ -384,7 +390,7 @@ public class GameStepManager : MonoBehaviour
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 2: ABC ï¿½Ú¼ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¹ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        // Phase 2: ABC ÀÚ¼¼ (°¡½¿ ¾Ð¹Ú ¹æÁö)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.ABCPose;
 
@@ -398,7 +404,7 @@ public class GameStepManager : MonoBehaviour
 
         yield return StartCoroutine(ShowStepTextAndDelay(2));
 
-        // ï¿½Ú¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+        // ÀÚ¼¼ °¨Áö ¸ð´ÏÅÍ¸µ ½ÃÀÛ
         Coroutine monitorCoroutine = StartCoroutine(MonitorContinuousAction(
             () => gestureManager.IsActionValid(),
             targetHoldTime
@@ -407,7 +413,7 @@ public class GameStepManager : MonoBehaviour
         if (uiManager) uiManager.DisplayTipsImage(0);
 
         yield return StartCoroutine(ShowTimedMission(
-            "ABC ï¿½Ú¼ï¿½ ï¿½ï¿½ï¿½Ï±ï¿½",
+            "ABC ÀÚ¼¼ ÃëÇÏ±â",
             () => isActionCompleted,
             () => currentActionHoldTimer / targetHoldTime,
             true
@@ -427,7 +433,7 @@ public class GameStepManager : MonoBehaviour
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 3: 2ï¿½ï¿½ ï¿½Ìµï¿½ (Å»ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        // Phase 3: 2Â÷ ÀÌµ¿ (Å»Ãâ Áö¼Ó)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Move2;
 
@@ -441,7 +447,7 @@ public class GameStepManager : MonoBehaviour
         if (uiManager) uiManager.DisplayTipsImage(2);
 
         yield return StartCoroutine(ShowTimedMission(
-            "ï¿½ë°¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½",
+            "´ë°¢¼±À¸·Î ÀÌµ¿",
             () => isZoneReached
         ));
 
@@ -453,7 +459,7 @@ public class GameStepManager : MonoBehaviour
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 4: ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ (ï¿½Ñ¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        // Phase 4: ±âµÕ Àâ±â (³Ñ¾îÁü ¹æÁö)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.HoldPillar;
 
@@ -478,7 +484,7 @@ public class GameStepManager : MonoBehaviour
         SetZoneActive(targetIndex, true);
 
         yield return StartCoroutine(ShowTimedMission(
-            "ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½",
+            "±âµÕ Àâ±â",
             () => isActionCompleted,
             () => currentActionHoldTimer / targetHoldTime,
             true
@@ -495,7 +501,7 @@ public class GameStepManager : MonoBehaviour
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 5: ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ È®ï¿½ï¿½)
+        // Phase 5: º®Àâ±â (¼û È®º¸)
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.ClimbUp;
 
@@ -512,7 +518,7 @@ public class GameStepManager : MonoBehaviour
         targetIndex = 8;
         SetZoneActive(targetIndex, true);
 
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ HoldPillarï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ClimbHandleï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ç´ï¿½
+        // ¿À¸£±â ÆÇÁ¤µµ HoldPillar¿Í À¯»çÇÏ°Ô ClimbHandleÀ» Àâ°í ÀÖ´Â °ÍÀ¸·Î ÆÇ´Ü
         monitorCoroutine = StartCoroutine(MonitorContinuousAction(
             () => gestureManager.IsHoldingClimbHandle(),
             targetHoldTime
@@ -521,7 +527,7 @@ public class GameStepManager : MonoBehaviour
         if (uiManager) uiManager.DisplayTipsImage(1);
 
         yield return StartCoroutine(ShowTimedMission(
-            "ï¿½ï¿½ ï¿½ï¿½ï¿½",
+            "º® Àâ±â",
             () => isActionCompleted,
             () => currentActionHoldTimer / targetHoldTime,
             true
@@ -539,7 +545,7 @@ public class GameStepManager : MonoBehaviour
         yield return new WaitForSeconds(nextStepDuration);
 
         // ---------------------------------------------------------------------------------
-        // Phase 6: ï¿½ï¿½ï¿½ï¿½ Å»ï¿½ï¿½
+        // Phase 6: ÃÖÁ¾ Å»Ãâ
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Escape;
         if (uiManager) uiManager.UpdatePressureGauge(2);
@@ -551,7 +557,7 @@ public class GameStepManager : MonoBehaviour
         if (uiManager) uiManager.DisplayTipsImage(2);
 
         yield return StartCoroutine(ShowTimedMission(
-            "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½",
+            "¾ÈÀü±¸¿ªÀ¸·Î ÀÌµ¿",
             () => isZoneReached
         ));
 
@@ -571,7 +577,7 @@ public class GameStepManager : MonoBehaviour
         }
 
         // ---------------------------------------------------------------------------------
-        // Phase 7: ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        // Phase 7: °ÔÀÓ Á¾·á
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Finished;
         Debug.Log("[Scenario] Game Finished");
@@ -583,13 +589,22 @@ public class GameStepManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ È°ï¿½ï¿½È­/ï¿½ï¿½È°ï¿½ï¿½È­ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
+    /// ¸ñÇ¥ ±¸¿ª ¿ÀºêÁ§Æ®¸¦ È°¼ºÈ­/ºñÈ°¼ºÈ­ÇÏ´Â ÇïÆÛ ¸Þ¼­µå
     /// </summary>
     private void SetZoneActive(int index, bool isActive)
     {
         if (TargerZone != null && TargerZone.Length > index && TargerZone[index] != null)
         {
             TargerZone[index].SetActive(isActive);
+        }
+    }
+
+    private void SetInteractionLimit(bool isActive)
+    {
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.SetLocomotion(!isActive);
+            PlayerManager.Instance.SetInteraction(!isActive);
         }
     }
 
