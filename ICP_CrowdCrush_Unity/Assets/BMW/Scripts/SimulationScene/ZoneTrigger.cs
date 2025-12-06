@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î°¡ Æ¯Á¤ ±¸¿ª(Zone)¿¡ ÁøÀÔÇß´ÂÁö °¨ÁöÇÏ¿© °ÔÀÓ ÁøÇàÀ» Á¦¾îÇÏ´Â Æ®¸®°ÅÀÔ´Ï´Ù.
+/// í”Œë ˆì´ì–´ê°€ íŠ¹ì • êµ¬ì—­(Zone)ì— ì§„ì…í–ˆëŠ”ì§€ ê°ì§€í•˜ì—¬ ê²Œì„ ì§„í–‰ì„ ì œì–´í•˜ëŠ” íŠ¸ë¦¬ê±°ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. Box Collider(Is Trigger Ã¼Å© ÇÊ¼ö)°¡ ÀÖ´Â ¿ÀºêÁ§Æ®¿¡ ÄÄÆ÷³ÍÆ®¸¦ Ãß°¡ÇØ¾ß ÇÕ´Ï´Ù.<br/>
-/// 2. 'Goal' ¼³Á¤ ½Ã ´ÙÀ½ ½Ã³ª¸®¿À ´Ü°è·Î ³Ñ¾î°¡µµ·Ï GameStepManager¿¡ ½ÅÈ£¸¦ º¸³À´Ï´Ù.<br/>
-/// 3. 'Danger' ¼³Á¤ ½Ã ½Ç¼ö È½¼ö¸¦ Áõ°¡½ÃÅ°°í ÇÃ·¹ÀÌ¾î¸¦ ¿ø·¡ À§Ä¡·Î µÇµ¹¸³´Ï´Ù.
+/// 1. Box Collider(Is Trigger ì²´í¬ í•„ìˆ˜)ê°€ ìˆëŠ” ì˜¤ë¸Œì íŠ¸ì— ì»´í¬ë„ŒíŠ¸ë¥¼ ì¶”ê°€í•´ì•¼ í•©ë‹ˆë‹¤.<br/>
+/// 2. 'Goal' ì„¤ì • ì‹œ ë‹¤ìŒ ì‹œë‚˜ë¦¬ì˜¤ ë‹¨ê³„ë¡œ ë„˜ì–´ê°€ë„ë¡ GameStepManagerì— ì‹ í˜¸ë¥¼ ë³´ëƒ…ë‹ˆë‹¤.<br/>
+/// 3. 'Danger' ì„¤ì • ì‹œ ì‹¤ìˆ˜ íšŸìˆ˜ë¥¼ ì¦ê°€ì‹œí‚¤ê³  í”Œë ˆì´ì–´ë¥¼ ì›ë˜ ìœ„ì¹˜ë¡œ ë˜ëŒë¦½ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class ZoneTrigger : MonoBehaviour
@@ -13,18 +13,18 @@ public class ZoneTrigger : MonoBehaviour
     #region Inspector Settings
 
     [Header("Trigger Settings")]
-    [Tooltip("Ã¼Å© ½Ã: ´ÙÀ½ ´Ü°è·Î ³Ñ¾î°¡±â À§ÇÑ ¸ñÇ¥ ÁöÁ¡À¸·Î µ¿ÀÛÇÕ´Ï´Ù.")]
+    [Tooltip("ì²´í¬ ì‹œ: ë‹¤ìŒ ë‹¨ê³„ë¡œ ë„˜ì–´ê°€ê¸° ìœ„í•œ ëª©í‘œ ì§€ì ìœ¼ë¡œ ë™ì‘í•©ë‹ˆë‹¤.")]
     [SerializeField] private bool isGoal = true;
 
-    [Tooltip("Ã¼Å© ½Ã: ÁøÀÔÇÏ¸é ¾È µÇ´Â À§Çè ±¸¿ªÀ¸·Î µ¿ÀÛÇÕ´Ï´Ù. (½Ç¼ö Ä«¿îÆ® Áõ°¡, À§Ä¡ ¸®¼Â)")]
+    [Tooltip("ì²´í¬ ì‹œ: ì§„ì…í•˜ë©´ ì•ˆ ë˜ëŠ” ìœ„í—˜ êµ¬ì—­ìœ¼ë¡œ ë™ì‘í•©ë‹ˆë‹¤. (ì‹¤ìˆ˜ ì¹´ìš´íŠ¸ ì¦ê°€, ìœ„ì¹˜ ë¦¬ì…‹)")]
     [SerializeField] private bool isDanger = false;
 
     [Header("Target Settings")]
-    [Tooltip("°¨ÁöÇÒ ÇÃ·¹ÀÌ¾îÀÇ ÅÂ±×ÀÔ´Ï´Ù. (XR Origin ¶Ç´Â Main CameraÀÇ ÅÂ±×¿Í ÀÏÄ¡ÇØ¾ß ÇÔ)")]
+    [Tooltip("ê°ì§€í•  í”Œë ˆì´ì–´ì˜ íƒœê·¸ì…ë‹ˆë‹¤. (XR Origin ë˜ëŠ” Main Cameraì˜ íƒœê·¸ì™€ ì¼ì¹˜í•´ì•¼ í•¨)")]
     [SerializeField] private string playerTag = "Player";
 
     [Header("Debug")]
-    [Tooltip("µğ¹ö±× ·Î±× Ãâ·Â ¿©ºÎ")]
+    [Tooltip("ë””ë²„ê·¸ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€")]
     [SerializeField] private bool isDebug = true;
 
     #endregion
@@ -33,8 +33,8 @@ public class ZoneTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // 1. ÇÃ·¹ÀÌ¾îÀÎÁö È®ÀÎ
-        // XR Origin ±¸Á¶»ó Collider°¡ ÀÚ½Ä °´Ã¼(Hands, Head µî)¿¡ ÀÖÀ» ¼ö ÀÖÀ¸¹Ç·Î RootÀÇ ÅÂ±×±îÁö È®ÀÎÇÕ´Ï´Ù.
+        // 1. í”Œë ˆì´ì–´ì¸ì§€ í™•ì¸
+        // XR Origin êµ¬ì¡°ìƒ Colliderê°€ ìì‹ ê°ì²´(Hands, Head ë“±)ì— ìˆì„ ìˆ˜ ìˆìœ¼ë¯€ë¡œ Rootì˜ íƒœê·¸ê¹Œì§€ í™•ì¸í•©ë‹ˆë‹¤.
         if (other.CompareTag(playerTag) || (other.transform.root != null && other.transform.root.CompareTag(playerTag)))
         {
             if (isDebug) Debug.Log($"[ZoneTrigger] Player entered trigger: {gameObject.name}");
@@ -48,24 +48,24 @@ public class ZoneTrigger : MonoBehaviour
     #region Internal Logic
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î°¡ Æ®¸®°Å¿¡ ÁøÀÔÇßÀ» ¶§ÀÇ ·ÎÁ÷À» Ã³¸®ÇÕ´Ï´Ù.
+    /// í”Œë ˆì´ì–´ê°€ íŠ¸ë¦¬ê±°ì— ì§„ì…í–ˆì„ ë•Œì˜ ë¡œì§ì„ ì²˜ë¦¬í•©ë‹ˆë‹¤.
     /// </summary>
     private void HandlePlayerEnter()
     {
-        // ¾À¿¡ ÀÖ´Â GameStepManager Ã£±â (½Ì±ÛÅæÀÌ ¾Æ´Ò °æ¿ì¸¦ ´ëºñÇØ Find »ç¿ë)
+        // ì”¬ì— ìˆëŠ” GameStepManager ì°¾ê¸° (ì‹±ê¸€í†¤ì´ ì•„ë‹ ê²½ìš°ë¥¼ ëŒ€ë¹„í•´ Find ì‚¬ìš©)
         var stepManager = FindAnyObjectByType<GameStepManager>();
 
         if (stepManager != null)
         {
             if (isGoal)
             {
-                // ¸ñÇ¥ ÁöÁ¡ µµ´Ş: ´ÙÀ½ ´Ü°è ÁøÇà ¿äÃ»
+                // ëª©í‘œ ì§€ì  ë„ë‹¬: ë‹¤ìŒ ë‹¨ê³„ ì§„í–‰ ìš”ì²­
                 Debug.Log($"[ZoneTrigger] Goal Reached: {gameObject.name}");
                 stepManager.SetZoneReached(true);
             }
             else if (isDanger)
             {
-                // À§Çè ±¸¿ª ÁøÀÔ: ½Ç¼ö Ä«¿îÆ® Áõ°¡ ¹× À§Ä¡ ¸®¼Â
+                // ìœ„í—˜ êµ¬ì—­ ì§„ì…: ì‹¤ìˆ˜ ì¹´ìš´íŠ¸ ì¦ê°€ ë° ìœ„ì¹˜ ë¦¬ì…‹
                 Debug.Log($"[ZoneTrigger] Danger Zone Entered: {gameObject.name}");
 
                 if (DataManager.Instance != null)

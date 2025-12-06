@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// »ç¿ëÀÚÀÇ ¼³Á¤°ª(º¼·ı, ÆíÀÇ ±â´É)°ú °ÔÀÓ ¼¼¼Ç µ¥ÀÌÅÍ(Á¡¼ö, ½Ã°£ µî)¸¦ °ü¸®ÇÏ´Â ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// ì‚¬ìš©ìì˜ ì„¤ì •ê°’(ë³¼ë¥¨, í¸ì˜ ê¸°ëŠ¥)ê³¼ ê²Œì„ ì„¸ì…˜ ë°ì´í„°(ì ìˆ˜, ì‹œê°„ ë“±)ë¥¼ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. PlayerPrefs¸¦ »ç¿ëÇÏ¿© ¼³Á¤À» ±â±â¿¡ ¿µ±¸ ÀúÀåÇÏ°Å³ª ºÒ·¯¿É´Ï´Ù.<br/>
-/// 2. °ÔÀÓ ÇÃ·¹ÀÌ Áß ¹ß»ıÇÏ´Â Åë°è µ¥ÀÌÅÍ(¼º°ø/½ÇÆĞ È½¼ö, ÇÃ·¹ÀÌ ½Ã°£)¸¦ ÃßÀûÇÕ´Ï´Ù.<br/>
-/// 3. ¾ÀÀÌ º¯°æµÇ¾îµµ µ¥ÀÌÅÍ°¡ À¯ÁöµÇµµ·Ï SingletonÀ¸·Î µ¿ÀÛÇÕ´Ï´Ù.
+/// 1. PlayerPrefsë¥¼ ì‚¬ìš©í•˜ì—¬ ì„¤ì •ì„ ê¸°ê¸°ì— ì˜êµ¬ ì €ì¥í•˜ê±°ë‚˜ ë¶ˆëŸ¬ì˜µë‹ˆë‹¤.<br/>
+/// 2. ê²Œì„ í”Œë ˆì´ ì¤‘ ë°œìƒí•˜ëŠ” í†µê³„ ë°ì´í„°(ì„±ê³µ/ì‹¤íŒ¨ íšŸìˆ˜, í”Œë ˆì´ ì‹œê°„)ë¥¼ ì¶”ì í•©ë‹ˆë‹¤.<br/>
+/// 3. ì”¬ì´ ë³€ê²½ë˜ì–´ë„ ë°ì´í„°ê°€ ìœ ì§€ë˜ë„ë¡ Singletonìœ¼ë¡œ ë™ì‘í•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class DataManager : MonoBehaviour
@@ -19,10 +19,10 @@ public class DataManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            transform.parent = null; // ÃÖ»óÀ§ °èÃşÀ¸·Î ºĞ¸®
+            transform.parent = null; // ìµœìƒìœ„ ê³„ì¸µìœ¼ë¡œ ë¶„ë¦¬
             DontDestroyOnLoad(gameObject);
 
-            // ÃÊ±âÈ­ ½Ã ÀúÀåµÈ ¼³Á¤À» ºÒ·¯¿É´Ï´Ù.
+            // ì´ˆê¸°í™” ì‹œ ì €ì¥ëœ ì„¤ì •ì„ ë¶ˆëŸ¬ì˜µë‹ˆë‹¤.
             LoadSettings();
         }
         else
@@ -35,7 +35,7 @@ public class DataManager : MonoBehaviour
 
     #region Constants (Keys)
 
-    // PlayerPrefs ÀúÀå Å°
+    // PlayerPrefs ì €ì¥ í‚¤
     private const string KEY_VOLUME = "MasterVolume";
     private const string KEY_MOTION_SICKNESS = "MotionSickness";
 
@@ -44,10 +44,10 @@ public class DataManager : MonoBehaviour
     #region User Settings
 
     [Header("User Settings")]
-    [Tooltip("ÀüÃ¼ ¸¶½ºÅÍ º¼·ı (0.0 ~ 1.0)")]
+    [Tooltip("ì „ì²´ ë§ˆìŠ¤í„° ë³¼ë¥¨ (0.0 ~ 1.0)")]
     [Range(0f, 1f)] public float MasterVolume = 1.0f;
 
-    [Tooltip("¸Ö¹Ì ¹æÁö ¸ğµå È°¼ºÈ­ ¿©ºÎ (FOV Ãà¼Ò, ºñ³×ÆÃ µî Àû¿ë¿ë)")]
+    [Tooltip("ë©€ë¯¸ ë°©ì§€ ëª¨ë“œ í™œì„±í™” ì—¬ë¶€ (FOV ì¶•ì†Œ, ë¹„ë„¤íŒ… ë“± ì ìš©ìš©)")]
     public bool IsAntiMotionSicknessMode = false;
 
     #endregion
@@ -55,16 +55,16 @@ public class DataManager : MonoBehaviour
     #region Session Data
 
     [Header("Session Data")]
-    [Tooltip("¹Ì¼Ç ¼º°ø È½¼ö")]
+    [Tooltip("ë¯¸ì…˜ ì„±ê³µ íšŸìˆ˜")]
     public int SuccessCount = 0;
 
-    [Tooltip("½Ç¼ö È½¼ö")]
+    [Tooltip("ì‹¤ìˆ˜ íšŸìˆ˜")]
     public int MistakeCount = 0;
 
-    [Tooltip("ÃÑ ÇÃ·¹ÀÌ ½Ã°£ (ÃÊ ´ÜÀ§)")]
+    [Tooltip("ì´ í”Œë ˆì´ ì‹œê°„ (ì´ˆ ë‹¨ìœ„)")]
     public float PlayTime = 0f;
 
-    [Tooltip("ÇöÀç ¼±ÅÃµÈ ¸Ê ÀÌ¸§")]
+    [Tooltip("í˜„ì¬ ì„ íƒëœ ë§µ ì´ë¦„")]
     public string SelectedMap = null;
 
     #endregion
@@ -72,19 +72,19 @@ public class DataManager : MonoBehaviour
     #region Session Management API
 
     /// <summary>
-    /// »õ·Î¿î °ÔÀÓ ¼¼¼ÇÀ» ½ÃÀÛÇÒ ¶§ µ¥ÀÌÅÍ¸¦ ÃÊ±âÈ­ÇÕ´Ï´Ù.
+    /// ìƒˆë¡œìš´ ê²Œì„ ì„¸ì…˜ì„ ì‹œì‘í•  ë•Œ ë°ì´í„°ë¥¼ ì´ˆê¸°í™”í•©ë‹ˆë‹¤.
     /// </summary>
     public void InitializeSessionData()
     {
         SuccessCount = 0;
         MistakeCount = 0;
         PlayTime = 0f;
-        // SelectedMapÀº À¯Áö (·Îºñ¿¡¼­ ¼±ÅÃÇÏ°í µé¾î¿ÔÀ» ¼ö ÀÖÀ¸¹Ç·Î)
+        // SelectedMapì€ ìœ ì§€ (ë¡œë¹„ì—ì„œ ì„ íƒí•˜ê³  ë“¤ì–´ì™”ì„ ìˆ˜ ìˆìœ¼ë¯€ë¡œ)
         Debug.Log("[DataManager] Session Data Initialized.");
     }
 
     /// <summary>
-    /// ¼º°ø È½¼ö¸¦ 1 Áõ°¡½ÃÅµ´Ï´Ù.
+    /// ì„±ê³µ íšŸìˆ˜ë¥¼ 1 ì¦ê°€ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
     public void AddSuccessCount()
     {
@@ -92,7 +92,7 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ½Ç¼ö È½¼ö¸¦ 1 Áõ°¡½ÃÅµ´Ï´Ù.
+    /// ì‹¤ìˆ˜ íšŸìˆ˜ë¥¼ 1 ì¦ê°€ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
     public void AddMistakeCount()
     {
@@ -100,13 +100,13 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ ½Ã°£À» ´©ÀûÇÕ´Ï´Ù.
+    /// í”Œë ˆì´ ì‹œê°„ì„ ëˆ„ì í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="timeToAdd">Ãß°¡ÇÒ ½Ã°£(ÃÊ)</param>
+    /// <param name="timeToAdd">ì¶”ê°€í•  ì‹œê°„(ì´ˆ)</param>
     public void AddPlayTime(float timeToAdd)
     {
         PlayTime += timeToAdd;
-        // ³Ê¹« ÀÚÁÖ ·Î±×°¡ ÂïÈ÷´Â °ÍÀ» ¹æÁöÇÏ·Á¸é ¾Æ·¡ ÁÙÀº ÁÖ¼® Ã³¸® °¡´É
+        // ë„ˆë¬´ ìì£¼ ë¡œê·¸ê°€ ì°íˆëŠ” ê²ƒì„ ë°©ì§€í•˜ë ¤ë©´ ì•„ë˜ ì¤„ì€ ì£¼ì„ ì²˜ë¦¬ ê°€ëŠ¥
         // Debug.Log($"[DataManager] PlayTime updated: {PlayTime:F2} seconds");
     }
 
@@ -115,9 +115,9 @@ public class DataManager : MonoBehaviour
     #region Settings Management API
 
     /// <summary>
-    /// ¸¶½ºÅÍ º¼·ıÀ» ¼³Á¤ÇÏ°í Áï½Ã Àû¿ëÇÕ´Ï´Ù. (AudioListener Àü¿ª º¼·ı Á¦¾î)
+    /// ë§ˆìŠ¤í„° ë³¼ë¥¨ì„ ì„¤ì •í•˜ê³  ì¦‰ì‹œ ì ìš©í•©ë‹ˆë‹¤. (AudioListener ì „ì—­ ë³¼ë¥¨ ì œì–´)
     /// </summary>
-    /// <param name="volume">0.0 ~ 1.0 »çÀÌÀÇ º¼·ı °ª</param>
+    /// <param name="volume">0.0 ~ 1.0 ì‚¬ì´ì˜ ë³¼ë¥¨ ê°’</param>
     public void SetVolume(float volume)
     {
         MasterVolume = Mathf.Clamp01(volume);
@@ -125,7 +125,7 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸Ö¹Ì ¹æÁö ¸ğµå(Anti-Motion Sickness)¸¦ ¼³Á¤ÇÕ´Ï´Ù.
+    /// ë©€ë¯¸ ë°©ì§€ ëª¨ë“œ(Anti-Motion Sickness)ë¥¼ ì„¤ì •í•©ë‹ˆë‹¤.
     /// </summary>
     public void SetMotionSicknessMode(bool isEnabled)
     {
@@ -133,7 +133,7 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇöÀç ¼³Á¤°ª(º¼·ı, ¸Ö¹Ì ¸ğµå)À» PlayerPrefs¿¡ ÀúÀåÇÕ´Ï´Ù.
+    /// í˜„ì¬ ì„¤ì •ê°’(ë³¼ë¥¨, ë©€ë¯¸ ëª¨ë“œ)ì„ PlayerPrefsì— ì €ì¥í•©ë‹ˆë‹¤.
     /// </summary>
     public void SaveSettings()
     {
@@ -145,15 +145,15 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀúÀåµÈ ¼³Á¤°ªÀ» ºÒ·¯¿Í Àû¿ëÇÕ´Ï´Ù. ÀúÀåµÈ °ªÀÌ ¾øÀ¸¸é ±âº»°ªÀ» »ç¿ëÇÕ´Ï´Ù.
+    /// ì €ì¥ëœ ì„¤ì •ê°’ì„ ë¶ˆëŸ¬ì™€ ì ìš©í•©ë‹ˆë‹¤. ì €ì¥ëœ ê°’ì´ ì—†ìœ¼ë©´ ê¸°ë³¸ê°’ì„ ì‚¬ìš©í•©ë‹ˆë‹¤.
     /// </summary>
     public void LoadSettings()
     {
-        // ±âº»°ª: º¼·ı 1.0, ¸Ö¹Ì¸ğµå OFF(0)
+        // ê¸°ë³¸ê°’: ë³¼ë¥¨ 1.0, ë©€ë¯¸ëª¨ë“œ OFF(0)
         MasterVolume = PlayerPrefs.GetFloat(KEY_VOLUME, 1.0f);
         IsAntiMotionSicknessMode = PlayerPrefs.GetInt(KEY_MOTION_SICKNESS, 0) == 1;
 
-        // ºÒ·¯¿Â °ª Áï½Ã Àû¿ë
+        // ë¶ˆëŸ¬ì˜¨ ê°’ ì¦‰ì‹œ ì ìš©
         AudioListener.volume = MasterVolume;
 
         Debug.Log($"[DataManager] Settings Loaded - Volume: {MasterVolume}, Anti-Motion: {IsAntiMotionSicknessMode}");

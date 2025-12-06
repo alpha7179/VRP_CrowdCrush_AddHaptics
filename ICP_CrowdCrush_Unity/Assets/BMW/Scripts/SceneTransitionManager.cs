@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering;
 using System.Collections;
@@ -33,7 +33,7 @@ public class SceneTransitionManager : MonoBehaviour
     [SerializeField] private float distFromCamera = 0.2f;
 
     [Header("Camera Settings")]
-    [Tooltip("UI Ä«¸Ş¶ó°¡ ÀÖ´Ù¸é ÀÌ ÅÂ±×¸¦ °¡Áø Ä«¸Ş¶ó¸¦ ¿ì¼±ÀûÀ¸·Î Ã£½À´Ï´Ù.")]
+    [Tooltip("UI ì¹´ë©”ë¼ê°€ ìˆë‹¤ë©´ ì´ íƒœê·¸ë¥¼ ê°€ì§„ ì¹´ë©”ë¼ë¥¼ ìš°ì„ ì ìœ¼ë¡œ ì°¾ìŠµë‹ˆë‹¤.")]
     [SerializeField] private string uiCameraTag = "UICamera";
 
     #endregion
@@ -64,7 +64,7 @@ public class SceneTransitionManager : MonoBehaviour
         if (fadeCanvas != null)
         {
             fadeCanvas.sortingOrder = 32767;
-            // Áß¿ä: Äµ¹ö½ºÀÇ ·¹ÀÌ¾î¸¦ UI Ä«¸Ş¶ó°¡ º¼ ¼ö ÀÖ´Â ·¹ÀÌ¾î·Î º¯°æ ±ÇÀå (¿©±â¼­ °­Á¦ÇÏÁö ¾Ê°í ¿¡µğÅÍ ¼³Á¤À» µû¸§)
+            // ì¤‘ìš”: ìº”ë²„ìŠ¤ì˜ ë ˆì´ì–´ë¥¼ UI ì¹´ë©”ë¼ê°€ ë³¼ ìˆ˜ ìˆëŠ” ë ˆì´ì–´ë¡œ ë³€ê²½ ê¶Œì¥ (ì—¬ê¸°ì„œ ê°•ì œí•˜ì§€ ì•Šê³  ì—ë””í„° ì„¤ì •ì„ ë”°ë¦„)
         }
 
         ForceUpdateCanvasPosition();
@@ -85,7 +85,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        cachedCamera = null; // ¾À ·Îµå ½Ã Ä³½Ã ÃÊ±âÈ­
+        cachedCamera = null; // ì”¬ ë¡œë“œ ì‹œ ìºì‹œ ì´ˆê¸°í™”
         ForceUpdateCanvasPosition();
     }
 
@@ -100,32 +100,32 @@ public class SceneTransitionManager : MonoBehaviour
     }
 
     // ==================================================================================
-    // [ÇÙ½É ¼öÁ¤] : Ä«¸Ş¶ó Ã£´Â ·ÎÁ÷ º¯°æ
-    // MainCameraº¸´Ù UICamera(¿À¹ö·¹ÀÌ Ä«¸Ş¶ó)¸¦ ¿ì¼±ÀûÀ¸·Î Ã£¾Æ¼­ Å¸°ÙÀ¸·Î »ï½À´Ï´Ù.
+    // [í•µì‹¬ ìˆ˜ì •] : ì¹´ë©”ë¼ ì°¾ëŠ” ë¡œì§ ë³€ê²½
+    // MainCameraë³´ë‹¤ UICamera(ì˜¤ë²„ë ˆì´ ì¹´ë©”ë¼)ë¥¼ ìš°ì„ ì ìœ¼ë¡œ ì°¾ì•„ì„œ íƒ€ê²Ÿìœ¼ë¡œ ì‚¼ìŠµë‹ˆë‹¤.
     // ==================================================================================
     private void ForceUpdateCanvasPosition()
     {
-        // 1. ÀÌ¹Ì Ã£Àº Ä«¸Ş¶ó°¡ À¯È¿ÇÏ°í È°¼ºÈ­µÇ¾î ÀÖ´Ù¸é ÆĞ½º
+        // 1. ì´ë¯¸ ì°¾ì€ ì¹´ë©”ë¼ê°€ ìœ íš¨í•˜ê³  í™œì„±í™”ë˜ì–´ ìˆë‹¤ë©´ íŒ¨ìŠ¤
         if (cachedCamera != null && cachedCamera.gameObject.activeInHierarchy)
         {
             SyncCanvasToCamera(cachedCamera);
             return;
         }
 
-        // 2. UI Ä«¸Ş¶ó(Overlay)¸¦ ¸ÕÀú Ã£À½ (ÅÂ±× ÀÌ¿ë)
+        // 2. UI ì¹´ë©”ë¼(Overlay)ë¥¼ ë¨¼ì € ì°¾ìŒ (íƒœê·¸ ì´ìš©)
         GameObject uiCamObj = GameObject.FindGameObjectWithTag(uiCameraTag);
         if (uiCamObj != null)
         {
             cachedCamera = uiCamObj.GetComponent<Camera>();
         }
 
-        // 3. UI Ä«¸Ş¶ó°¡ ¾øÀ¸¸é ¸ŞÀÎ Ä«¸Ş¶ó¸¦ Ã£À½
+        // 3. UI ì¹´ë©”ë¼ê°€ ì—†ìœ¼ë©´ ë©”ì¸ ì¹´ë©”ë¼ë¥¼ ì°¾ìŒ
         if (cachedCamera == null)
         {
             cachedCamera = Camera.main;
         }
 
-        // 4. ±×·¡µµ ¾øÀ¸¸é ¾Æ¹« Ä«¸Ş¶ó³ª Ã£À½ (ÃÖÈÄÀÇ ¼ö´Ü)
+        // 4. ê·¸ë˜ë„ ì—†ìœ¼ë©´ ì•„ë¬´ ì¹´ë©”ë¼ë‚˜ ì°¾ìŒ (ìµœí›„ì˜ ìˆ˜ë‹¨)
         if (cachedCamera == null)
         {
             cachedCamera = FindAnyObjectByType<Camera>();
@@ -139,32 +139,32 @@ public class SceneTransitionManager : MonoBehaviour
 
     private void SyncCanvasToCamera(Camera cam)
     {
-        // ÇöÀç ¿ì¸®°¡ Å¸°ÙÆÃÇÏ°í ÀÖ´Â(°¡Àå ÃÖ»ó´Ü) Ä«¸Ş¶ó°¡ ¾Æ´Ï¸é À§Ä¡ °»½Å ¹«½Ã
+        // í˜„ì¬ ìš°ë¦¬ê°€ íƒ€ê²ŸíŒ…í•˜ê³  ìˆëŠ”(ê°€ì¥ ìµœìƒë‹¨) ì¹´ë©”ë¼ê°€ ì•„ë‹ˆë©´ ìœ„ì¹˜ ê°±ì‹  ë¬´ì‹œ
         if (cachedCamera != null && cam != cachedCamera) return;
 
         if (cam == null || fadeCanvas == null) return;
         if (!isFading && fadeCanvasGroup.alpha <= 0.01f) return;
 
-        // 1. Äµ¹ö½º ¿ùµå Ä«¸Ş¶ó ¼³Á¤
+        // 1. ìº”ë²„ìŠ¤ ì›”ë“œ ì¹´ë©”ë¼ ì„¤ì •
         if (fadeCanvas.worldCamera != cam)
         {
             fadeCanvas.worldCamera = cam;
         }
 
-        // 2. À§Ä¡ µ¿±âÈ­
+        // 2. ìœ„ì¹˜ ë™ê¸°í™”
         Transform camTr = cam.transform;
         Transform canvasTr = fadeCanvas.transform;
 
         canvasTr.position = camTr.position + (camTr.forward * distFromCamera);
         canvasTr.rotation = camTr.rotation;
 
-        // Áß¿ä: UI Ä«¸Ş¶ó°¡ Orthographic(Á÷±³)ÀÏ °æ¿ì ½ºÄÉÀÏÀÌ³ª °Å¸®°¡ ´Ù¸¦ ¼ö ÀÖÀ½.
-        // ¸¸¾à UI Ä«¸Ş¶ó°¡ OrthographicÀÌ¶ó¸é °Å¸®¸¦ Á» ´õ ¶ç¿ì°Å³ª »çÀÌÁî Á¶ÀıÀÌ ÇÊ¿äÇÒ ¼ö ÀÖ½À´Ï´Ù.
+        // ì¤‘ìš”: UI ì¹´ë©”ë¼ê°€ Orthographic(ì§êµ)ì¼ ê²½ìš° ìŠ¤ì¼€ì¼ì´ë‚˜ ê±°ë¦¬ê°€ ë‹¤ë¥¼ ìˆ˜ ìˆìŒ.
+        // ë§Œì•½ UI ì¹´ë©”ë¼ê°€ Orthographicì´ë¼ë©´ ê±°ë¦¬ë¥¼ ì¢€ ë” ë„ìš°ê±°ë‚˜ ì‚¬ì´ì¦ˆ ì¡°ì ˆì´ í•„ìš”í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
     }
 
     #endregion
 
-    #region Public API (LoadScene µî)
+    #region Public API (LoadScene ë“±)
 
     public void LoadScene(string sceneName)
     {
@@ -198,11 +198,11 @@ public class SceneTransitionManager : MonoBehaviour
         }
 
         // --------------------------------------------------------
-        // [ÀÌÀü ¼öÁ¤»çÇ× À¯Áö]: ¾À ·Îµå Á÷ÈÄ ±ôºıÀÓ ¹æÁö ´ë±â
-        cachedCamera = null; // »õ ¾ÀÀÇ Ä«¸Ş¶ó¸¦ ´Ù½Ã Ã£µµ·Ï ÃÊ±âÈ­
+        // [ì´ì „ ìˆ˜ì •ì‚¬í•­ ìœ ì§€]: ì”¬ ë¡œë“œ ì§í›„ ê¹œë¹¡ì„ ë°©ì§€ ëŒ€ê¸°
+        cachedCamera = null; // ìƒˆ ì”¬ì˜ ì¹´ë©”ë¼ë¥¼ ë‹¤ì‹œ ì°¾ë„ë¡ ì´ˆê¸°í™”
         ForceUpdateCanvasPosition();
 
-        // 5ÇÁ·¹ÀÓ Á¤µµ ´ë±â (UI Ä«¸Ş¶ó Ã£°í À§Ä¡ ÀâÀ» ½Ã°£ ¹ú±â)
+        // 5í”„ë ˆì„ ì •ë„ ëŒ€ê¸° (UI ì¹´ë©”ë¼ ì°¾ê³  ìœ„ì¹˜ ì¡ì„ ì‹œê°„ ë²Œê¸°)
         for (int i = 0; i < 5; i++)
         {
             ForceUpdateCanvasPosition();
@@ -246,7 +246,7 @@ public class SceneTransitionManager : MonoBehaviour
 
     private void ResetGameManagers()
     {
-        // (±âÁ¸ ÄÚµå¿Í µ¿ÀÏ)
+        // (ê¸°ì¡´ ì½”ë“œì™€ ë™ì¼)
         if (DataManager.Instance != null) Destroy(DataManager.Instance.gameObject);
         if (GameManager.Instance != null) Destroy(GameManager.Instance.gameObject);
         if (ControllerInputManager.Instance != null) Destroy(ControllerInputManager.Instance.gameObject);

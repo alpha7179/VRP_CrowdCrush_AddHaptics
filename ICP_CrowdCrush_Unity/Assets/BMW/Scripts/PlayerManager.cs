@@ -1,13 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾îÀÇ ÀÌµ¿(Locomotion) ¹× »óÈ£ÀÛ¿ë(Interaction) ±â´ÉÀ» Áß¾Ó¿¡¼­ °ü¸®ÇÏ´Â ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// í”Œë ˆì´ì–´ì˜ ì´ë™(Locomotion) ë° ìƒí˜¸ì‘ìš©(Interaction) ê¸°ëŠ¥ì„ ì¤‘ì•™ì—ì„œ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. ¾À ·Îµå ½Ã XR OriginÀ» ÀÚµ¿À¸·Î Å½»öÇÏ¿© ÂüÁ¶¸¦ °»½ÅÇÕ´Ï´Ù.<br/>
-/// 2. ¾ÀÀÇ Á¾·ù(Intro vs Game)¿¡ µû¶ó ÃÊ±â ±ÇÇÑÀ» ÀÚµ¿À¸·Î ¼³Á¤ÇÕ´Ï´Ù.<br/>
-/// 3. ¿ÜºÎ(GameStepManager µî)¿¡¼­ ÇÃ·¹ÀÌ¾îÀÇ ±â´ÉÀ» Á¦¾îÇÒ ¼ö ÀÖ´Â API¸¦ Á¦°øÇÕ´Ï´Ù.
+/// 1. ì”¬ ë¡œë“œ ì‹œ XR Originì„ ìë™ìœ¼ë¡œ íƒìƒ‰í•˜ì—¬ ì°¸ì¡°ë¥¼ ê°±ì‹ í•©ë‹ˆë‹¤.<br/>
+/// 2. ì”¬ì˜ ì¢…ë¥˜(Intro vs Game)ì— ë”°ë¼ ì´ˆê¸° ê¶Œí•œì„ ìë™ìœ¼ë¡œ ì„¤ì •í•©ë‹ˆë‹¤.<br/>
+/// 3. ì™¸ë¶€(GameStepManager ë“±)ì—ì„œ í”Œë ˆì´ì–´ì˜ ê¸°ëŠ¥ì„ ì œì–´í•  ìˆ˜ ìˆëŠ” APIë¥¼ ì œê³µí•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class PlayerManager : MonoBehaviour
@@ -21,7 +21,7 @@ public class PlayerManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            transform.parent = null; // ÃÖ»óÀ§ °èÃşÀ¸·Î ºĞ¸®ÇÏ¿© °ü¸®
+            transform.parent = null; // ìµœìƒìœ„ ê³„ì¸µìœ¼ë¡œ ë¶„ë¦¬í•˜ì—¬ ê´€ë¦¬
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -36,18 +36,18 @@ public class PlayerManager : MonoBehaviour
     #region Inspector Settings
 
     [Header("Target Object Names")]
-    [Tooltip("ÇÃ·¹ÀÌ¾îÀÇ ÃÖ»óÀ§ ºÎ¸ğ °´Ã¼ ÀÌ¸§ (XR Origin °Ë»ö¿ë Å°¿öµå)")]
+    [Tooltip("í”Œë ˆì´ì–´ì˜ ìµœìƒìœ„ ë¶€ëª¨ ê°ì²´ ì´ë¦„ (XR Origin ê²€ìƒ‰ìš© í‚¤ì›Œë“œ)")]
     [SerializeField] private string originKeyword = "XROrigin";
 
     [Header("Locomotion Settings")]
-    [Tooltip("ÀÌµ¿ ½Ã½ºÅÛ ±×·ì °´Ã¼ÀÇ ÀÌ¸§ (Locomotion System)")]
+    [Tooltip("ì´ë™ ì‹œìŠ¤í…œ ê·¸ë£¹ ê°ì²´ì˜ ì´ë¦„ (Locomotion System)")]
     [SerializeField] private string locomotionKeyword = "Locomotion";
 
-    [Tooltip("Á¦¾îÇÒ ÀÌµ¿ °ü·Ã ÄÄÆ÷³ÍÆ® ¶Ç´Â ÀÚ½Ä °´Ã¼ÀÇ Å°¿öµå ¸ñ·Ï (Move, Turn, Teleport µî)")]
+    [Tooltip("ì œì–´í•  ì´ë™ ê´€ë ¨ ì»´í¬ë„ŒíŠ¸ ë˜ëŠ” ìì‹ ê°ì²´ì˜ í‚¤ì›Œë“œ ëª©ë¡ (Move, Turn, Teleport ë“±)")]
     [SerializeField] private string[] moveKeywords = { "Turn", "Teleport", "Move" };
 
     [Header("Interaction Settings")]
-    [Tooltip("Á¦¾îÇÒ »óÈ£ÀÛ¿ë °ü·Ã ÄÄÆ÷³ÍÆ® ¶Ç´Â ÀÚ½Ä °´Ã¼ÀÇ Å°¿öµå ¸ñ·Ï (Ray Interactor, Direct Interactor µî)")]
+    [Tooltip("ì œì–´í•  ìƒí˜¸ì‘ìš© ê´€ë ¨ ì»´í¬ë„ŒíŠ¸ ë˜ëŠ” ìì‹ ê°ì²´ì˜ í‚¤ì›Œë“œ ëª©ë¡ (Ray Interactor, Direct Interactor ë“±)")]
     [SerializeField] private string[] interactionKeywords = { "Direct Interactor", "UI&Teleport Ray Interactor" };
 
     #endregion
@@ -55,7 +55,7 @@ public class PlayerManager : MonoBehaviour
     #region Internal State
 
     /// <summary>
-    /// ÇöÀç È°¼ºÈ­µÈ ¾ÀÀÇ XR Origin ÂüÁ¶ÀÔ´Ï´Ù. ¾ÀÀÌ ¹Ù²ğ ¶§¸¶´Ù °»½ÅµË´Ï´Ù.
+    /// í˜„ì¬ í™œì„±í™”ëœ ì”¬ì˜ XR Origin ì°¸ì¡°ì…ë‹ˆë‹¤. ì”¬ì´ ë°”ë€” ë•Œë§ˆë‹¤ ê°±ì‹ ë©ë‹ˆë‹¤.
     /// </summary>
     private GameObject currentXROrigin;
 
@@ -74,32 +74,32 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¾À ·Îµå°¡ ¿Ï·áµÉ ¶§ È£ÃâµÇ¾î ÇÃ·¹ÀÌ¾î¸¦ Ã£°í ÃÊ±â ±ÇÇÑÀ» ¼³Á¤ÇÕ´Ï´Ù.
+    /// ì”¬ ë¡œë“œê°€ ì™„ë£Œë  ë•Œ í˜¸ì¶œë˜ì–´ í”Œë ˆì´ì–´ë¥¼ ì°¾ê³  ì´ˆê¸° ê¶Œí•œì„ ì„¤ì •í•©ë‹ˆë‹¤.
     /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 1. ÇöÀç ¾ÀÀÇ XR Origin Å½»ö
+        // 1. í˜„ì¬ ì”¬ì˜ XR Origin íƒìƒ‰
         currentXROrigin = FindXROrigin();
 
         if (currentXROrigin == null)
         {
-            Debug.LogWarning($"[PlayerManager] '{scene.name}' ¾À¿¡¼­ '{originKeyword}' °´Ã¼¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogWarning($"[PlayerManager] '{scene.name}' ì”¬ì—ì„œ '{originKeyword}' ê°ì²´ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
-        // 2. ¾À Å¸ÀÔ¿¡ µû¸¥ ÃÊ±â ±ÇÇÑ ¼³Á¤
-        // ºñ±³ ½Ã ´ë¼Ò¹®ÀÚ¸¦ ¹«½ÃÇÏ¿© ¾ÈÀüÇÏ°Ô Ã¼Å© (OrdinalIgnoreCase)
+        // 2. ì”¬ íƒ€ì…ì— ë”°ë¥¸ ì´ˆê¸° ê¶Œí•œ ì„¤ì •
+        // ë¹„êµ ì‹œ ëŒ€ì†Œë¬¸ìë¥¼ ë¬´ì‹œí•˜ì—¬ ì•ˆì „í•˜ê²Œ ì²´í¬ (OrdinalIgnoreCase)
         if(scene.name.Equals("Main_Street", System.StringComparison.OrdinalIgnoreCase))
         {
-            // Game ¾À (½Ã¹Ä·¹ÀÌ¼Ç):
-            // ½Ã³ª¸®¿À ¸Å´ÏÀú(GameStepManager)°¡ Á¦¾î±ÇÀ» °¡Áú ¶§±îÁö ¿ÀÀÛµ¿ ¹æÁö¸¦ À§ÇØ ¸ğµç ±â´É Àá±İ
+            // Game ì”¬ (ì‹œë®¬ë ˆì´ì…˜):
+            // ì‹œë‚˜ë¦¬ì˜¤ ë§¤ë‹ˆì €(GameStepManager)ê°€ ì œì–´ê¶Œì„ ê°€ì§ˆ ë•Œê¹Œì§€ ì˜¤ì‘ë™ ë°©ì§€ë¥¼ ìœ„í•´ ëª¨ë“  ê¸°ëŠ¥ ì ê¸ˆ
             SetInteraction(false);
             SetLocomotion(false);
             Debug.Log("[PlayerManager] Game Scene: All Features Locked (Waiting for GameStepManager)");
         }
         else
         {
-            // Intro ¾À: ¸Ş´º Á¶ÀÛ(Interaction)Àº ÇÊ¿äÇÏÁö¸¸, ÀÌµ¿(Locomotion)Àº Á¦ÇÑ
+            // Intro ì”¬: ë©”ë‰´ ì¡°ì‘(Interaction)ì€ í•„ìš”í•˜ì§€ë§Œ, ì´ë™(Locomotion)ì€ ì œí•œ
             SetInteraction(true);
             SetLocomotion(false);
             Debug.Log("[PlayerManager] Intro Scene: Interaction ON / Locomotion OFF");
@@ -112,9 +112,9 @@ public class PlayerManager : MonoBehaviour
     #region Public API
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾îÀÇ ÀÌµ¿(Move, Turn, Teleport) ±â´ÉÀ» È°¼ºÈ­ÇÏ°Å³ª ºñÈ°¼ºÈ­ÇÕ´Ï´Ù.
+    /// í”Œë ˆì´ì–´ì˜ ì´ë™(Move, Turn, Teleport) ê¸°ëŠ¥ì„ í™œì„±í™”í•˜ê±°ë‚˜ ë¹„í™œì„±í™”í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="isEnabled">true: ÀÌµ¿ °¡´É, false: ÀÌµ¿ ºÒ°¡</param>
+    /// <param name="isEnabled">true: ì´ë™ ê°€ëŠ¥, false: ì´ë™ ë¶ˆê°€</param>
     public void SetLocomotion(bool isEnabled)
     {
         if (EnsureOriginFound())
@@ -124,14 +124,14 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾îÀÇ »óÈ£ÀÛ¿ë(Ray, Direct Grab µî) ±â´ÉÀ» È°¼ºÈ­ÇÏ°Å³ª ºñÈ°¼ºÈ­ÇÕ´Ï´Ù.
+    /// í”Œë ˆì´ì–´ì˜ ìƒí˜¸ì‘ìš©(Ray, Direct Grab ë“±) ê¸°ëŠ¥ì„ í™œì„±í™”í•˜ê±°ë‚˜ ë¹„í™œì„±í™”í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="isEnabled">true: »óÈ£ÀÛ¿ë °¡´É, false: »óÈ£ÀÛ¿ë ºÒ°¡</param>
+    /// <param name="isEnabled">true: ìƒí˜¸ì‘ìš© ê°€ëŠ¥, false: ìƒí˜¸ì‘ìš© ë¶ˆê°€</param>
     public void SetInteraction(bool isEnabled)
     {
         if (EnsureOriginFound())
         {
-            // »óÈ£ÀÛ¿ë ÄÄÆ÷³ÍÆ®´Â ÄÁÆ®·Ñ·¯ ÇÏÀ§ ¿©·¯ °÷¿¡ ºĞ»êµÇ¾î ÀÖÀ» ¼ö ÀÖÀ¸¹Ç·Î ÀüÃ¼ °Ë»öÀ¸·Î Á¦¾î
+            // ìƒí˜¸ì‘ìš© ì»´í¬ë„ŒíŠ¸ëŠ” ì»¨íŠ¸ë¡¤ëŸ¬ í•˜ìœ„ ì—¬ëŸ¬ ê³³ì— ë¶„ì‚°ë˜ì–´ ìˆì„ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ì „ì²´ ê²€ìƒ‰ìœ¼ë¡œ ì œì–´
             ControlFeaturesByKeywords(currentXROrigin, interactionKeywords, isEnabled);
         }
     }
@@ -141,23 +141,23 @@ public class PlayerManager : MonoBehaviour
     #region Helper Methods (Core Logic)
 
     /// <summary>
-    /// XR Origin ÂüÁ¶°¡ À¯È¿ÇÑÁö È®ÀÎÇÏ°í, ¾ø´Ù¸é ÀçÅ½»öÀ» ½ÃµµÇÕ´Ï´Ù.
+    /// XR Origin ì°¸ì¡°ê°€ ìœ íš¨í•œì§€ í™•ì¸í•˜ê³ , ì—†ë‹¤ë©´ ì¬íƒìƒ‰ì„ ì‹œë„í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <returns>ÂüÁ¶°¡ À¯È¿ÇÏ¸é true, ¾Æ´Ï¸é false</returns>
+    /// <returns>ì°¸ì¡°ê°€ ìœ íš¨í•˜ë©´ true, ì•„ë‹ˆë©´ false</returns>
     private bool EnsureOriginFound()
     {
         if (currentXROrigin == null) currentXROrigin = FindXROrigin();
 
         if (currentXROrigin == null)
         {
-            Debug.LogWarning("[PlayerManager] XR OriginÀ» Ã£À» ¼ö ¾ø¾î ¸í·ÉÀ» ¼öÇàÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogWarning("[PlayerManager] XR Originì„ ì°¾ì„ ìˆ˜ ì—†ì–´ ëª…ë ¹ì„ ìˆ˜í–‰í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return false;
         }
         return true;
     }
 
     /// <summary>
-    /// ÇöÀç ¾ÀÀÇ ·çÆ® °´Ã¼µé Áß¿¡¼­ ÁöÁ¤µÈ Å°¿öµå(XR Origin)¸¦ °¡Áø °´Ã¼¸¦ Ã£½À´Ï´Ù.
+    /// í˜„ì¬ ì”¬ì˜ ë£¨íŠ¸ ê°ì²´ë“¤ ì¤‘ì—ì„œ ì§€ì •ëœ í‚¤ì›Œë“œ(XR Origin)ë¥¼ ê°€ì§„ ê°ì²´ë¥¼ ì°¾ìŠµë‹ˆë‹¤.
     /// </summary>
     private GameObject FindXROrigin()
     {
@@ -173,16 +173,16 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Locomotion ½Ã½ºÅÛ ÇÏÀ§ÀÇ Æ¯Á¤ ±â´É(Move, Turn µî)À» Á¦¾îÇÕ´Ï´Ù.
+    /// Locomotion ì‹œìŠ¤í…œ í•˜ìœ„ì˜ íŠ¹ì • ê¸°ëŠ¥(Move, Turn ë“±)ì„ ì œì–´í•©ë‹ˆë‹¤.
     /// </summary>
     private void ControlLocomotion(GameObject xrOrigin, bool isEnabled)
     {
-        // 1. Locomotion System ºÎ¸ğ Ã£±â
+        // 1. Locomotion System ë¶€ëª¨ ì°¾ê¸°
         Transform locomotionTr = FindChildRecursive(xrOrigin.transform, locomotionKeyword);
 
         if (locomotionTr != null)
         {
-            // 2. ÇÏÀ§ÀÇ ÀÌµ¿ °ü·Ã °´Ã¼(Move, Turn, Teleport)µéÀ» Ã£¾Æ ÄÑ°Å³ª ²û
+            // 2. í•˜ìœ„ì˜ ì´ë™ ê´€ë ¨ ê°ì²´(Move, Turn, Teleport)ë“¤ì„ ì°¾ì•„ ì¼œê±°ë‚˜ ë”
             foreach (string keyword in moveKeywords)
             {
                 Transform targetTr = FindChildRecursive(locomotionTr, keyword);
@@ -195,19 +195,19 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ·çÆ® °´Ã¼ ÇÏÀ§ÀÇ ¸ğµç ÀÚ½Ä Áß¿¡¼­ Å°¿öµå°¡ Æ÷ÇÔµÈ °´Ã¼µéÀ» Ã£¾Æ È°¼ºÈ­/ºñÈ°¼ºÈ­ÇÕ´Ï´Ù.
-    /// (»óÈ£ÀÛ¿ë ±â´É Á¦¾î¿ë: ÄÁÆ®·Ñ·¯ ±¸Á¶°¡ º¹ÀâÇÒ ¼ö ÀÖ¾î ÀüÃ¼ °Ë»ö »ç¿ë)
+    /// ë£¨íŠ¸ ê°ì²´ í•˜ìœ„ì˜ ëª¨ë“  ìì‹ ì¤‘ì—ì„œ í‚¤ì›Œë“œê°€ í¬í•¨ëœ ê°ì²´ë“¤ì„ ì°¾ì•„ í™œì„±í™”/ë¹„í™œì„±í™”í•©ë‹ˆë‹¤.
+    /// (ìƒí˜¸ì‘ìš© ê¸°ëŠ¥ ì œì–´ìš©: ì»¨íŠ¸ë¡¤ëŸ¬ êµ¬ì¡°ê°€ ë³µì¡í•  ìˆ˜ ìˆì–´ ì „ì²´ ê²€ìƒ‰ ì‚¬ìš©)
     /// </summary>
     private void ControlFeaturesByKeywords(GameObject root, string[] keywords, bool isEnabled)
     {
-        // ºñÈ°¼ºÈ­µÈ ÀÚ½Ä(true)±îÁö ¸ğµÎ Æ÷ÇÔÇØ¼­ °Ë»öÇØ¾ß ²¨Áø ±â´ÉÀ» ´Ù½Ã ÄÓ ¼ö ÀÖÀ½
+        // ë¹„í™œì„±í™”ëœ ìì‹(true)ê¹Œì§€ ëª¨ë‘ í¬í•¨í•´ì„œ ê²€ìƒ‰í•´ì•¼ êº¼ì§„ ê¸°ëŠ¥ì„ ë‹¤ì‹œ ì¼¤ ìˆ˜ ìˆìŒ
         Transform[] allChildren = root.GetComponentsInChildren<Transform>(true);
 
         foreach (Transform child in allChildren)
         {
             foreach (string keyword in keywords)
             {
-                // ÀÌ¸§¿¡ Å°¿öµå°¡ Æ÷ÇÔµÇ¾î ÀÖ´ÂÁö È®ÀÎ (´ë¼Ò¹®ÀÚ ¹«½Ã)
+                // ì´ë¦„ì— í‚¤ì›Œë“œê°€ í¬í•¨ë˜ì–´ ìˆëŠ”ì§€ í™•ì¸ (ëŒ€ì†Œë¬¸ì ë¬´ì‹œ)
                 if (child.name.IndexOf(keyword, System.StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     child.gameObject.SetActive(isEnabled);
@@ -217,7 +217,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Àç±ÍÀûÀ¸·Î ÀÚ½Ä °´Ã¼¸¦ Å½»öÇÏ¿© Æ¯Á¤ ÀÌ¸§À» °¡Áø Ã¹ ¹øÂ° °´Ã¼¸¦ ¹İÈ¯ÇÕ´Ï´Ù.
+    /// ì¬ê·€ì ìœ¼ë¡œ ìì‹ ê°ì²´ë¥¼ íƒìƒ‰í•˜ì—¬ íŠ¹ì • ì´ë¦„ì„ ê°€ì§„ ì²« ë²ˆì§¸ ê°ì²´ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.
     /// </summary>
     private Transform FindChildRecursive(Transform parent, string namePart)
     {

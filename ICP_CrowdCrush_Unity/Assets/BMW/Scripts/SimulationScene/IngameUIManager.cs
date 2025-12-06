@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using TMPro;
@@ -7,11 +7,11 @@ using UnityEngine.UI;
 using static UnityEngine.InputSystem.HID.HID;
 
 /// <summary>
-/// ÀÎ°ÔÀÓ UI(HUD), ÆË¾÷ ÆĞ³Î, ¾Ğ¹Ú È¿°ú(Vignette) ¹× ¹Ì¼Ç ÁøÇà »óÈ²À» ÃÑ°ıÇÏ´Â ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// ì¸ê²Œì„ UI(HUD), íŒì—… íŒ¨ë„, ì••ë°• íš¨ê³¼(Vignette) ë° ë¯¸ì…˜ ì§„í–‰ ìƒí™©ì„ ì´ê´„í•˜ëŠ” ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. HUD ¿ä¼Ò(ÅØ½ºÆ®, °ÔÀÌÁö)¸¦ °»½ÅÇÏ°í ¾È³»/ÀÏ½ÃÁ¤Áö/°æ°í ÆĞ³ÎÀ» Á¦¾îÇÕ´Ï´Ù.<br/>
-/// 2. PressureVignette¿Í ¿¬µ¿ÇÏ¿© °ÔÀÓ ³» ¾Ğ¹Ú°¨(½Ã°¢Àû ¿Ö°î)À» Á¶ÀıÇÕ´Ï´Ù.<br/>
-/// 3. ÄÁÆ®·Ñ·¯ ÀÔ·ÂÀ» ¹Ş¾Æ ÀÏ½ÃÁ¤Áö(Y¹öÆ°), ÆĞ³Î ´İ±â(A¹öÆ°) µîÀÇ »óÈ£ÀÛ¿ëÀ» Ã³¸®ÇÕ´Ï´Ù.
+/// 1. HUD ìš”ì†Œ(í…ìŠ¤íŠ¸, ê²Œì´ì§€)ë¥¼ ê°±ì‹ í•˜ê³  ì•ˆë‚´/ì¼ì‹œì •ì§€/ê²½ê³  íŒ¨ë„ì„ ì œì–´í•©ë‹ˆë‹¤.<br/>
+/// 2. PressureVignetteì™€ ì—°ë™í•˜ì—¬ ê²Œì„ ë‚´ ì••ë°•ê°(ì‹œê°ì  ì™œê³¡)ì„ ì¡°ì ˆí•©ë‹ˆë‹¤.<br/>
+/// 3. ì»¨íŠ¸ë¡¤ëŸ¬ ì…ë ¥ì„ ë°›ì•„ ì¼ì‹œì •ì§€(Yë²„íŠ¼), íŒ¨ë„ ë‹«ê¸°(Aë²„íŠ¼) ë“±ì˜ ìƒí˜¸ì‘ìš©ì„ ì²˜ë¦¬í•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class IngameUIManager : MonoBehaviour
@@ -19,21 +19,21 @@ public class IngameUIManager : MonoBehaviour
     #region Inspector Settings (Panels)
 
     [Header("HUD Elements")]
-    [Tooltip("ÀÎ°ÔÀÓ HUD ÀüÃ¼¸¦ Æ÷ÇÔÇÏ´Â Äµ¹ö½º")]
+    [Tooltip("ì¸ê²Œì„ HUD ì „ì²´ë¥¼ í¬í•¨í•˜ëŠ” ìº”ë²„ìŠ¤")]
     [SerializeField] private Canvas IngameCanvas;
 
     [Header("Popup Panels")]
-    [Tooltip("ÁÖÀÇ »çÇ×(°æ°í) ÆĞ³Î")]
+    [Tooltip("ì£¼ì˜ ì‚¬í•­(ê²½ê³ ) íŒ¨ë„")]
     [SerializeField] private GameObject cautionPanel;
-    [Tooltip("¾È³» »çÇ× ÆĞ³Î")]
+    [Tooltip("ì•ˆë‚´ ì‚¬í•­ íŒ¨ë„")]
     [SerializeField] private GameObject situationPanel;
-    [Tooltip("ÀÏ½ÃÁ¤Áö ¸Ş´º ÆĞ³Î")]
+    [Tooltip("ì¼ì‹œì •ì§€ ë©”ë‰´ íŒ¨ë„")]
     [SerializeField] private GameObject pausePanel;
-    [Tooltip("Á¶ÀÛ ¼³¸í ¹× ¾È³» ÆĞ³Î")]
+    [Tooltip("ì¡°ì‘ ì„¤ëª… ë° ì•ˆë‚´ íŒ¨ë„")]
     [SerializeField] private GameObject instructionPanel;
-    [Tooltip("¹Ì¼Ç ÁøÇàµµ(ÇÁ·Î±×·¹½º ¹Ù) ÆĞ³Î")]
+    [Tooltip("ë¯¸ì…˜ ì§„í–‰ë„(í”„ë¡œê·¸ë ˆìŠ¤ ë°”) íŒ¨ë„")]
     [SerializeField] private GameObject progressPanel;
-    [Tooltip("¾Ğ¹Ú°¨ »óÅÂ¸¦ º¸¿©ÁÖ´Â ÆĞ³Î")]
+    [Tooltip("ì••ë°•ê° ìƒíƒœë¥¼ ë³´ì—¬ì£¼ëŠ” íŒ¨ë„")]
     [SerializeField] private GameObject pressurePanel;
 
     #endregion
@@ -41,54 +41,54 @@ public class IngameUIManager : MonoBehaviour
     #region Inspector Settings (UI Elements)
 
     [Header("Text Elements")]
-    [Tooltip("¾È³» ÆĞ³ÎÀÇ º»¹® ÅØ½ºÆ®")]
+    [Tooltip("ì•ˆë‚´ íŒ¨ë„ì˜ ë³¸ë¬¸ í…ìŠ¤íŠ¸")]
     [SerializeField] private GameObject[] instruction;
     private int currentInstruction = 0;
-    [Tooltip("ÇÇµå¹é/°á°ú ÅØ½ºÆ®")]
+    [Tooltip("í”¼ë“œë°±/ê²°ê³¼ í…ìŠ¤íŠ¸")]
     [SerializeField] private GameObject[] feedback;
     [SerializeField] private GameObject[] negativeFeedback;
     private int currentFeedback = 0;
     private int currentNegativeFeedback = 0;
 
     [Header("Progress Elements")]
-    [Tooltip("ÁøÇàµµ ÆĞ³ÎÀÇ ¹Ì¼Ç ¼³¸í ÅØ½ºÆ®")]
+    [Tooltip("ì§„í–‰ë„ íŒ¨ë„ì˜ ë¯¸ì…˜ ì„¤ëª… í…ìŠ¤íŠ¸")]
     [SerializeField] private TextMeshProUGUI progressMissionText;
-    [Tooltip("ÁøÇàµµ ÆÛ¼¾Æ®/½Ã°£ ÅØ½ºÆ®")]
+    [Tooltip("ì§„í–‰ë„ í¼ì„¼íŠ¸/ì‹œê°„ í…ìŠ¤íŠ¸")]
     [SerializeField] public TextMeshProUGUI progressText;
-    [Tooltip("ÁøÇàµµ ½½¶óÀÌ´õ")]
+    [Tooltip("ì§„í–‰ë„ ìŠ¬ë¼ì´ë”")]
     [SerializeField] public Image barSlider;
-    [Tooltip("ÁøÇà ´Ü°èº° ÆÁ ÀÌ¹ÌÁö ¹è¿­")]
+    [Tooltip("ì§„í–‰ ë‹¨ê³„ë³„ íŒ ì´ë¯¸ì§€ ë°°ì—´")]
     [SerializeField] public Image[] tipsImage;
 
     [Header("Pressure Elements")]
-    [Tooltip("¾Ğ¹Ú°¨ »óÅÂ ÅØ½ºÆ® (Á¤»ó ~ À§Çè)")]
+    [Tooltip("ì••ë°•ê° ìƒíƒœ í…ìŠ¤íŠ¸ (ì •ìƒ ~ ìœ„í—˜)")]
     [SerializeField] private TextMeshProUGUI pressureStateText;
-    [Tooltip("¾Ğ¹Ú°¨ ´Ü°èº° °ÔÀÌÁö ÀÌ¹ÌÁö ¹è¿­")]
+    [Tooltip("ì••ë°•ê° ë‹¨ê³„ë³„ ê²Œì´ì§€ ì´ë¯¸ì§€ ë°°ì—´")]
     [SerializeField] public Image[] pressureGaugeImages;
     [SerializeField] public Image[] pressureHighlightImages;
 
-    private readonly string[] PressureState = new string[] { "Á¤»ó", "ÁÖÀÇ", "°æ°í", "¾Ğ¹Ú", "À§Çè", "ÃÖ´ë À§Çè" };
+    private readonly string[] PressureState = new string[] { "ì •ìƒ", "ì£¼ì˜", "ê²½ê³ ", "ì••ë°•", "ìœ„í—˜", "ìµœëŒ€ ìœ„í—˜" };
 
     #endregion
 
     #region Inspector Settings (Effects & Settings)
 
     [Header("Visual Effects")]
-    [Tooltip("È­¸é °¡ÀåÀÚ¸® ºñ³×ÆÃ È¿°ú Á¦¾î ½ºÅ©¸³Æ®")]
+    [Tooltip("í™”ë©´ ê°€ì¥ìë¦¬ ë¹„ë„¤íŒ… íš¨ê³¼ ì œì–´ ìŠ¤í¬ë¦½íŠ¸")]
     [SerializeField] private PressureVignette pressureVignette;
 
     [Header("Animation Settings")]
-    [Tooltip("ºñ³×ÆÃ °­µµ°¡ º¯°æµÉ ¶§ °É¸®´Â ½Ã°£(ÃÊ)")]
+    [Tooltip("ë¹„ë„¤íŒ… ê°•ë„ê°€ ë³€ê²½ë  ë•Œ ê±¸ë¦¬ëŠ” ì‹œê°„(ì´ˆ)")]
     [SerializeField] private float vignetteSmoothTime = 0.5f;
-    [Tooltip("UI ÀÌ¹ÌÁö(°ÔÀÌÁö µî) ÆäÀÌµå ½Ã°£")]
+    [Tooltip("UI ì´ë¯¸ì§€(ê²Œì´ì§€ ë“±) í˜ì´ë“œ ì‹œê°„")]
     [SerializeField] private float imageFadeDuration = 0.3f;
-    [Tooltip("ÆĞ³ÎÀÌ ÄÑÁö°í ²¨Áö´Â ÆäÀÌµå ½Ã°£")]
+    [Tooltip("íŒ¨ë„ì´ ì¼œì§€ê³  êº¼ì§€ëŠ” í˜ì´ë“œ ì‹œê°„")]
     [SerializeField] private float panelFadeDuration = 0.2f;
 
     [Header("Pulse Settings")]
-    [Tooltip("°ÔÀÌÁö ±ôºıÀÓ(ÆŞ½º) ¼Óµµ")]
+    [Tooltip("ê²Œì´ì§€ ê¹œë¹¡ì„(í„ìŠ¤) ì†ë„")]
     [SerializeField] private float pulseSpeed = 3.0f;
-    [Tooltip("ÆŞ½º È¿°ú ½Ã ÃÖ¼Ò ¾ËÆÄ°ª")]
+    [Tooltip("í„ìŠ¤ íš¨ê³¼ ì‹œ ìµœì†Œ ì•ŒíŒŒê°’")]
     [SerializeField] private float minPulseAlpha = 0.2f;
 
     #endregion
@@ -96,25 +96,25 @@ public class IngameUIManager : MonoBehaviour
     #region External References
 
     [Header("External References")]
-    [Tooltip("°ÔÀÓ Á¾·á È­¸é ¸Å´ÏÀú")]
+    [Tooltip("ê²Œì„ ì¢…ë£Œ í™”ë©´ ë§¤ë‹ˆì €")]
     [SerializeField] private OuttroUIManager outtroManager;
 
     #endregion
 
     #region Internal State
 
-    // ÇöÀç ÆĞ³ÎÀÌ ¿­·ÁÀÖ´ÂÁö ¿©ºÎ (ÀÔ·Â Á¦¾î¿ë)
+    // í˜„ì¬ íŒ¨ë„ì´ ì—´ë ¤ìˆëŠ”ì§€ ì—¬ë¶€ (ì…ë ¥ ì œì–´ìš©)
     private bool isDisplayPanel = false;
 
-    // ÄÚ·çÆ¾ °ü¸® (Áßº¹ ½ÇÇà ¹æÁö)
+    // ì½”ë£¨í‹´ ê´€ë¦¬ (ì¤‘ë³µ ì‹¤í–‰ ë°©ì§€)
     private Dictionary<GameObject, Coroutine> panelCoroutines = new Dictionary<GameObject, Coroutine>();
     private Dictionary<Image, Coroutine> imageCoroutines = new Dictionary<Image, Coroutine>();
 
-    // ºñ³×ÆÃ Á¦¾î º¯¼ö
+    // ë¹„ë„¤íŒ… ì œì–´ ë³€ìˆ˜
     private float currentVignetteValue = 0f;
     private Coroutine vignetteCoroutine;
 
-    // ÆŞ½º È¿°ú¿ë Ä³½Ì º¯¼ö
+    // í„ìŠ¤ íš¨ê³¼ìš© ìºì‹± ë³€ìˆ˜
     private float cachedOriginalAlpha = 1.0f;
 
     #endregion
@@ -161,7 +161,7 @@ public class IngameUIManager : MonoBehaviour
 
     private void InitializeUI()
     {
-        // ¸ğµç ÆË¾÷ ÆĞ³Î ºñÈ°¼ºÈ­
+        // ëª¨ë“  íŒì—… íŒ¨ë„ ë¹„í™œì„±í™”
         if (cautionPanel) cautionPanel.SetActive(true);
         if (situationPanel) situationPanel.SetActive(false);
         if (pausePanel) pausePanel.SetActive(false);
@@ -171,7 +171,7 @@ public class IngameUIManager : MonoBehaviour
 
         HideAllTipsImages();
 
-        // ¾Ğ¹Ú È¿°ú ÃÊ±âÈ­ (0)
+        // ì••ë°• íš¨ê³¼ ì´ˆê¸°í™” (0)
         if (pressureVignette != null)
         {
             pressureVignette.SetIntensity(0f);
@@ -191,7 +191,7 @@ public class IngameUIManager : MonoBehaviour
     #region Input Handlers
 
     /// <summary>
-    /// Y ¹öÆ°: ÀÏ½ÃÁ¤Áö Åä±Û
+    /// Y ë²„íŠ¼: ì¼ì‹œì •ì§€ í† ê¸€
     /// </summary>
     private void HandleYButtonInput()
     {
@@ -200,36 +200,36 @@ public class IngameUIManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.TogglePause();
-            SetDisplayPanel(true); // ÀÏ½ÃÁ¤Áö ½Ã ÆĞ³Î »óÅÂ true
+            SetDisplayPanel(true); // ì¼ì‹œì •ì§€ ì‹œ íŒ¨ë„ ìƒíƒœ true
         }
     }
 
     /// <summary>
-    /// A ¹öÆ°: È®ÀÎ / ÆĞ³Î ´İ±â / ¸ŞÀÎÀ¸·Î ÀÌµ¿
+    /// A ë²„íŠ¼: í™•ì¸ / íŒ¨ë„ ë‹«ê¸° / ë©”ì¸ìœ¼ë¡œ ì´ë™
     /// </summary>
     private void HandleAButtonInput()
     {
         if (this == null || !gameObject.activeInHierarchy) return;
 
-        // 1. ÀÏ½ÃÁ¤Áö »óÅÂ¶ó¸é -> ÀÎÆ®·Î(¸ŞÀÎ)·Î ÀÌµ¿
+        // 1. ì¼ì‹œì •ì§€ ìƒíƒœë¼ë©´ -> ì¸íŠ¸ë¡œ(ë©”ì¸)ë¡œ ì´ë™
         if (pausePanel != null && pausePanel.activeSelf)
         {
-            Time.timeScale = 1f; // ½Ã°£ Á¤»óÈ­ ÈÄ ÀÌµ¿
+            Time.timeScale = 1f; // ì‹œê°„ ì •ìƒí™” í›„ ì´ë™
             GameManager.Instance.LoadScene("Main_Intro");
         }
-        // 2. ¾È³» ÆĞ³ÎÀÌ ¿­·ÁÀÖ´Ù¸é -> ´İ±â
+        // 2. ì•ˆë‚´ íŒ¨ë„ì´ ì—´ë ¤ìˆë‹¤ë©´ -> ë‹«ê¸°
         else if (instructionPanel != null && instructionPanel.activeSelf)
         {
             CloseInstructionPanel();
             SetDisplayPanel(false);
         }
-        // 3. ÁÖÀÇ ÆĞ³ÎÀÌ ¿­·ÁÀÖ´Ù¸é -> ´İ±â
+        // 3. ì£¼ì˜ íŒ¨ë„ì´ ì—´ë ¤ìˆë‹¤ë©´ -> ë‹«ê¸°
         else if (cautionPanel != null && cautionPanel.activeSelf)
         {
             CloseCautionPanel();
             SetDisplayPanel(false);
         }
-        // 4. »óÈ² ÆĞ³ÎÀÌ ¿­·ÁÀÖ´Ù¸é -> ´İ±â
+        // 4. ìƒí™© íŒ¨ë„ì´ ì—´ë ¤ìˆë‹¤ë©´ -> ë‹«ê¸°
         else if (situationPanel != null && situationPanel.activeSelf)
         {
             CloseSituationPanel();
@@ -238,13 +238,13 @@ public class IngameUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// B ¹öÆ°: Ãë¼Ò / °ÔÀÓ Àç°³
+    /// B ë²„íŠ¼: ì·¨ì†Œ / ê²Œì„ ì¬ê°œ
     /// </summary>
     private void HandleBButtonInput()
     {
         if (this == null || !gameObject.activeInHierarchy) return;
 
-        // ÀÏ½ÃÁ¤Áö »óÅÂ¶ó¸é -> °ÔÀÓ Àç°³
+        // ì¼ì‹œì •ì§€ ìƒíƒœë¼ë©´ -> ê²Œì„ ì¬ê°œ
         if (pausePanel != null && pausePanel.activeSelf)
         {
             if (GameManager.Instance != null) GameManager.Instance.TogglePause();
@@ -286,7 +286,7 @@ public class IngameUIManager : MonoBehaviour
     public void OpenPressurePanel() { if (pressurePanel) FadePanel(pressurePanel, true); }
     public void ClosePressurePanel() { if (pressurePanel) FadePanel(pressurePanel, false); }
 
-    // °ÔÀÓ Á¾·á È­¸é Ç¥½Ã (Canvas ²ô°í OuttroManager È°¼ºÈ­)
+    // ê²Œì„ ì¢…ë£Œ í™”ë©´ í‘œì‹œ (Canvas ë„ê³  OuttroManager í™œì„±í™”)
     public void ShowOuttroUI()
     {
         if (IngameCanvas) IngameCanvas.enabled = false;
@@ -352,13 +352,13 @@ public class IngameUIManager : MonoBehaviour
     #region Pressure & Vignette Logic
 
     /// <summary>
-    /// ºñ³×ÆÃ °­µµ¸¦ ºÎµå·´°Ô º¯°æÇÕ´Ï´Ù.
+    /// ë¹„ë„¤íŒ… ê°•ë„ë¥¼ ë¶€ë“œëŸ½ê²Œ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
     public void SetPressureIntensity(float targetIntensity)
     {
         if (pressureVignette == null) return;
 
-        // ±âÁ¸ ÄÚ·çÆ¾ ÁßÁöÇÏ°í »õ·Î¿î ÀüÈ¯ ½ÃÀÛ
+        // ê¸°ì¡´ ì½”ë£¨í‹´ ì¤‘ì§€í•˜ê³  ìƒˆë¡œìš´ ì „í™˜ ì‹œì‘
         if (vignetteCoroutine != null) StopCoroutine(vignetteCoroutine);
         vignetteCoroutine = StartCoroutine(SmoothVignetteRoutine(targetIntensity));
     }
@@ -381,11 +381,11 @@ public class IngameUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¾Ğ¹Ú °ÔÀÌÁö UI¸¦ ·¹º§(1~6)¿¡ ¸ÂÃç ¾÷µ¥ÀÌÆ®ÇÏ°í, ÇØ´ç ´Ü°è±îÁö ÀÌ¹ÌÁö¸¦ ÄÑ°Å³ª ÆŞ½º È¿°ú¸¦ Áİ´Ï´Ù.
+    /// ì••ë°• ê²Œì´ì§€ UIë¥¼ ë ˆë²¨(1~6)ì— ë§ì¶° ì—…ë°ì´íŠ¸í•˜ê³ , í•´ë‹¹ ë‹¨ê³„ê¹Œì§€ ì´ë¯¸ì§€ë¥¼ ì¼œê±°ë‚˜ í„ìŠ¤ íš¨ê³¼ë¥¼ ì¤ë‹ˆë‹¤.
     /// </summary>
     public void UpdatePressureGauge(int level)
     {
-        // 1. ÅØ½ºÆ® ¹× ºñ³×ÆÃ ¾÷µ¥ÀÌÆ®
+        // 1. í…ìŠ¤íŠ¸ ë° ë¹„ë„¤íŒ… ì—…ë°ì´íŠ¸
         if (pressureStateText)
         {
             int stateIndex = Mathf.Clamp(level, 0, PressureState.Length - 1);
@@ -396,10 +396,10 @@ public class IngameUIManager : MonoBehaviour
         float intensity = Mathf.Clamp01((float)level / maxLevel);
         SetPressureIntensity(intensity);
 
-        // 2. °ÔÀÌÁö ÀÌ¹ÌÁö ½Ã°¢ È¿°ú
+        // 2. ê²Œì´ì§€ ì´ë¯¸ì§€ ì‹œê° íš¨ê³¼
         if (pressureGaugeImages == null || pressureGaugeImages.Length == 0 || pressureHighlightImages == null || pressureHighlightImages.Length == 0) return;
 
-        int targetIndex = level - 1; // ÇöÀç ·¹º§ (0-based index)
+        int targetIndex = level - 1; // í˜„ì¬ ë ˆë²¨ (0-based index)
 
         for (int i = 0; i < pressureGaugeImages.Length; i++)
         {
@@ -407,7 +407,7 @@ public class IngameUIManager : MonoBehaviour
             Image highlightImg = pressureHighlightImages[i];
             if (img == null || highlightImg == null) continue;
 
-            // Áßº¹ ½ÇÇà ¹æÁö
+            // ì¤‘ë³µ ì‹¤í–‰ ë°©ì§€
             if (imageCoroutines.ContainsKey(img) && imageCoroutines[img] != null)
             {
                 StopCoroutine(imageCoroutines[img]);
@@ -417,28 +417,28 @@ public class IngameUIManager : MonoBehaviour
                 StopCoroutine(imageCoroutines[highlightImg]);
             }
 
-            bool shouldBeOn = (i < level); // ÇöÀç ·¹º§ ÀÌÇÏÀÇ °ÔÀÌÁö´Â ÄÑÁü
-            bool isPulseTarget = (i == targetIndex); // ÇöÀç ·¹º§ÀÇ °ÔÀÌÁö´Â ±ôºıÀÓ
+            bool shouldBeOn = (i < level); // í˜„ì¬ ë ˆë²¨ ì´í•˜ì˜ ê²Œì´ì§€ëŠ” ì¼œì§
+            bool isPulseTarget = (i == targetIndex); // í˜„ì¬ ë ˆë²¨ì˜ ê²Œì´ì§€ëŠ” ê¹œë¹¡ì„
 
             if (shouldBeOn)
             {
-                // ÄÑ±â (Fade In -> Pulse if target)
+                // ì¼œê¸° (Fade In -> Pulse if target)
                 imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 1.0f, true, false));
             }
             else
             {
-                // ²ô±â (Fade Out)
+                // ë„ê¸° (Fade Out)
                 imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 0.0f, false, false));
             }
 
             if (isPulseTarget)
             {
-                // ÄÑ±â (Fade In -> Pulse if target)
+                // ì¼œê¸° (Fade In -> Pulse if target)
                 imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 1.0f, true, isPulseTarget));
             }
             else
             {
-                // ²ô±â (Fade Out)
+                // ë„ê¸° (Fade Out)
                 imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 0.0f, false, false));
             }
         }
@@ -449,30 +449,30 @@ public class IngameUIManager : MonoBehaviour
     #region Mission Timer Logic
 
     /// <summary>
-    /// ¹Ì¼Ç Å¸ÀÌ¸Ó ÄÚ·çÆ¾. ÁöÁ¤µÈ ½Ã°£ µ¿¾È ÁøÇàµµ¸¦ °»½ÅÇÏ¸ç ´ë±âÇÕ´Ï´Ù.
+    /// ë¯¸ì…˜ íƒ€ì´ë¨¸ ì½”ë£¨í‹´. ì§€ì •ëœ ì‹œê°„ ë™ì•ˆ ì§„í–‰ë„ë¥¼ ê°±ì‹ í•˜ë©° ëŒ€ê¸°í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="missionText">ÁøÇà ÆĞ³Î¿¡ Ç¥½ÃÇÒ ÅØ½ºÆ®</param>
-    /// <param name="totalTime">ÃÑ Á¦ÇÑ ½Ã°£</param>
-    /// <param name="isMissionCompleteCondition">¹Ì¼Ç ¿Ï·á Á¶°Ç ÇÔ¼ö (true ¹İÈ¯ ½Ã Áï½Ã Á¾·á)</param>
-    /// <param name="progressCalculator">ÁøÇàµµ(0~1) °è»ê ÇÔ¼ö (nullÀÌ¸é ½Ã°£ ±âÁØ)</param>
+    /// <param name="missionText">ì§„í–‰ íŒ¨ë„ì— í‘œì‹œí•  í…ìŠ¤íŠ¸</param>
+    /// <param name="totalTime">ì´ ì œí•œ ì‹œê°„</param>
+    /// <param name="isMissionCompleteCondition">ë¯¸ì…˜ ì™„ë£Œ ì¡°ê±´ í•¨ìˆ˜ (true ë°˜í™˜ ì‹œ ì¦‰ì‹œ ì¢…ë£Œ)</param>
+    /// <param name="progressCalculator">ì§„í–‰ë„(0~1) ê³„ì‚° í•¨ìˆ˜ (nullì´ë©´ ì‹œê°„ ê¸°ì¤€)</param>
     public IEnumerator StartMissionTimer(string missionText, float totalTime, System.Func<bool> isMissionCompleteCondition, System.Func<float> progressCalculator = null, bool isDisplyPanel = false)
     {
         float currentTime = totalTime;
         float timeSpent = 0f;
 
-        // ÃÊ±â ÅØ½ºÆ® ¼³Á¤
+        // ì´ˆê¸° í…ìŠ¤íŠ¸ ì„¤ì •
         if (progressCalculator != null && progressText) progressText.text = "0 %";
         else if (progressText) progressText.text = $"{totalTime} s";
 
         if(isDisplyPanel) OpenProgressPanel(missionText);
 
-        // ¿Ï·á Á¶°ÇÀÌ ÃæÁ·µÉ ¶§±îÁö ·çÇÁ
+        // ì™„ë£Œ ì¡°ê±´ì´ ì¶©ì¡±ë  ë•Œê¹Œì§€ ë£¨í”„
         while (!isMissionCompleteCondition.Invoke())
         {
             currentTime -= Time.deltaTime;
             timeSpent += Time.deltaTime;
 
-            // ÁøÇàµµ °»½Å
+            // ì§„í–‰ë„ ê°±ì‹ 
             if (progressCalculator != null)
             { 
                 float currentProgress = progressCalculator.Invoke();
@@ -481,7 +481,7 @@ public class IngameUIManager : MonoBehaviour
             }
             else
             {
-                // ½Ã°£ ±âÁØ ÁøÇàµµ (³²Àº ½Ã°£ Ç¥½Ã)
+                // ì‹œê°„ ê¸°ì¤€ ì§„í–‰ë„ (ë‚¨ì€ ì‹œê°„ í‘œì‹œ)
                 if (progressText) progressText.text = $"{Mathf.CeilToInt(currentTime)} s";
                 if (barSlider) barSlider.fillAmount = currentTime / totalTime;
             }
@@ -489,7 +489,7 @@ public class IngameUIManager : MonoBehaviour
             yield return null;
         }
 
-        // ¹Ì¼Ç ¿Ï·á ÈÄ µ¥ÀÌÅÍ °»½Å
+        // ë¯¸ì…˜ ì™„ë£Œ í›„ ë°ì´í„° ê°±ì‹ 
         if (DataManager.Instance != null)
         {
             DataManager.Instance.AddSuccessCount();
