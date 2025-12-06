@@ -1,14 +1,14 @@
-using TMPro;
+ï»¿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>
-/// ÀÎÆ®·Î ¾ÀÀÇ UI Èå¸§(ÆĞ³Î ÀüÈ¯, ¸Ş´º Á¶ÀÛ, °ÔÀÓ ½ÃÀÛ)À» ÃÑ°ıÇÏ´Â ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// ì¸íŠ¸ë¡œ ì”¬ì˜ UI íë¦„(íŒ¨ë„ ì „í™˜, ë©”ë‰´ ì¡°ì‘, ê²Œì„ ì‹œì‘)ì„ ì´ê´„í•˜ëŠ” ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. ÃÖ»óÀ§ ÆĞ³Î(Intro vs Start)°ú ÇÏÀ§ ÄÜÅÙÃ÷ ÆĞ³Î(Place, Manual, Tips, Setting)À» °ü¸®ÇÕ´Ï´Ù.<br/>
-/// 2. DataManager¿Í ¿¬µ¿ÇÏ¿© º¼·ı ¹× ÆíÀÇ ¸ğµå ¼³Á¤À» ÃÊ±âÈ­ÇÏ°í º¯°æÇÕ´Ï´Ù.<br/>
-/// 3. ÆÁ(Tips) ÆĞ³ÎÀÇ ÆäÀÌÁö ³Ñ±è ±â´ÉÀ» Ã³¸®ÇÕ´Ï´Ù.
+/// 1. ìµœìƒìœ„ íŒ¨ë„(Intro vs Start)ê³¼ í•˜ìœ„ ì½˜í…ì¸  íŒ¨ë„(Place, Manual, Tips, Setting)ì„ ê´€ë¦¬í•©ë‹ˆë‹¤.<br/>
+/// 2. DataManagerì™€ ì—°ë™í•˜ì—¬ ë³¼ë¥¨ ë° í¸ì˜ ëª¨ë“œ ì„¤ì •ì„ ì´ˆê¸°í™”í•˜ê³  ë³€ê²½í•©ë‹ˆë‹¤.<br/>
+/// 3. íŒ(Tips) íŒ¨ë„ì˜ í˜ì´ì§€ ë„˜ê¹€ ê¸°ëŠ¥ì„ ì²˜ë¦¬í•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class IntroUIManager : MonoBehaviour
@@ -16,23 +16,23 @@ public class IntroUIManager : MonoBehaviour
     #region Inspector Settings (Panels)
 
     [Header("Top Level Panels")]
-    [Tooltip("°ÔÀÓ ½ÃÀÛ Àü 'ÅÍÄ¡ÇÏ¿© ½ÃÀÛ' µîÀ» Ç¥½ÃÇÏ´Â Ã¹ È­¸é ÆĞ³Î")]
+    [Tooltip("ê²Œì„ ì‹œì‘ ì „ 'í„°ì¹˜í•˜ì—¬ ì‹œì‘' ë“±ì„ í‘œì‹œí•˜ëŠ” ì²« í™”ë©´ íŒ¨ë„")]
     [SerializeField] private GameObject introPanel;
 
-    [Tooltip("¸ŞÀÎ ¸Ş´º ¹öÆ°µéÀÌ Æ÷ÇÔµÈ ½ÃÀÛ ÆĞ³Î")]
+    [Tooltip("ë©”ì¸ ë©”ë‰´ ë²„íŠ¼ë“¤ì´ í¬í•¨ëœ ì‹œì‘ íŒ¨ë„")]
     [SerializeField] private GameObject startPanel;
 
     [Header("Sub Panels (Inside StartPanel)")]
-    [Tooltip("Àå¼Ò ¼±ÅÃ ÆĞ³Î")]
+    [Tooltip("ì¥ì†Œ ì„ íƒ íŒ¨ë„")]
     [SerializeField] private GameObject placePanel;
     [SerializeField] private Image placeButton;
-    [Tooltip("Á¶ÀÛ ¼³¸í ÆĞ³Î")]
+    [Tooltip("ì¡°ì‘ ì„¤ëª… íŒ¨ë„")]
     [SerializeField] private GameObject manualPanel;
     [SerializeField] private Image manualButton;
-    [Tooltip("ÆÁ(µµ¿ò¸») ÆĞ³Î")]
+    [Tooltip("íŒ(ë„ì›€ë§) íŒ¨ë„")]
     [SerializeField] private GameObject tipsPanel;
     [SerializeField] private Image tipsButton;
-    [Tooltip("È¯°æ ¼³Á¤ ÆĞ³Î")]
+    [Tooltip("í™˜ê²½ ì„¤ì • íŒ¨ë„")]
     [SerializeField] private GameObject settingPanel;
     [SerializeField] private Image settingButton;
 
@@ -52,18 +52,18 @@ public class IntroUIManager : MonoBehaviour
     [SerializeField] private GameObject tip3;
     [SerializeField] private GameObject tip4;
     [SerializeField] private GameObject tip5;
-    [Tooltip("ÇöÀç ÆÁ ÆäÀÌÁö ¹øÈ£¸¦ Ç¥½ÃÇÒ ÅØ½ºÆ®")]
+    [Tooltip("í˜„ì¬ íŒ í˜ì´ì§€ ë²ˆí˜¸ë¥¼ í‘œì‹œí•  í…ìŠ¤íŠ¸")]
     [SerializeField] private TextMeshProUGUI tipPageText;
 
     [Header("Settings Panels Elements")]
-    [Tooltip("¿Àµğ¿À º¼·ı ½½¶óÀÌ´õ")]
+    [Tooltip("ì˜¤ë””ì˜¤ ë³¼ë¥¨ ìŠ¬ë¼ì´ë”")]
     [SerializeField] private Slider audioSlider;
-    [Tooltip("¿Àµğ¿À º¼·ı ¼öÄ¡ ÅØ½ºÆ® (0-100)")]
+    [Tooltip("ì˜¤ë””ì˜¤ ë³¼ë¥¨ ìˆ˜ì¹˜ í…ìŠ¤íŠ¸ (0-100)")]
     [SerializeField] private TextMeshProUGUI audioText;
 
-    [Tooltip("¸Ö¹Ì ¹æÁö ¸ğµå ½½¶óÀÌ´õ (0: OFF, 1: ON)")]
+    [Tooltip("ë©€ë¯¸ ë°©ì§€ ëª¨ë“œ ìŠ¬ë¼ì´ë” (0: OFF, 1: ON)")]
     [SerializeField] private Slider modeSlider;
-    [Tooltip("¸Ö¹Ì ¹æÁö ¸ğµå »óÅÂ ÅØ½ºÆ® (ON/OFF)")]
+    [Tooltip("ë©€ë¯¸ ë°©ì§€ ëª¨ë“œ ìƒíƒœ í…ìŠ¤íŠ¸ (ON/OFF)")]
     [SerializeField] private TextMeshProUGUI modeText;
 
     [Header("Debug")]
@@ -94,49 +94,49 @@ public class IntroUIManager : MonoBehaviour
     #region Initialization
 
     /// <summary>
-    /// DataManagerÀÇ ÀúÀåµÈ °ªÀ» ºÒ·¯¿Í UI(½½¶óÀÌ´õ)¿¡ ¹İ¿µÇÕ´Ï´Ù.
+    /// DataManagerì˜ ì €ì¥ëœ ê°’ì„ ë¶ˆëŸ¬ì™€ UI(ìŠ¬ë¼ì´ë”)ì— ë°˜ì˜í•©ë‹ˆë‹¤.
     /// </summary>
     private void InitializeSettings()
     {
-        // 1. ¿Àµğ¿À ½½¶óÀÌ´õ ¼³Á¤
+        // 1. ì˜¤ë””ì˜¤ ìŠ¬ë¼ì´ë” ì„¤ì •
         audioSlider.minValue = 0;
         audioSlider.maxValue = 100;
         audioSlider.wholeNumbers = true;
 
-        // DataManager°¡ ÀÖÀ¸¸é ÀúÀåµÈ º¼·ı °¡Á®¿À±â (0.0~1.0 -> 0~100 º¯È¯)
+        // DataManagerê°€ ìˆìœ¼ë©´ ì €ì¥ëœ ë³¼ë¥¨ ê°€ì ¸ì˜¤ê¸° (0.0~1.0 -> 0~100 ë³€í™˜)
         float currentVol = DataManager.Instance != null ? DataManager.Instance.MasterVolume : 1.0f;
         int displayVol = Mathf.RoundToInt(currentVol * 100f);
 
         audioSlider.value = displayVol;
-        OnAudioSliderValueChanged(displayVol); // ÅØ½ºÆ® °»½Å
+        OnAudioSliderValueChanged(displayVol); // í…ìŠ¤íŠ¸ ê°±ì‹ 
         audioSlider.onValueChanged.AddListener(OnAudioSliderValueChanged);
 
 
-        // 2. ¸ğµå ½½¶óÀÌ´õ ¼³Á¤
+        // 2. ëª¨ë“œ ìŠ¬ë¼ì´ë” ì„¤ì •
         modeSlider.minValue = 0;
         modeSlider.maxValue = 1;
         modeSlider.wholeNumbers = true;
 
-        // DataManager°¡ ÀÖÀ¸¸é ÀúÀåµÈ ¸ğµå °¡Á®¿À±â (bool -> 0/1)
+        // DataManagerê°€ ìˆìœ¼ë©´ ì €ì¥ëœ ëª¨ë“œ ê°€ì ¸ì˜¤ê¸° (bool -> 0/1)
         bool isModeOn = DataManager.Instance != null && DataManager.Instance.IsAntiMotionSicknessMode;
 
         modeSlider.value = isModeOn ? 1 : 0;
-        OnModeSliderValueChanged(isModeOn ? 1 : 0); // ÅØ½ºÆ® °»½Å
+        OnModeSliderValueChanged(isModeOn ? 1 : 0); // í…ìŠ¤íŠ¸ ê°±ì‹ 
         modeSlider.onValueChanged.AddListener(OnModeSliderValueChanged);
     }
 
     /// <summary>
-    /// ¾Û ½ÃÀÛ ½Ã ÆĞ³ÎµéÀÇ ÃÊ±â »óÅÂ(È°¼º/ºñÈ°¼º)¸¦ ¼³Á¤ÇÕ´Ï´Ù.
+    /// ì•± ì‹œì‘ ì‹œ íŒ¨ë„ë“¤ì˜ ì´ˆê¸° ìƒíƒœ(í™œì„±/ë¹„í™œì„±)ë¥¼ ì„¤ì •í•©ë‹ˆë‹¤.
     /// </summary>
     private void InitializeUIState()
     {
-        // ÇÏÀ§ ÆĞ³Î ¸ğµÎ ºñÈ°¼ºÈ­
+        // í•˜ìœ„ íŒ¨ë„ ëª¨ë‘ ë¹„í™œì„±í™”
         if (placePanel) placePanel.SetActive(false);
         if (manualPanel) manualPanel.SetActive(false);
         if (tipsPanel) tipsPanel.SetActive(false);
         if (settingPanel) settingPanel.SetActive(false);
 
-        // ÃÖ»óÀ§ ÆĞ³Î: IntroPanel È°¼ºÈ­
+        // ìµœìƒìœ„ íŒ¨ë„: IntroPanel í™œì„±í™”
         if (startPanel) startPanel.SetActive(false);
         if (introPanel) introPanel.SetActive(true);
 
@@ -149,19 +149,19 @@ public class IntroUIManager : MonoBehaviour
     #region UI Event Handlers (Navigation)
 
     /// <summary>
-    /// [Intro ÆĞ³Î Å¬¸¯ ½Ã] IntroPanelÀ» ´İ°í StartPanel(¸ŞÀÎ ¸Ş´º)À» ¿±´Ï´Ù.
+    /// [Intro íŒ¨ë„ í´ë¦­ ì‹œ] IntroPanelì„ ë‹«ê³  StartPanel(ë©”ì¸ ë©”ë‰´)ì„ ì—½ë‹ˆë‹¤.
     /// </summary>
     public void OnClickIntroButton()
     {
         if (isDebug) Debug.Log("IntroButton Clicked");
         SwitchTopPanel(startPanel);
 
-        // StartPanel ÁøÀÔ ½Ã ±âº»À¸·Î 'Àå¼Ò ¼±ÅÃ' ÆĞ³ÎÀ» º¸¿©ÁÜ
+        // StartPanel ì§„ì… ì‹œ ê¸°ë³¸ìœ¼ë¡œ 'ì¥ì†Œ ì„ íƒ' íŒ¨ë„ì„ ë³´ì—¬ì¤Œ
         SwitchMainPanel(placePanel, placeButton);
     }
 
     /// <summary>
-    /// [Àå¼Ò ¼±ÅÃ ¹öÆ°]
+    /// [ì¥ì†Œ ì„ íƒ ë²„íŠ¼]
     /// </summary>
     public void OnClickPlaceButton()
     {
@@ -170,7 +170,7 @@ public class IntroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [¸Å´º¾ó ¹öÆ°]
+    /// [ë§¤ë‰´ì–¼ ë²„íŠ¼]
     /// </summary>
     public void OnClickManualButton()
     {
@@ -178,7 +178,7 @@ public class IntroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [¼³Á¤ ¹öÆ°]
+    /// [ì„¤ì • ë²„íŠ¼]
     /// </summary>
     public void OnClickSettingButton()
     {
@@ -186,7 +186,7 @@ public class IntroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [ÆÁ ¹öÆ°] ÆÁ ÆĞ³ÎÀ» ¿­°í 1ÆäÀÌÁö·Î ÃÊ±âÈ­ÇÕ´Ï´Ù.
+    /// [íŒ ë²„íŠ¼] íŒ íŒ¨ë„ì„ ì—´ê³  1í˜ì´ì§€ë¡œ ì´ˆê¸°í™”í•©ë‹ˆë‹¤.
     /// </summary>
     public void OnClickTipsButton()
     {
@@ -195,7 +195,7 @@ public class IntroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [Àå¼Ò ¼±ÅÃ ¹öÆ°] ÀÌ¹ÌÁö ÃY¼ºÈ­µË´Ï´Ù.
+    /// [ì¥ì†Œ ì„ íƒ ë²„íŠ¼] ì´ë¯¸ì§€ í™ ì„±í™”ë©ë‹ˆë‹¤.
     /// </summary>
     public void OnClickPlace1()
     {
@@ -226,29 +226,29 @@ public class IntroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// [Ã¼Çè ½ÃÀÛ ¹öÆ°] ½Ã¹Ä·¹ÀÌ¼Ç ¾ÀÀ¸·Î ÀüÈ¯ÇÕ´Ï´Ù.
+    /// [ì²´í—˜ ì‹œì‘ ë²„íŠ¼] ì‹œë®¬ë ˆì´ì…˜ ì”¬ìœ¼ë¡œ ì „í™˜í•©ë‹ˆë‹¤.
     /// </summary>
     public void OnClickPlayButton()
     {
         if (DataManager.Instance.SelectedMap != "Street") return;
 
-        if (isDebug) Debug.Log("Ã¼ÇèÀ» ½ÃÀÛÇÕ´Ï´Ù.");
+        if (isDebug) Debug.Log("ì²´í—˜ì„ ì‹œì‘í•©ë‹ˆë‹¤.");
 
-        // ¼³Á¤°ª ÀúÀå (È¤½Ã º¯°æ ÈÄ ÀúÀåÀÌ ¾È µÇ¾úÀ» °æ¿ì ´ëºñ)
+        // ì„¤ì •ê°’ ì €ì¥ (í˜¹ì‹œ ë³€ê²½ í›„ ì €ì¥ì´ ì•ˆ ë˜ì—ˆì„ ê²½ìš° ëŒ€ë¹„)
         if (DataManager.Instance != null)
         {
             DataManager.Instance.SaveSettings();
         }
 
-        // ¾À ÀüÈ¯
+        // ì”¬ ì „í™˜
         if (GameManager.Instance != null)
         {
             GameManager.Instance.LoadScene("Main_Street");
         }
         else
         {
-            // SceneTransitionManager°¡ Á¸ÀçÇÏ¸é »ç¿ëÇÏ°í, ¾øÀ¸¸é ÀÏ¹İ SceneManager »ç¿ë
-            // (void ÇÔ¼ö¿¡´Â ?? ¿¬»êÀÚ¸¦ »ç¿ëÇÒ ¼ö ¾øÀ¸¹Ç·Î if¹®À¸·Î ºĞ¸®)
+            // SceneTransitionManagerê°€ ì¡´ì¬í•˜ë©´ ì‚¬ìš©í•˜ê³ , ì—†ìœ¼ë©´ ì¼ë°˜ SceneManager ì‚¬ìš©
+            // (void í•¨ìˆ˜ì—ëŠ” ?? ì—°ì‚°ìë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ìœ¼ë¯€ë¡œ ifë¬¸ìœ¼ë¡œ ë¶„ë¦¬)
             if (SceneTransitionManager.Instance != null)
             {
                 SceneTransitionManager.Instance.LoadScene("Main_Street");
@@ -298,16 +298,16 @@ public class IntroUIManager : MonoBehaviour
     #region UI Event Handlers (Settings)
 
     /// <summary>
-    /// ¿Àµğ¿À ½½¶óÀÌ´õ °ª º¯°æ ½Ã È£Ãâ (0 ~ 100)
+    /// ì˜¤ë””ì˜¤ ìŠ¬ë¼ì´ë” ê°’ ë³€ê²½ ì‹œ í˜¸ì¶œ (0 ~ 100)
     /// </summary>
     private void OnAudioSliderValueChanged(float value)
     {
         int intValue = Mathf.RoundToInt(value);
 
-        // UI ÅØ½ºÆ® °»½Å
+        // UI í…ìŠ¤íŠ¸ ê°±ì‹ 
         if (audioText != null) audioText.text = intValue.ToString();
 
-        // DataManager¿¡ ¹İ¿µ (0.0 ~ 1.0)
+        // DataManagerì— ë°˜ì˜ (0.0 ~ 1.0)
         if (DataManager.Instance != null)
         {
             DataManager.Instance.SetVolume(intValue / 100f);
@@ -315,20 +315,20 @@ public class IntroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸ğµå ½½¶óÀÌ´õ °ª º¯°æ ½Ã È£Ãâ (0 or 1)
+    /// ëª¨ë“œ ìŠ¬ë¼ì´ë” ê°’ ë³€ê²½ ì‹œ í˜¸ì¶œ (0 or 1)
     /// </summary>
     private void OnModeSliderValueChanged(float value)
     {
         int intValue = Mathf.RoundToInt(value);
         bool isModeOn = (intValue == 1);
 
-        // UI ÅØ½ºÆ® °»½Å
+        // UI í…ìŠ¤íŠ¸ ê°±ì‹ 
         if (modeText != null)
         {
             modeText.text = isModeOn ? "ON" : "OFF";
         }
 
-        // DataManager¿¡ ¹İ¿µ
+        // DataManagerì— ë°˜ì˜
         if (DataManager.Instance != null)
         {
             DataManager.Instance.SetMotionSicknessMode(isModeOn);
@@ -353,7 +353,7 @@ public class IntroUIManager : MonoBehaviour
     {
         if (currentMainPanel == panelToActivate) return;
 
-        // ÆÁ ÆĞ³ÎÀ» ´İÀ» ¶§´Â ³»ºÎ ÆäÀÌÁöµéµµ Á¤¸®
+        // íŒ íŒ¨ë„ì„ ë‹«ì„ ë•ŒëŠ” ë‚´ë¶€ í˜ì´ì§€ë“¤ë„ ì •ë¦¬
         if (currentMainPanel == tipsPanel)
         {
             if (tip1) tip1.SetActive(false);

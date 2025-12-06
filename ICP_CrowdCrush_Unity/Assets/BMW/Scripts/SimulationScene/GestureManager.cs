@@ -1,12 +1,12 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾îÀÇ Æ¯Á¤ Çàµ¿(¿¹: ABC ¹æ¾î ÀÚ¼¼)À» ÆÇÁ¤ÇÏ´Â ¸Å´ÏÀú Å¬·¡½ºÀÔ´Ï´Ù.
+/// í”Œë ˆì´ì–´ì˜ íŠ¹ì • í–‰ë™(ì˜ˆ: ABC ë°©ì–´ ìì„¸)ì„ íŒì •í•˜ëŠ” ë§¤ë‹ˆì € í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. ¸Ó¸®¿Í ¾ç¼ÕÀÇ À§Ä¡ °ü°è¸¦ °è»êÇÏ¿© Á¦½ºÃ³¸¦ ÀÎ½ÄÇÕ´Ï´Ù.<br/>
-/// 2. ÀÎ½Ä·ü ÀúÇÏ¸¦ ´ëºñÇØ ÄÁÆ®·Ñ·¯ ¹öÆ°(Trigger)À» ÀÌ¿ëÇÑ °­Á¦ ¹ßµ¿(Fail-safe)À» Áö¿øÇÕ´Ï´Ù.<br/>
-/// 3. µî¹İ(Climbing) »óÅÂÀÎÁö ÆÇº°ÇÏ´Â ·ÎÁ÷À» Æ÷ÇÔÇÕ´Ï´Ù.
+/// 1. ë¨¸ë¦¬ì™€ ì–‘ì†ì˜ ìœ„ì¹˜ ê´€ê³„ë¥¼ ê³„ì‚°í•˜ì—¬ ì œìŠ¤ì²˜ë¥¼ ì¸ì‹í•©ë‹ˆë‹¤.<br/>
+/// 2. ì¸ì‹ë¥  ì €í•˜ë¥¼ ëŒ€ë¹„í•´ ì»¨íŠ¸ë¡¤ëŸ¬ ë²„íŠ¼(Trigger)ì„ ì´ìš©í•œ ê°•ì œ ë°œë™(Fail-safe)ì„ ì§€ì›í•©ë‹ˆë‹¤.<br/>
+/// 3. ë“±ë°˜(Climbing) ìƒíƒœì¸ì§€ íŒë³„í•˜ëŠ” ë¡œì§ì„ í¬í•¨í•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class GestureManager : MonoBehaviour
@@ -14,13 +14,13 @@ public class GestureManager : MonoBehaviour
     #region Inspector Settings (Tracked Objects)
 
     [Header("Tracked Objects")]
-    [Tooltip("ÇÃ·¹ÀÌ¾îÀÇ ¸Ó¸®(Main Camera) Transform")]
+    [Tooltip("í”Œë ˆì´ì–´ì˜ ë¨¸ë¦¬(Main Camera) Transform")]
     [SerializeField] private Transform head;
 
-    [Tooltip("¿Ş¼Õ ÄÁÆ®·Ñ·¯ÀÇ À§Ä¡ (Attach Point)")]
+    [Tooltip("ì™¼ì† ì»¨íŠ¸ë¡¤ëŸ¬ì˜ ìœ„ì¹˜ (Attach Point)")]
     [SerializeField] private Transform leftHand;
 
-    [Tooltip("¿À¸¥¼Õ ÄÁÆ®·Ñ·¯ÀÇ À§Ä¡ (Attach Point)")]
+    [Tooltip("ì˜¤ë¥¸ì† ì»¨íŠ¸ë¡¤ëŸ¬ì˜ ìœ„ì¹˜ (Attach Point)")]
     [SerializeField] private Transform rightHand;
 
     #endregion
@@ -28,13 +28,13 @@ public class GestureManager : MonoBehaviour
     #region Inspector Settings (Detection Parameters)
 
     [Header("Detection Settings")]
-    [Tooltip("¸Ó¸® À§Ä¡¿¡¼­ ¾Æ·¡·Î ¾ó¸¶¸¸Å­ ³»·Á°£ °÷À» '°¡½¿'À¸·Î ÃßÁ¤ÇÒÁö ¼³Á¤ (´ÜÀ§: m)")]
+    [Tooltip("ë¨¸ë¦¬ ìœ„ì¹˜ì—ì„œ ì•„ë˜ë¡œ ì–¼ë§ˆë§Œí¼ ë‚´ë ¤ê°„ ê³³ì„ 'ê°€ìŠ´'ìœ¼ë¡œ ì¶”ì •í• ì§€ ì„¤ì • (ë‹¨ìœ„: m)")]
     [SerializeField] private float chestYOffset = 0.35f;
 
-    [Tooltip("°¡½¿(ÃßÁ¤ À§Ä¡)°ú ¼Õ »çÀÌÀÇ ÃÖ´ë Çã¿ë °Å¸® (ÀÌ °Å¸® ¾ÈÀ¸·Î ¼ÕÀÌ µé¾î¿Í¾ß ÇÔ)")]
+    [Tooltip("ê°€ìŠ´(ì¶”ì • ìœ„ì¹˜)ê³¼ ì† ì‚¬ì´ì˜ ìµœëŒ€ í—ˆìš© ê±°ë¦¬ (ì´ ê±°ë¦¬ ì•ˆìœ¼ë¡œ ì†ì´ ë“¤ì–´ì™€ì•¼ í•¨)")]
     [SerializeField] private float chestDistanceThreshold = 0.5f;
 
-    [Tooltip("¾ç¼Õ »çÀÌÀÇ ÃÖ´ë Çã¿ë °Å¸® (¾ç¼ÕÀ» ¸ğ¾Ò´ÂÁö ÆÇº°)")]
+    [Tooltip("ì–‘ì† ì‚¬ì´ì˜ ìµœëŒ€ í—ˆìš© ê±°ë¦¬ (ì–‘ì†ì„ ëª¨ì•˜ëŠ”ì§€ íŒë³„)")]
     [SerializeField] private float handsDistanceThreshold = 0.35f;
 
     #endregion
@@ -42,22 +42,22 @@ public class GestureManager : MonoBehaviour
     #region Debug Info
 
     [Header("Debug Info (Read Only)")]
-    [Tooltip("ÇöÀç ¾ç¼Õ »çÀÌÀÇ °Å¸®")]
+    [Tooltip("í˜„ì¬ ì–‘ì† ì‚¬ì´ì˜ ê±°ë¦¬")]
     [SerializeField] private float currentHandDist;
 
-    [Tooltip("ÇöÀç ¾ç¼Õ »çÀÌÀÇ °Å¸®")]
+    [Tooltip("í˜„ì¬ ì–‘ì† ì‚¬ì´ì˜ ê±°ë¦¬")]
     [SerializeField] private bool isOnlyButtonDetected = true;
 
-    [Tooltip("ÇöÀç °¡½¿°ú ¿Ş¼Õ »çÀÌÀÇ °Å¸®")]
+    [Tooltip("í˜„ì¬ ê°€ìŠ´ê³¼ ì™¼ì† ì‚¬ì´ì˜ ê±°ë¦¬")]
     [SerializeField] private float currentLeftDist;
 
-    [Tooltip("ÇöÀç °¡½¿°ú ¿À¸¥¼Õ »çÀÌÀÇ °Å¸®")]
+    [Tooltip("í˜„ì¬ ê°€ìŠ´ê³¼ ì˜¤ë¥¸ì† ì‚¬ì´ì˜ ê±°ë¦¬")]
     [SerializeField] private float currentRightDist;
 
-    [Tooltip("Á¦½ºÃ³(°Å¸® ±â¹İ) ÀÎ½Ä ¼º°ø ¿©ºÎ")]
+    [Tooltip("ì œìŠ¤ì²˜(ê±°ë¦¬ ê¸°ë°˜) ì¸ì‹ ì„±ê³µ ì—¬ë¶€")]
     [SerializeField] private bool isGestureDetected;
 
-    [Tooltip("¹öÆ°(Æ®¸®°Å) ÀÔ·ÂÀ» ÅëÇÑ °­Á¦ ÀÎ½Ä ¿©ºÎ")]
+    [Tooltip("ë²„íŠ¼(íŠ¸ë¦¬ê±°) ì…ë ¥ì„ í†µí•œ ê°•ì œ ì¸ì‹ ì—¬ë¶€")]
     [SerializeField] private bool isButtonOverride;
 
     #endregion
@@ -65,41 +65,41 @@ public class GestureManager : MonoBehaviour
     #region Public API (Action Checks)
 
     /// <summary>
-    /// ÇöÀç ¹æ¾î Çàµ¿(ABC ÀÚ¼¼)ÀÌ À¯È¿ÇÑÁö °Ë»çÇÕ´Ï´Ù.
-    /// <para>Á¦½ºÃ³°¡ ÀÎ½ÄµÇ¾ú°Å³ª(OR), ¾çÂÊ Æ®¸®°Å ¹öÆ°À» µ¿½Ã¿¡ ´©¸£°í ÀÖÀ¸¸é true¸¦ ¹İÈ¯ÇÕ´Ï´Ù.</para>
+    /// í˜„ì¬ ë°©ì–´ í–‰ë™(ABC ìì„¸)ì´ ìœ íš¨í•œì§€ ê²€ì‚¬í•©ë‹ˆë‹¤.
+    /// <para>ì œìŠ¤ì²˜ê°€ ì¸ì‹ë˜ì—ˆê±°ë‚˜(OR), ì–‘ìª½ íŠ¸ë¦¬ê±° ë²„íŠ¼ì„ ë™ì‹œì— ëˆ„ë¥´ê³  ìˆìœ¼ë©´ trueë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤.</para>
     /// </summary>
     public bool IsActionValid()
     {
-        // 1. °ø°£ ÁÂÇ¥ ±â¹İ Á¦½ºÃ³ ÆÇÁ¤
+        // 1. ê³µê°„ ì¢Œí‘œ ê¸°ë°˜ ì œìŠ¤ì²˜ íŒì •
         isGestureDetected = CheckGestureGeometry();
 
-        // 2. ¹öÆ° ÀÔ·Â ±â¹İ ¾ÈÀüÀåÄ¡ (Fail-safe)
+        // 2. ë²„íŠ¼ ì…ë ¥ ê¸°ë°˜ ì•ˆì „ì¥ì¹˜ (Fail-safe)
         if (ControllerInputManager.Instance != null)
         {
-            // ¾çÂÊ Æ®¸®°Å¸¦ ¸ğµÎ ´ç±â°í ÀÖ´ÂÁö È®ÀÎ
+            // ì–‘ìª½ íŠ¸ë¦¬ê±°ë¥¼ ëª¨ë‘ ë‹¹ê¸°ê³  ìˆëŠ”ì§€ í™•ì¸
             isButtonOverride = ControllerInputManager.Instance.IsLeftTriggerHeld &&
                                ControllerInputManager.Instance.IsRightTriggerHeld;
         }
 
-        // µÑ Áß ÇÏ³ª¶óµµ ¸¸Á·ÇÏ¸é À¯È¿ÇÑ Çàµ¿À¸·Î °£ÁÖ
+        // ë‘˜ ì¤‘ í•˜ë‚˜ë¼ë„ ë§Œì¡±í•˜ë©´ ìœ íš¨í•œ í–‰ë™ìœ¼ë¡œ ê°„ì£¼
         if (!isOnlyButtonDetected) return isGestureDetected || isButtonOverride;
         else return isButtonOverride;
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î°¡ ÇöÀç 'µî¹İ(Climbing)' ÇÚµéÀ» Àâ°í ÀÖ´ÂÁö È®ÀÎÇÕ´Ï´Ù.
+    /// í”Œë ˆì´ì–´ê°€ í˜„ì¬ 'ë“±ë°˜(Climbing)' í•¸ë“¤ì„ ì¡ê³  ìˆëŠ”ì§€ í™•ì¸í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <returns>¾ç¼Õ ±×¸³ ¹öÆ°À» ´©¸£°í ÀÖ°í, ½ÇÁ¦·Î 2°³ ÀÌ»óÀÇ ÇÚµéÀ» Àâ°í ÀÖ´Ù¸é true</returns>
+    /// <returns>ì–‘ì† ê·¸ë¦½ ë²„íŠ¼ì„ ëˆ„ë¥´ê³  ìˆê³ , ì‹¤ì œë¡œ 2ê°œ ì´ìƒì˜ í•¸ë“¤ì„ ì¡ê³  ìˆë‹¤ë©´ true</returns>
     public bool IsHoldingClimbHandle()
     {
         if (ControllerInputManager.Instance != null)
         {
-            // Á¶°Ç 1: ¾ç¼Õ ±×¸³ ¹öÆ°(Select)ÀÌ ¸ğµÎ ´­·ÁÀÖ´Â°¡?
+            // ì¡°ê±´ 1: ì–‘ì† ê·¸ë¦½ ë²„íŠ¼(Select)ì´ ëª¨ë‘ ëˆŒë ¤ìˆëŠ”ê°€?
             bool areBothGripsPressed = ControllerInputManager.Instance.IsLeftGripHeld &&
                                        ControllerInputManager.Instance.IsRightGripHeld;
 
-            // Á¶°Ç 2: ½ÇÁ¦·Î ClimbHandle ÄÄÆ÷³ÍÆ®°¡ ´Ş¸° ¹°Ã¼¸¦ 2°³ ÀÌ»ó Àâ°í ÀÖ´Â°¡?
-            // (ClimbHandle.ActiveGrabCount´Â ClimbHandle Å¬·¡½º¿¡¼­ °ü¸®ÇÏ´Â Á¤Àû º¯¼ö·Î °¡Á¤)
+            // ì¡°ê±´ 2: ì‹¤ì œë¡œ ClimbHandle ì»´í¬ë„ŒíŠ¸ê°€ ë‹¬ë¦° ë¬¼ì²´ë¥¼ 2ê°œ ì´ìƒ ì¡ê³  ìˆëŠ”ê°€?
+            // (ClimbHandle.ActiveGrabCountëŠ” ClimbHandle í´ë˜ìŠ¤ì—ì„œ ê´€ë¦¬í•˜ëŠ” ì •ì  ë³€ìˆ˜ë¡œ ê°€ì •)
             bool isGrabbingTwoHandles = ClimbHandle.ActiveGrabCount >= 2;
 
             return areBothGripsPressed && isGrabbingTwoHandles;
@@ -108,13 +108,13 @@ public class GestureManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÄÁÆ®·Ñ·¯¿¡ ÇİÆ½ ÇÇµå¹é(Áøµ¿)À» ¹ß»ı½ÃÅµ´Ï´Ù.
+    /// ì»¨íŠ¸ë¡¤ëŸ¬ì— í–…í‹± í”¼ë“œë°±(ì§„ë™)ì„ ë°œìƒì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    /// <param name="intensity">Áøµ¿ °­µµ (0.0 ~ 1.0)</param>
+    /// <param name="intensity">ì§„ë™ ê°•ë„ (0.0 ~ 1.0)</param>
     public void TriggerHapticFeedback(float intensity)
     {
-        // TODO: XR Interaction ToolkitÀÇ Haptic ±â´ÉÀ» »ç¿ëÇÏ¿© ±¸Çö
-        // ¿¹: controller.SendHapticImpulse(intensity, duration);
+        // TODO: XR Interaction Toolkitì˜ Haptic ê¸°ëŠ¥ì„ ì‚¬ìš©í•˜ì—¬ êµ¬í˜„
+        // ì˜ˆ: controller.SendHapticImpulse(intensity, duration);
     }
 
     #endregion
@@ -122,29 +122,29 @@ public class GestureManager : MonoBehaviour
     #region Internal Logic (Geometry Calculation)
 
     /// <summary>
-    /// ¸Ó¸®, ¾ç¼ÕÀÇ ÁÂÇ¥¸¦ °è»êÇÏ¿© Á¦½ºÃ³(ABC ÀÚ¼¼)°¡ ¸Â´ÂÁö ÆÇº°ÇÕ´Ï´Ù.
+    /// ë¨¸ë¦¬, ì–‘ì†ì˜ ì¢Œí‘œë¥¼ ê³„ì‚°í•˜ì—¬ ì œìŠ¤ì²˜(ABC ìì„¸)ê°€ ë§ëŠ”ì§€ íŒë³„í•©ë‹ˆë‹¤.
     /// </summary>
     private bool CheckGestureGeometry()
     {
-        // ÇÊ¼ö ÃßÀû ´ë»óÀÌ ¾øÀ¸¸é ÆÇÁ¤ ºÒ°¡
+        // í•„ìˆ˜ ì¶”ì  ëŒ€ìƒì´ ì—†ìœ¼ë©´ íŒì • ë¶ˆê°€
         if (head == null || leftHand == null || rightHand == null) return false;
 
-        // 1. °¡½¿ À§Ä¡ ÃßÁ¤
-        // HMD(¸Ó¸®) À§Ä¡¿¡¼­ ´Ü¼øÈ÷ YÃàÀ¸·Î ÀÏÁ¤ °Å¸®(chestYOffset) ³»¸° ÁöÁ¡À» °¡½¿À¸·Î °¡Á¤ÇÕ´Ï´Ù.
-        // È¸ÀüÀ» °í·ÁÇÏÁö ¾Ê´Â ÀÌÀ¯´Â »ç¿ëÀÚ°¡ °í°³¸¦ µ¹·Áµµ °¡½¿ À§Ä¡´Â À¯ÁöµÇ´Â °æ¿ì°¡ ¸¹±â ¶§¹®ÀÔ´Ï´Ù.
+        // 1. ê°€ìŠ´ ìœ„ì¹˜ ì¶”ì •
+        // HMD(ë¨¸ë¦¬) ìœ„ì¹˜ì—ì„œ ë‹¨ìˆœíˆ Yì¶•ìœ¼ë¡œ ì¼ì • ê±°ë¦¬(chestYOffset) ë‚´ë¦° ì§€ì ì„ ê°€ìŠ´ìœ¼ë¡œ ê°€ì •í•©ë‹ˆë‹¤.
+        // íšŒì „ì„ ê³ ë ¤í•˜ì§€ ì•ŠëŠ” ì´ìœ ëŠ” ì‚¬ìš©ìê°€ ê³ ê°œë¥¼ ëŒë ¤ë„ ê°€ìŠ´ ìœ„ì¹˜ëŠ” ìœ ì§€ë˜ëŠ” ê²½ìš°ê°€ ë§ê¸° ë•Œë¬¸ì…ë‹ˆë‹¤.
         Vector3 chestPosition = head.position - new Vector3(0, chestYOffset, 0);
 
-        // 2. °Å¸® °è»ê
-        currentHandDist = Vector3.Distance(leftHand.position, rightHand.position);      // ¾ç¼Õ °£ °Å¸®
-        currentLeftDist = Vector3.Distance(chestPosition, leftHand.position);           // °¡½¿-¿Ş¼Õ °Å¸®
-        currentRightDist = Vector3.Distance(chestPosition, rightHand.position);         // °¡½¿-¿À¸¥¼Õ °Å¸®
+        // 2. ê±°ë¦¬ ê³„ì‚°
+        currentHandDist = Vector3.Distance(leftHand.position, rightHand.position);      // ì–‘ì† ê°„ ê±°ë¦¬
+        currentLeftDist = Vector3.Distance(chestPosition, leftHand.position);           // ê°€ìŠ´-ì™¼ì† ê±°ë¦¬
+        currentRightDist = Vector3.Distance(chestPosition, rightHand.position);         // ê°€ìŠ´-ì˜¤ë¥¸ì† ê±°ë¦¬
 
-        // 3. ÀÓ°è°ª ºñ±³ ÆÇÁ¤
-        bool handsClose = currentHandDist < handsDistanceThreshold;     // ¾ç¼ÕÀÌ ¸ğ¿´´Â°¡?
-        bool leftClose = currentLeftDist < chestDistanceThreshold;      // ¿Ş¼ÕÀÌ °¡½¿ ±ÙÃ³ÀÎ°¡?
-        bool rightClose = currentRightDist < chestDistanceThreshold;    // ¿À¸¥¼ÕÀÌ °¡½¿ ±ÙÃ³ÀÎ°¡?
+        // 3. ì„ê³„ê°’ ë¹„êµ íŒì •
+        bool handsClose = currentHandDist < handsDistanceThreshold;     // ì–‘ì†ì´ ëª¨ì˜€ëŠ”ê°€?
+        bool leftClose = currentLeftDist < chestDistanceThreshold;      // ì™¼ì†ì´ ê°€ìŠ´ ê·¼ì²˜ì¸ê°€?
+        bool rightClose = currentRightDist < chestDistanceThreshold;    // ì˜¤ë¥¸ì†ì´ ê°€ìŠ´ ê·¼ì²˜ì¸ê°€?
 
-        // ¼¼ Á¶°ÇÀÌ ¸ğµÎ ÃæÁ·µÇ¾î¾ß Á¦½ºÃ³ ÀÎÁ¤
+        // ì„¸ ì¡°ê±´ì´ ëª¨ë‘ ì¶©ì¡±ë˜ì–´ì•¼ ì œìŠ¤ì²˜ ì¸ì •
         return handsClose && leftClose && rightClose;
     }
 
@@ -153,30 +153,30 @@ public class GestureManager : MonoBehaviour
     #region Debugging (Gizmos)
 
     /// <summary>
-    /// ¾À ºä(Scene View)¿¡¼­ ÀÎ½Ä ¹üÀ§¸¦ ½Ã°¢ÀûÀ¸·Î È®ÀÎÇÏ±â À§ÇÑ ±âÁî¸ğ¸¦ ±×¸³´Ï´Ù.
+    /// ì”¬ ë·°(Scene View)ì—ì„œ ì¸ì‹ ë²”ìœ„ë¥¼ ì‹œê°ì ìœ¼ë¡œ í™•ì¸í•˜ê¸° ìœ„í•œ ê¸°ì¦ˆëª¨ë¥¼ ê·¸ë¦½ë‹ˆë‹¤.
     /// </summary>
     private void OnDrawGizmos()
     {
         if (head == null) return;
 
-        // ÃßÁ¤µÈ °¡½¿ À§Ä¡
+        // ì¶”ì •ëœ ê°€ìŠ´ ìœ„ì¹˜
         Vector3 chestPos = head.position - new Vector3(0, chestYOffset, 0);
 
-        // 1. °¡½¿ ÀÎ½Ä ¹üÀ§ Ç¥½Ã (¹İÅõ¸í ÃÊ·Ï»ö ±¸)
+        // 1. ê°€ìŠ´ ì¸ì‹ ë²”ìœ„ í‘œì‹œ (ë°˜íˆ¬ëª… ì´ˆë¡ìƒ‰ êµ¬)
         Gizmos.color = new Color(0, 1, 0, 0.3f);
         Gizmos.DrawSphere(chestPos, chestDistanceThreshold);
 
-        // °¡½¿ Áß½ÉÁ¡ Ç¥½Ã (»¡°£ ¿ÍÀÌ¾î ±¸)
+        // ê°€ìŠ´ ì¤‘ì‹¬ì  í‘œì‹œ (ë¹¨ê°„ ì™€ì´ì–´ êµ¬)
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(chestPos, 0.05f);
 
-        // 2. ÇöÀç ¼Õ À§Ä¡¿Í °¡½¿ »çÀÌÀÇ °Å¸® ¹× ÀÎ½Ä »óÅÂ Ç¥½Ã
+        // 2. í˜„ì¬ ì† ìœ„ì¹˜ì™€ ê°€ìŠ´ ì‚¬ì´ì˜ ê±°ë¦¬ ë° ì¸ì‹ ìƒíƒœ í‘œì‹œ
         DrawHandGizmo(leftHand, chestPos);
         DrawHandGizmo(rightHand, chestPos);
     }
 
     /// <summary>
-    /// °¢ ¼Õ¿¡ ´ëÇÑ ±âÁî¸ğ(¼±)¸¦ ±×¸³´Ï´Ù. ÀÎ½Ä ¹üÀ§ ³»¿¡ ÀÖÀ¸¸é ÃÊ·Ï»ö, ¹ÛÀÌ¸é »¡°£»öÀ¸·Î Ç¥½ÃµË´Ï´Ù.
+    /// ê° ì†ì— ëŒ€í•œ ê¸°ì¦ˆëª¨(ì„ )ë¥¼ ê·¸ë¦½ë‹ˆë‹¤. ì¸ì‹ ë²”ìœ„ ë‚´ì— ìˆìœ¼ë©´ ì´ˆë¡ìƒ‰, ë°–ì´ë©´ ë¹¨ê°„ìƒ‰ìœ¼ë¡œ í‘œì‹œë©ë‹ˆë‹¤.
     /// </summary>
     private void DrawHandGizmo(Transform hand, Vector3 targetPos)
     {
@@ -184,7 +184,7 @@ public class GestureManager : MonoBehaviour
         {
             float dist = Vector3.Distance(targetPos, hand.position);
 
-            // ÀÎ½Ä ¹üÀ§ ¾ÈÀÌ¸é ÃÊ·Ï»ö, ¹ÛÀÌ¸é »¡°£»ö
+            // ì¸ì‹ ë²”ìœ„ ì•ˆì´ë©´ ì´ˆë¡ìƒ‰, ë°–ì´ë©´ ë¹¨ê°„ìƒ‰
             Gizmos.color = dist < chestDistanceThreshold ? Color.green : Color.red;
 
             Gizmos.DrawLine(targetPos, hand.position);

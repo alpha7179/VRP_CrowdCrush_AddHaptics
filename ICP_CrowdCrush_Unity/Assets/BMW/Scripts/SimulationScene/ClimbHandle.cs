@@ -1,14 +1,14 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Climbing;
 
 /// <summary>
-/// µî¹İ °¡´ÉÇÑ ¿ÀºêÁ§Æ®(»ç´Ù¸®, ¾Ïº® µî)¿¡ ºÎÂøÇÏ¿© Àâ°í ÀÖ´Â »óÅÂ¸¦ ÃßÀûÇÏ´Â Å¬·¡½ºÀÔ´Ï´Ù.
+/// ë“±ë°˜ ê°€ëŠ¥í•œ ì˜¤ë¸Œì íŠ¸(ì‚¬ë‹¤ë¦¬, ì•”ë²½ ë“±)ì— ë¶€ì°©í•˜ì—¬ ì¡ê³  ìˆëŠ” ìƒíƒœë¥¼ ì¶”ì í•˜ëŠ” í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. XR Interaction ToolkitÀÇ ClimbInteractableÀ» »ó¼Ó¹Ş¾Æ ±âº»ÀûÀÎ µî¹İ ±â´ÉÀ» ¼öÇàÇÕ´Ï´Ù.<br/>
-/// 2. ÇÃ·¹ÀÌ¾î°¡ Àâ°Å³ª ³õÀ» ¶§ Àü¿ª Ä«¿îÆ®(ActiveGrabCount)¸¦ °»½ÅÇÕ´Ï´Ù.<br/>
-/// 3. GestureManager¿¡¼­ ÀÌ Ä«¿îÆ®¸¦ ÂüÁ¶ÇÏ¿© '¾ç¼ÕÀ¸·Î ¸Å´Ş·Á ÀÖ´ÂÁö' ÆÇÁ¤ÇÕ´Ï´Ù.
+/// 1. XR Interaction Toolkitì˜ ClimbInteractableì„ ìƒì†ë°›ì•„ ê¸°ë³¸ì ì¸ ë“±ë°˜ ê¸°ëŠ¥ì„ ìˆ˜í–‰í•©ë‹ˆë‹¤.<br/>
+/// 2. í”Œë ˆì´ì–´ê°€ ì¡ê±°ë‚˜ ë†“ì„ ë•Œ ì „ì—­ ì¹´ìš´íŠ¸(ActiveGrabCount)ë¥¼ ê°±ì‹ í•©ë‹ˆë‹¤.<br/>
+/// 3. GestureManagerì—ì„œ ì´ ì¹´ìš´íŠ¸ë¥¼ ì°¸ì¡°í•˜ì—¬ 'ì–‘ì†ìœ¼ë¡œ ë§¤ë‹¬ë ¤ ìˆëŠ”ì§€' íŒì •í•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class ClimbHandle : ClimbInteractable
@@ -16,8 +16,8 @@ public class ClimbHandle : ClimbInteractable
     #region Global State
 
     /// <summary>
-    /// ÇöÀç ¾À¿¡¼­ ÇÃ·¹ÀÌ¾î°¡ Àâ°í ÀÖ´Â ¸ğµç ClimbHandleÀÇ ÃÑ °³¼öÀÔ´Ï´Ù.
-    /// (ÀÌ °ªÀÌ 2 ÀÌ»óÀÌ¸é ¾ç¼ÕÀ¸·Î ¸Å´Ş¸° °ÍÀ¸·Î °£ÁÖ)
+    /// í˜„ì¬ ì”¬ì—ì„œ í”Œë ˆì´ì–´ê°€ ì¡ê³  ìˆëŠ” ëª¨ë“  ClimbHandleì˜ ì´ ê°œìˆ˜ì…ë‹ˆë‹¤.
+    /// (ì´ ê°’ì´ 2 ì´ìƒì´ë©´ ì–‘ì†ìœ¼ë¡œ ë§¤ë‹¬ë¦° ê²ƒìœ¼ë¡œ ê°„ì£¼)
     /// </summary>
     public static int ActiveGrabCount = 0;
 
@@ -26,30 +26,30 @@ public class ClimbHandle : ClimbInteractable
     #region Interaction Events
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î°¡ ÇÚµéÀ» Àâ¾ÒÀ» ¶§ È£ÃâµË´Ï´Ù.
+    /// í”Œë ˆì´ì–´ê°€ í•¸ë“¤ì„ ì¡ì•˜ì„ ë•Œ í˜¸ì¶œë©ë‹ˆë‹¤.
     /// </summary>
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
-        base.OnSelectEntered(args); // ºÎ¸ğ Å¬·¡½ºÀÇ µî¹İ ·ÎÁ÷ ½ÇÇà
+        base.OnSelectEntered(args); // ë¶€ëª¨ í´ë˜ìŠ¤ì˜ ë“±ë°˜ ë¡œì§ ì‹¤í–‰
 
-        // ÀâÀº ÇÚµé ¼ö Áõ°¡
+        // ì¡ì€ í•¸ë“¤ ìˆ˜ ì¦ê°€
         ActiveGrabCount++;
 
-        // µğ¹ö±× ·Î±× (ÇÊ¿ä ½Ã ÁÖ¼® Ã³¸®)
+        // ë””ë²„ê·¸ ë¡œê·¸ (í•„ìš” ì‹œ ì£¼ì„ ì²˜ë¦¬)
         // Debug.Log($"[ClimbHandle] Grabbed. Total Count: {ActiveGrabCount}");
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î°¡ ÇÚµéÀ» ³õ¾ÒÀ» ¶§ È£ÃâµË´Ï´Ù.
+    /// í”Œë ˆì´ì–´ê°€ í•¸ë“¤ì„ ë†“ì•˜ì„ ë•Œ í˜¸ì¶œë©ë‹ˆë‹¤.
     /// </summary>
     protected override void OnSelectExited(SelectExitEventArgs args)
     {
-        base.OnSelectExited(args); // ºÎ¸ğ Å¬·¡½ºÀÇ ·ÎÁ÷ ½ÇÇà
+        base.OnSelectExited(args); // ë¶€ëª¨ í´ë˜ìŠ¤ì˜ ë¡œì§ ì‹¤í–‰
 
-        // ÀâÀº ÇÚµé ¼ö °¨¼Ò
+        // ì¡ì€ í•¸ë“¤ ìˆ˜ ê°ì†Œ
         ActiveGrabCount--;
 
-        // ¾ÈÀüÀåÄ¡: À½¼ö°¡ µÇÁö ¾Êµµ·Ï º¸Á¤
+        // ì•ˆì „ì¥ì¹˜: ìŒìˆ˜ê°€ ë˜ì§€ ì•Šë„ë¡ ë³´ì •
         if (ActiveGrabCount < 0) ActiveGrabCount = 0;
     }
 
@@ -58,14 +58,14 @@ public class ClimbHandle : ClimbInteractable
     #region Unity Lifecycle
 
     /// <summary>
-    /// ¿ÀºêÁ§Æ®°¡ ºñÈ°¼ºÈ­µÇ°Å³ª ÆÄ±«µÉ ¶§ ¿¹¿Ü Ã³¸®¸¦ ¼öÇàÇÕ´Ï´Ù.
-    /// (ÀâÀº »óÅÂ·Î ¿ÀºêÁ§Æ®°¡ »ç¶óÁö¸é Ä«¿îÆ®°¡ ¿µ¿øÈ÷ ³²´Â ¹®Á¦ ¹æÁö)
+    /// ì˜¤ë¸Œì íŠ¸ê°€ ë¹„í™œì„±í™”ë˜ê±°ë‚˜ íŒŒê´´ë  ë•Œ ì˜ˆì™¸ ì²˜ë¦¬ë¥¼ ìˆ˜í–‰í•©ë‹ˆë‹¤.
+    /// (ì¡ì€ ìƒíƒœë¡œ ì˜¤ë¸Œì íŠ¸ê°€ ì‚¬ë¼ì§€ë©´ ì¹´ìš´íŠ¸ê°€ ì˜ì›íˆ ë‚¨ëŠ” ë¬¸ì œ ë°©ì§€)
     /// </summary>
     protected override void OnDisable()
     {
         base.OnDisable();
 
-        // ¸¸¾à ´©±º°¡ Àâ°í ÀÖ´Â »óÅÂ¿¡¼­ ºñÈ°¼ºÈ­µÇ¾ú´Ù¸é Ä«¿îÆ® Â÷°¨
+        // ë§Œì•½ ëˆ„êµ°ê°€ ì¡ê³  ìˆëŠ” ìƒíƒœì—ì„œ ë¹„í™œì„±í™”ë˜ì—ˆë‹¤ë©´ ì¹´ìš´íŠ¸ ì°¨ê°
         if (isSelected)
         {
             ActiveGrabCount--;
