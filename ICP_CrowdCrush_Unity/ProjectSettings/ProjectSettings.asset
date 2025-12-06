@@ -1005,11 +1005,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 131d86f7-45a8-4876-a8b2-7f6d8e15af13
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: ICP_CrowdCrush_Unity 2025-12-07_02-19-28
+  organizationId: h27480suhyeon2
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
