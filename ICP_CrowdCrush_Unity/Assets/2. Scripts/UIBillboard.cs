@@ -1,12 +1,12 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 // =========================================================
 // Attributes
 // =========================================================
 
 /// <summary>
-/// ÀÎ½ºÆåÅÍ(Inspector)¿¡¼­ ÇÊµå¸¦ ÀĞ±â Àü¿ë(Greyed out)À¸·Î Ç¥½ÃÇÏ±â À§ÇÑ ¼Ó¼ºÀÔ´Ï´Ù.
-/// <para>Âü°í: º°µµÀÇ Editor ½ºÅ©¸³Æ®(PropertyDrawer)°¡ ÀÖ¾î¾ß ½ÇÁ¦·Î ÀÛµ¿ÇÕ´Ï´Ù.</para>
+/// ì¸ìŠ¤í™í„°(Inspector)ì—ì„œ í•„ë“œë¥¼ ì½ê¸° ì „ìš©(Greyed out)ìœ¼ë¡œ í‘œì‹œí•˜ê¸° ìœ„í•œ ì†ì„±ì…ë‹ˆë‹¤.
+/// <para>ì°¸ê³ : ë³„ë„ì˜ Editor ìŠ¤í¬ë¦½íŠ¸(PropertyDrawer)ê°€ ìˆì–´ì•¼ ì‹¤ì œë¡œ ì‘ë™í•©ë‹ˆë‹¤.</para>
 /// </summary>
 public class ReadOnlyAttribute : PropertyAttribute { }
 
@@ -16,24 +16,24 @@ public class ReadOnlyAttribute : PropertyAttribute { }
 // =========================================================
 
 /// <summary>
-/// UI È¤Àº ¿ÀºêÁ§Æ®°¡ Ç×»ó Æ¯Á¤ Ä«¸Ş¶ó¸¦ ¹Ù¶óº¸°Ô ÇÏ´Â ºôº¸µå(Billboard) ½ºÅ©¸³Æ®ÀÔ´Ï´Ù.
+/// UI í˜¹ì€ ì˜¤ë¸Œì íŠ¸ê°€ í•­ìƒ íŠ¹ì • ì¹´ë©”ë¼ë¥¼ ë°”ë¼ë³´ê²Œ í•˜ëŠ” ë¹Œë³´ë“œ(Billboard) ìŠ¤í¬ë¦½íŠ¸ì…ë‹ˆë‹¤.
 /// </summary>
 public class UIBillboard : MonoBehaviour
 {
     #region Inspector Settings
 
     [Header("Billboard Settings")]
-    [Tooltip("ºôº¸µå°¡ ¹Ù¶óº¼ Å¸°Ù Ä«¸Ş¶óÀÔ´Ï´Ù. (NullÀÏ °æ¿ì MainCamera¸¦ ÀÚµ¿À¸·Î Å½»öÇÕ´Ï´Ù)")]
+    [Tooltip("ë¹Œë³´ë“œê°€ ë°”ë¼ë³¼ íƒ€ê²Ÿ ì¹´ë©”ë¼ì…ë‹ˆë‹¤. (Nullì¼ ê²½ìš° MainCameraë¥¼ ìë™ìœ¼ë¡œ íƒìƒ‰í•©ë‹ˆë‹¤)")]
     [SerializeField] private Camera targetCamera;
 
-    [Tooltip("ºôº¸µå È¸Àü °è»ê ¹æ½ÄÀÔ´Ï´Ù.")]
+    [Tooltip("ë¹Œë³´ë“œ íšŒì „ ê³„ì‚° ë°©ì‹ì…ë‹ˆë‹¤.")]
     [SerializeField] private BillboardMode mode = BillboardMode.LookAtCamera;
 
-    [Tooltip("Ã¼Å© ½Ã YÃà È¸Àü¸¸ Àû¿ëÇÕ´Ï´Ù. (¼öÆò È¸Àü À¯Áö, ¼öÁ÷ È¸Àü ¹«½Ã)")]
+    [Tooltip("ì²´í¬ ì‹œ Yì¶• íšŒì „ë§Œ ì ìš©í•©ë‹ˆë‹¤. (ìˆ˜í‰ íšŒì „ ìœ ì§€, ìˆ˜ì§ íšŒì „ ë¬´ì‹œ)")]
     [SerializeField] private bool lockYAxis = false;
 
     [Header("Debug Info")]
-    [Tooltip("ÇöÀç ÂüÁ¶ ÁßÀÎ Ä«¸Ş¶óÀÇ TransformÀÔ´Ï´Ù.")]
+    [Tooltip("í˜„ì¬ ì°¸ì¡° ì¤‘ì¸ ì¹´ë©”ë¼ì˜ Transformì…ë‹ˆë‹¤.")]
     [SerializeField, ReadOnly] private Transform cameraTransform;
 
     #endregion
@@ -41,22 +41,22 @@ public class UIBillboard : MonoBehaviour
     #region Data Types
 
     /// <summary>
-    /// ºôº¸µåÀÇ È¸Àü ¹æ½ÄÀ» Á¤ÀÇÇÕ´Ï´Ù.
+    /// ë¹Œë³´ë“œì˜ íšŒì „ ë°©ì‹ì„ ì •ì˜í•©ë‹ˆë‹¤.
     /// </summary>
     public enum BillboardMode
     {
         /// <summary>
-        /// ¿ÀºêÁ§Æ®°¡ Ä«¸Ş¶óÀÇ À§Ä¡¸¦ Á÷Á¢ ¹Ù¶óº¾´Ï´Ù. (°¡Àå ÀÏ¹İÀûÀÎ ¹æ½Ä)
+        /// ì˜¤ë¸Œì íŠ¸ê°€ ì¹´ë©”ë¼ì˜ ìœ„ì¹˜ë¥¼ ì§ì ‘ ë°”ë¼ë´…ë‹ˆë‹¤. (ê°€ì¥ ì¼ë°˜ì ì¸ ë°©ì‹)
         /// </summary>
         LookAtCamera,
 
         /// <summary>
-        /// Ä«¸Ş¶ó°¡ ¹Ù¶óº¸´Â ¹æÇâ°ú ÆòÇàÇÏ°Ô Á¤·ÄÇÕ´Ï´Ù. (Ä«¸Ş¶ó¿Í ¿Ïº®ÇÑ Æò¸é À¯Áö)
+        /// ì¹´ë©”ë¼ê°€ ë°”ë¼ë³´ëŠ” ë°©í–¥ê³¼ í‰í–‰í•˜ê²Œ ì •ë ¬í•©ë‹ˆë‹¤. (ì¹´ë©”ë¼ì™€ ì™„ë²½í•œ í‰ë©´ ìœ ì§€)
         /// </summary>
         CameraForward,
 
         /// <summary>
-        /// Ä«¸Ş¶óÀÇ ¹İ´ë ¹æÇâÀ» ¹Ù¶óº¾´Ï´Ù. (°Å¿ï»ó È¤Àº Æ¯¼ö ¸ñÀû)
+        /// ì¹´ë©”ë¼ì˜ ë°˜ëŒ€ ë°©í–¥ì„ ë°”ë¼ë´…ë‹ˆë‹¤. (ê±°ìš¸ìƒ í˜¹ì€ íŠ¹ìˆ˜ ëª©ì )
         /// </summary>
         OppositeDirection
     }
@@ -67,7 +67,7 @@ public class UIBillboard : MonoBehaviour
 
     private void OnEnable()
     {
-        // ÄÄÆ÷³ÍÆ® È°¼ºÈ­ ½Ã Ä«¸Ş¶ó ÂüÁ¶ ÃÊ±âÈ­
+        // ì»´í¬ë„ŒíŠ¸ í™œì„±í™” ì‹œ ì¹´ë©”ë¼ ì°¸ì¡° ì´ˆê¸°í™”
         if (targetCamera == null)
         {
             TryFindCamera();
@@ -80,11 +80,11 @@ public class UIBillboard : MonoBehaviour
 
     private void LateUpdate()
     {
-        // Ä«¸Ş¶ó°¡ ÀÌµ¿ÇÑ "ÈÄ"¿¡ UI°¡ µû¶ó°¡¾ß ¶³¸²(Jitter)ÀÌ ¾øÀ¸¹Ç·Î LateUpdate »ç¿ë
+        // ì¹´ë©”ë¼ê°€ ì´ë™í•œ "í›„"ì— UIê°€ ë”°ë¼ê°€ì•¼ ë–¨ë¦¼(Jitter)ì´ ì—†ìœ¼ë¯€ë¡œ LateUpdate ì‚¬ìš©
         if (cameraTransform == null)
         {
             TryFindCamera();
-            if (cameraTransform == null) return; // ¿©ÀüÈ÷ Ä«¸Ş¶ó°¡ ¾øÀ¸¸é ·ÎÁ÷ Áß´Ü
+            if (cameraTransform == null) return; // ì—¬ì „íˆ ì¹´ë©”ë¼ê°€ ì—†ìœ¼ë©´ ë¡œì§ ì¤‘ë‹¨
         }
 
         UpdateBillboardRotation();
@@ -95,42 +95,42 @@ public class UIBillboard : MonoBehaviour
     #region Core Logic
 
     /// <summary>
-    /// ÇöÀç ¸ğµå¿¡ µû¶ó Å¸°Ù ¹æÇâÀ» °è»êÇÏ°í È¸ÀüÀ» Àû¿ëÇÕ´Ï´Ù.
+    /// í˜„ì¬ ëª¨ë“œì— ë”°ë¼ íƒ€ê²Ÿ ë°©í–¥ì„ ê³„ì‚°í•˜ê³  íšŒì „ì„ ì ìš©í•©ë‹ˆë‹¤.
     /// </summary>
     private void UpdateBillboardRotation()
     {
         Vector3 targetPosition;
 
-        // 1. Å¸°Ù À§Ä¡ °è»ê
+        // 1. íƒ€ê²Ÿ ìœ„ì¹˜ ê³„ì‚°
         switch (mode)
         {
             case BillboardMode.CameraForward:
-                // Ä«¸Ş¶óÀÇ ¾Õ¹æÇâ º¤ÅÍ¸¦ ´õÇØ ÆòÇàÇÑ ¸éÀ» ¸¸µê
+                // ì¹´ë©”ë¼ì˜ ì•ë°©í–¥ ë²¡í„°ë¥¼ ë”í•´ í‰í–‰í•œ ë©´ì„ ë§Œë“¦
                 targetPosition = transform.position + cameraTransform.forward;
                 break;
 
             case BillboardMode.OppositeDirection:
-                // Ä«¸Ş¶ó¿Í ¹İ´ë ¹æÇâ º¤ÅÍ °è»ê
+                // ì¹´ë©”ë¼ì™€ ë°˜ëŒ€ ë°©í–¥ ë²¡í„° ê³„ì‚°
                 targetPosition = transform.position - (cameraTransform.position - transform.position);
                 break;
 
             case BillboardMode.LookAtCamera:
             default:
-                // Ä«¸Ş¶ó À§Ä¡ ÀÚÃ¼¸¦ Å¸°ÙÀ¸·Î ¼³Á¤
+                // ì¹´ë©”ë¼ ìœ„ì¹˜ ìì²´ë¥¼ íƒ€ê²Ÿìœ¼ë¡œ ì„¤ì •
                 targetPosition = cameraTransform.position;
                 break;
         }
 
-        // 2. ¹Ù¶óº¼ ¹æÇâ º¤ÅÍ °è»ê
+        // 2. ë°”ë¼ë³¼ ë°©í–¥ ë²¡í„° ê³„ì‚°
         Vector3 directionToCamera = targetPosition - transform.position;
 
-        // 3. YÃà Àá±İ Ã³¸® (¼öÁ÷ È¸Àü ¹æÁö)
+        // 3. Yì¶• ì ê¸ˆ ì²˜ë¦¬ (ìˆ˜ì§ íšŒì „ ë°©ì§€)
         if (lockYAxis)
         {
             directionToCamera.y = 0;
         }
 
-        // 4. ÃÖÁ¾ È¸Àü Àû¿ë
+        // 4. ìµœì¢… íšŒì „ ì ìš©
         if (directionToCamera != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(directionToCamera);
@@ -138,7 +138,7 @@ public class UIBillboard : MonoBehaviour
     }
 
     /// <summary>
-    /// MainCamera ÅÂ±×°¡ ºÙÀº Ä«¸Ş¶ó¸¦ Ã£¾Æ ÂüÁ¶¸¦ ¼³Á¤ÇÕ´Ï´Ù.
+    /// MainCamera íƒœê·¸ê°€ ë¶™ì€ ì¹´ë©”ë¼ë¥¼ ì°¾ì•„ ì°¸ì¡°ë¥¼ ì„¤ì •í•©ë‹ˆë‹¤.
     /// </summary>
     private void TryFindCamera()
     {
@@ -161,9 +161,9 @@ public class UIBillboard : MonoBehaviour
     #region Public API
 
     /// <summary>
-    /// ·±Å¸ÀÓ¿¡ Å¸°Ù Ä«¸Ş¶ó¸¦ º¯°æÇÕ´Ï´Ù.
+    /// ëŸ°íƒ€ì„ì— íƒ€ê²Ÿ ì¹´ë©”ë¼ë¥¼ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="camera">»õ·Î ÁöÁ¤ÇÒ Ä«¸Ş¶ó</param>
+    /// <param name="camera">ìƒˆë¡œ ì§€ì •í•  ì¹´ë©”ë¼</param>
     public void SetTargetCamera(Camera camera)
     {
         targetCamera = camera;
@@ -171,9 +171,9 @@ public class UIBillboard : MonoBehaviour
     }
 
     /// <summary>
-    /// ·±Å¸ÀÓ¿¡ ºôº¸µå ¸ğµå¸¦ º¯°æÇÕ´Ï´Ù.
+    /// ëŸ°íƒ€ì„ì— ë¹Œë³´ë“œ ëª¨ë“œë¥¼ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="newMode">º¯°æÇÒ ¸ğµå</param>
+    /// <param name="newMode">ë³€ê²½í•  ëª¨ë“œ</param>
     public void SetBillboardMode(BillboardMode newMode)
     {
         mode = newMode;

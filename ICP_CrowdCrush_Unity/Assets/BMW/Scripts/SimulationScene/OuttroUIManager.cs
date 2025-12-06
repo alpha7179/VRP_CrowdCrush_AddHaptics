@@ -1,15 +1,15 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// °ÔÀÓ Á¾·á ÈÄ °á°ú(Result) ¹× ¿ä¾à(Summary) È­¸éÀÇ UI Èå¸§°ú ¿¬ÃâÀ» °ü¸®ÇÏ´Â ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// ê²Œì„ ì¢…ë£Œ í›„ ê²°ê³¼(Result) ë° ìš”ì•½(Summary) í™”ë©´ì˜ UI íë¦„ê³¼ ì—°ì¶œì„ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. DataManagerÀÇ µ¥ÀÌÅÍ¸¦ ±â¹İÀ¸·Î º°Á¡À» °è»êÇÏ°í ¾Ö´Ï¸ŞÀÌ¼Ç(ÆŞ½º)À» Àç»ıÇÕ´Ï´Ù.<br/>
-/// 2. ÄÁÆ®·Ñ·¯ ÀÔ·Â(A¹öÆ°, Á¶ÀÌ½ºÆ½)À» ÅëÇØ ÆäÀÌÁö¸¦ ³Ñ±â°Å³ª ¸ŞÀÎÀ¸·Î ÀÌµ¿ÇÕ´Ï´Ù.<br/>
-/// 3. ÆäÀÌµå(Fade) ¹× ÆŞ½º(Pulse) È¿°ú¸¦ ÄÚ·çÆ¾À¸·Î Ã³¸®ÇÏ¿© ½Ã°¢Àû ÇÇµå¹éÀ» Á¦°øÇÕ´Ï´Ù.
+/// 1. DataManagerì˜ ë°ì´í„°ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ë³„ì ì„ ê³„ì‚°í•˜ê³  ì• ë‹ˆë©”ì´ì…˜(í„ìŠ¤)ì„ ì¬ìƒí•©ë‹ˆë‹¤.<br/>
+/// 2. ì»¨íŠ¸ë¡¤ëŸ¬ ì…ë ¥(Aë²„íŠ¼, ì¡°ì´ìŠ¤í‹±)ì„ í†µí•´ í˜ì´ì§€ë¥¼ ë„˜ê¸°ê±°ë‚˜ ë©”ì¸ìœ¼ë¡œ ì´ë™í•©ë‹ˆë‹¤.<br/>
+/// 3. í˜ì´ë“œ(Fade) ë° í„ìŠ¤(Pulse) íš¨ê³¼ë¥¼ ì½”ë£¨í‹´ìœ¼ë¡œ ì²˜ë¦¬í•˜ì—¬ ì‹œê°ì  í”¼ë“œë°±ì„ ì œê³µí•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class OuttroUIManager : MonoBehaviour
@@ -17,10 +17,10 @@ public class OuttroUIManager : MonoBehaviour
     #region Inspector Settings (Panels)
 
     [Header("Panels")]
-    [Tooltip("°ÔÀÓ °á°ú(º°Á¡)¸¦ º¸¿©ÁÖ´Â ÆĞ³Î")]
+    [Tooltip("ê²Œì„ ê²°ê³¼(ë³„ì )ë¥¼ ë³´ì—¬ì£¼ëŠ” íŒ¨ë„")]
     [SerializeField] private GameObject resultPanel;
 
-    [Tooltip("°ÔÀÓ ¿ä¾à(ÆäÀÌÁö)À» º¸¿©ÁÖ´Â ÆĞ³Î")]
+    [Tooltip("ê²Œì„ ìš”ì•½(í˜ì´ì§€)ì„ ë³´ì—¬ì£¼ëŠ” íŒ¨ë„")]
     [SerializeField] private GameObject summaryPanel;
 
     #endregion
@@ -28,10 +28,10 @@ public class OuttroUIManager : MonoBehaviour
     #region Inspector Settings (Result UI)
 
     [Header("Result Elements")]
-    [Tooltip("º°Á¡ ¾ÆÀÌÄÜ ¹è¿­ (¼ø¼­´ë·Î 1Á¡, 2Á¡, 3Á¡)")]
+    [Tooltip("ë³„ì  ì•„ì´ì½˜ ë°°ì—´ (ìˆœì„œëŒ€ë¡œ 1ì , 2ì , 3ì )")]
     [SerializeField] private GameObject[] starIcons;
 
-    [Tooltip("Á¡¼ö ÅØ½ºÆ® (»ç¿ëÇÏÁö ¾ÊÀ» °æ¿ì ºñ¿öµÎ¼¼¿ä)")]
+    [Tooltip("ì ìˆ˜ í…ìŠ¤íŠ¸ (ì‚¬ìš©í•˜ì§€ ì•Šì„ ê²½ìš° ë¹„ì›Œë‘ì„¸ìš”)")]
     [SerializeField] private TextMeshProUGUI scoreText;
 
     #endregion
@@ -39,23 +39,23 @@ public class OuttroUIManager : MonoBehaviour
     #region Inspector Settings (Summary UI)
 
     [Header("Summary Elements")]
-    [Tooltip("¿ä¾à È­¸éÀÇ ÆäÀÌÁöµé")]
+    [Tooltip("ìš”ì•½ í™”ë©´ì˜ í˜ì´ì§€ë“¤")]
     [SerializeField] private GameObject[] summaryPages;
 
-    [Tooltip("ÆäÀÌÁö ¹øÈ£ Ç¥½Ã ¿ÀºêÁ§Æ® (¸¶Áö¸· ÆäÀÌÁö¿¡¼± ¼û±è)")]
+    [Tooltip("í˜ì´ì§€ ë²ˆí˜¸ í‘œì‹œ ì˜¤ë¸Œì íŠ¸ (ë§ˆì§€ë§‰ í˜ì´ì§€ì—ì„  ìˆ¨ê¹€)")]
     [SerializeField] private GameObject pageNumber;
 
-    [Tooltip("ÀÎÆ®·Î(¸ŞÀÎ)·Î µ¹¾Æ°¡´Â ¹öÆ° ¿ÀºêÁ§Æ®")]
+    [Tooltip("ì¸íŠ¸ë¡œ(ë©”ì¸)ë¡œ ëŒì•„ê°€ëŠ” ë²„íŠ¼ ì˜¤ë¸Œì íŠ¸")]
     [SerializeField] private GameObject introButton;
 
-    [Tooltip("ÇöÀç ÆäÀÌÁö ¹øÈ£ ÅØ½ºÆ®")]
+    [Tooltip("í˜„ì¬ í˜ì´ì§€ ë²ˆí˜¸ í…ìŠ¤íŠ¸")]
     [SerializeField] private TextMeshProUGUI pageNumberText;
 
     [Header("Visual Feedback")]
-    [Tooltip("ÀÌÀü ÆäÀÌÁö ¹öÆ° ºñÁÖ¾ó (ÀÔ·ÂÀº Á¶ÀÌ½ºÆ½À¸·Î Ã³¸®)")]
+    [Tooltip("ì´ì „ í˜ì´ì§€ ë²„íŠ¼ ë¹„ì£¼ì–¼ (ì…ë ¥ì€ ì¡°ì´ìŠ¤í‹±ìœ¼ë¡œ ì²˜ë¦¬)")]
     [SerializeField] private GameObject prevBtnVisual;
 
-    [Tooltip("´ÙÀ½ ÆäÀÌÁö ¹öÆ° ºñÁÖ¾ó (ÀÔ·ÂÀº Á¶ÀÌ½ºÆ½À¸·Î Ã³¸®)")]
+    [Tooltip("ë‹¤ìŒ í˜ì´ì§€ ë²„íŠ¼ ë¹„ì£¼ì–¼ (ì…ë ¥ì€ ì¡°ì´ìŠ¤í‹±ìœ¼ë¡œ ì²˜ë¦¬)")]
     [SerializeField] private GameObject nextBtnVisual;
 
     #endregion
@@ -63,16 +63,16 @@ public class OuttroUIManager : MonoBehaviour
     #region Inspector Settings (Animation)
 
     [Header("UI Fade & Pulse Settings")]
-    [Tooltip("ÆĞ³ÎÀÌ ÄÑÁö°í ²¨Áö´Â ÆäÀÌµå ½Ã°£(ÃÊ)")]
+    [Tooltip("íŒ¨ë„ì´ ì¼œì§€ê³  êº¼ì§€ëŠ” í˜ì´ë“œ ì‹œê°„(ì´ˆ)")]
     [SerializeField] private float panelFadeDuration = 0.2f;
 
-    [Tooltip("ÀÌ¹ÌÁö(º°) ÆäÀÌµå ½Ã°£(ÃÊ)")]
+    [Tooltip("ì´ë¯¸ì§€(ë³„) í˜ì´ë“œ ì‹œê°„(ì´ˆ)")]
     [SerializeField] private float imageFadeDuration = 0.3f;
 
-    [Tooltip("ÆŞ½º(µÎ±Ù°Å¸²) È¿°ú ¼Óµµ")]
+    [Tooltip("í„ìŠ¤(ë‘ê·¼ê±°ë¦¼) íš¨ê³¼ ì†ë„")]
     [SerializeField] private float pulseSpeed = 5.0f;
 
-    [Tooltip("ÆŞ½º È¿°ú ½Ã ÃÖ¼Ò ¾ËÆÄ°ª")]
+    [Tooltip("í„ìŠ¤ íš¨ê³¼ ì‹œ ìµœì†Œ ì•ŒíŒŒê°’")]
     [SerializeField] private float minPulseAlpha = 0.2f;
 
     #endregion
@@ -81,15 +81,15 @@ public class OuttroUIManager : MonoBehaviour
 
     private int currentPageIndex = 0;
 
-    // Á¶ÀÌ½ºÆ½ Áßº¹ ÀÔ·Â ¹æÁö¿ë
+    // ì¡°ì´ìŠ¤í‹± ì¤‘ë³µ ì…ë ¥ ë°©ì§€ìš©
     private bool isJoystickReady = true;
     private const float JoystickThreshold = 0.5f;
 
-    // ÄÚ·çÆ¾ °ü¸® (Áßº¹ ½ÇÇà ¹æÁö)
+    // ì½”ë£¨í‹´ ê´€ë¦¬ (ì¤‘ë³µ ì‹¤í–‰ ë°©ì§€)
     private Dictionary<GameObject, Coroutine> panelCoroutines = new Dictionary<GameObject, Coroutine>();
     private Dictionary<Image, Coroutine> imageCoroutines = new Dictionary<Image, Coroutine>();
 
-    // ÆŞ½º È¿°ú¿ë ¿øº» ¾ËÆÄ°ª Ä³½Ì
+    // í„ìŠ¤ íš¨ê³¼ìš© ì›ë³¸ ì•ŒíŒŒê°’ ìºì‹±
     private float cachedOriginalAlpha = 1.0f;
 
     #endregion
@@ -98,7 +98,7 @@ public class OuttroUIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // ÄÁÆ®·Ñ·¯ ÀÔ·Â ÀÌº¥Æ® ±¸µ¶
+        // ì»¨íŠ¸ë¡¤ëŸ¬ ì…ë ¥ ì´ë²¤íŠ¸ êµ¬ë…
         if (ControllerInputManager.Instance != null)
         {
             ControllerInputManager.Instance.OnAButtonDown += HandleAButtonInput;
@@ -115,7 +115,7 @@ public class OuttroUIManager : MonoBehaviour
 
     private void Update()
     {
-        // ¿ä¾à ÆĞ³ÎÀÌ È°¼ºÈ­µÈ »óÅÂ¿¡¼­¸¸ Á¶ÀÌ½ºÆ½ ÀÔ·Â Ã³¸®
+        // ìš”ì•½ íŒ¨ë„ì´ í™œì„±í™”ëœ ìƒíƒœì—ì„œë§Œ ì¡°ì´ìŠ¤í‹± ì…ë ¥ ì²˜ë¦¬
         if (summaryPanel.activeSelf)
         {
             HandleJoystickInput();
@@ -127,22 +127,22 @@ public class OuttroUIManager : MonoBehaviour
     #region Input Handlers
 
     /// <summary>
-    /// A ¹öÆ° ÀÔ·Â Ã³¸®: [°á°ú -> ¿ä¾à] ¶Ç´Â [¿ä¾à -> ¸ŞÀÎ]À¸·Î »óÅÂ ÀüÈ¯
+    /// A ë²„íŠ¼ ì…ë ¥ ì²˜ë¦¬: [ê²°ê³¼ -> ìš”ì•½] ë˜ëŠ” [ìš”ì•½ -> ë©”ì¸]ìœ¼ë¡œ ìƒíƒœ ì „í™˜
     /// </summary>
     private void HandleAButtonInput()
     {
-        // ¿ÀºêÁ§Æ®°¡ ºñÈ°¼ºÈ­ »óÅÂ¶ó¸é ÀÔ·Â ¹«½Ã
+        // ì˜¤ë¸Œì íŠ¸ê°€ ë¹„í™œì„±í™” ìƒíƒœë¼ë©´ ì…ë ¥ ë¬´ì‹œ
         if (this == null || !gameObject.activeInHierarchy) return;
 
-        // 1. °á°ú È­¸éÀÎ °æ¿ì -> ¿ä¾à È­¸éÀ¸·Î ÀüÈ¯
+        // 1. ê²°ê³¼ í™”ë©´ì¸ ê²½ìš° -> ìš”ì•½ í™”ë©´ìœ¼ë¡œ ì „í™˜
         if (resultPanel != null && resultPanel.activeSelf)
         {
             ShowSummary();
         }
-        // 2. ¿ä¾à È­¸éÀÎ °æ¿ì -> ¸ŞÀÎÀ¸·Î ÀÌµ¿
+        // 2. ìš”ì•½ í™”ë©´ì¸ ê²½ìš° -> ë©”ì¸ìœ¼ë¡œ ì´ë™
         else if (summaryPanel != null && summaryPanel.activeSelf)
         {
-            // ¸¶Áö¸· ÆäÀÌÁö¿¡¼­¸¸ È¨À¸·Î ÀÌµ¿ °¡´É
+            // ë§ˆì§€ë§‰ í˜ì´ì§€ì—ì„œë§Œ í™ˆìœ¼ë¡œ ì´ë™ ê°€ëŠ¥
             if (currentPageIndex == summaryPages.Length - 1)
             {
                 GoHome();
@@ -151,7 +151,7 @@ public class OuttroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¿À¸¥ÂÊ Á¶ÀÌ½ºÆ½ ÁÂ¿ì ÀÔ·Â Ã³¸®: ÆäÀÌÁö ³Ñ±è
+    /// ì˜¤ë¥¸ìª½ ì¡°ì´ìŠ¤í‹± ì¢Œìš° ì…ë ¥ ì²˜ë¦¬: í˜ì´ì§€ ë„˜ê¹€
     /// </summary>
     private void HandleJoystickInput()
     {
@@ -159,22 +159,22 @@ public class OuttroUIManager : MonoBehaviour
 
         Vector2 input = ControllerInputManager.Instance.RightJoystickValue;
 
-        // ÀÔ·Â ´ë±â »óÅÂÀÌ°í, ÀÓ°è°ªÀ» ³Ñ¾úÀ» ¶§ µ¿ÀÛ
+        // ì…ë ¥ ëŒ€ê¸° ìƒíƒœì´ê³ , ì„ê³„ê°’ì„ ë„˜ì—ˆì„ ë•Œ ë™ì‘
         if (isJoystickReady)
         {
-            if (input.x > JoystickThreshold) // ¿À¸¥ÂÊ -> ´ÙÀ½
+            if (input.x > JoystickThreshold) // ì˜¤ë¥¸ìª½ -> ë‹¤ìŒ
             {
                 NextPage();
-                isJoystickReady = false; // ÀÔ·Â Àá±İ
+                isJoystickReady = false; // ì…ë ¥ ì ê¸ˆ
             }
-            else if (input.x < -JoystickThreshold) // ¿ŞÂÊ -> ÀÌÀü
+            else if (input.x < -JoystickThreshold) // ì™¼ìª½ -> ì´ì „
             {
                 PrevPage();
-                isJoystickReady = false; // ÀÔ·Â Àá±İ
+                isJoystickReady = false; // ì…ë ¥ ì ê¸ˆ
             }
         }
 
-        // Á¶ÀÌ½ºÆ½ÀÌ Áß¾Ó(Deadzone)À¸·Î µ¹¾Æ¿À¸é ´Ù½Ã ÀÔ·Â °¡´É »óÅÂ·Î º¯°æ
+        // ì¡°ì´ìŠ¤í‹±ì´ ì¤‘ì•™(Deadzone)ìœ¼ë¡œ ëŒì•„ì˜¤ë©´ ë‹¤ì‹œ ì…ë ¥ ê°€ëŠ¥ ìƒíƒœë¡œ ë³€ê²½
         if (Mathf.Abs(input.x) < 0.1f)
         {
             isJoystickReady = true;
@@ -186,14 +186,14 @@ public class OuttroUIManager : MonoBehaviour
     #region Logic Methods (Initialization & Navigation)
 
     /// <summary>
-    /// °á°ú È­¸é ÃÊ±âÈ­ ÄÚ·çÆ¾: µ¥ÀÌÅÍ¸¦ ºÒ·¯¿Í º°Á¡À» °è»êÇÏ°í ¾Ö´Ï¸ŞÀÌ¼ÇÀ» Àç»ıÇÕ´Ï´Ù.
+    /// ê²°ê³¼ í™”ë©´ ì´ˆê¸°í™” ì½”ë£¨í‹´: ë°ì´í„°ë¥¼ ë¶ˆëŸ¬ì™€ ë³„ì ì„ ê³„ì‚°í•˜ê³  ì• ë‹ˆë©”ì´ì…˜ì„ ì¬ìƒí•©ë‹ˆë‹¤.
     /// </summary>
     public IEnumerator InitializeRoutine()
     {
         FadePanel(resultPanel, true);
         FadePanel(summaryPanel, false);
 
-        // 1. µ¥ÀÌÅÍ ºÒ·¯¿À±â
+        // 1. ë°ì´í„° ë¶ˆëŸ¬ì˜¤ê¸°
         int successCount = 0;
         int mistakeCount = 0;
         float playTime = 0f;
@@ -205,48 +205,48 @@ public class OuttroUIManager : MonoBehaviour
             playTime = DataManager.Instance.PlayTime;
         }
 
-        // 2. º°Á¡ °è»ê ·ÎÁ÷
+        // 2. ë³„ì  ê³„ì‚° ë¡œì§
         int starCount = CalculateStarCount(successCount, mistakeCount, playTime);
 
-        // 3. º° ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı (ÃÊ±âÈ­ -> ¼øÂ÷Àû ÄÑÁü)
+        // 3. ë³„ ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ (ì´ˆê¸°í™” -> ìˆœì°¨ì  ì¼œì§)
         foreach (var star in starIcons)
         {
-            star.SetActive(false); // ÀÏ´Ü ¸ğµÎ ²û
+            star.SetActive(false); // ì¼ë‹¨ ëª¨ë‘ ë”
         }
 
         yield return new WaitForSeconds(panelFadeDuration);
 
-        // °è»êµÈ º°Á¡¸¸Å­ ¼øÂ÷ÀûÀ¸·Î ÄÑ±â
+        // ê³„ì‚°ëœ ë³„ì ë§Œí¼ ìˆœì°¨ì ìœ¼ë¡œ ì¼œê¸°
         for (int i = 0; i < starCount; i++)
         {
             if (i < starIcons.Length)
             {
                 FadeInAndPulseStar(starIcons[i]);
-                yield return new WaitForSeconds(0.2f); // ¼øÂ÷Àû µô·¹ÀÌ
+                yield return new WaitForSeconds(0.2f); // ìˆœì°¨ì  ë”œë ˆì´
             }
         }
     }
 
     /// <summary>
-    /// ¼º°ø È½¼ö, ½Ç¼ö, ½Ã°£À» ±â¹İÀ¸·Î º°Á¡(0~3)À» °è»êÇÕ´Ï´Ù.
+    /// ì„±ê³µ íšŸìˆ˜, ì‹¤ìˆ˜, ì‹œê°„ì„ ê¸°ë°˜ìœ¼ë¡œ ë³„ì (0~3)ì„ ê³„ì‚°í•©ë‹ˆë‹¤.
     /// </summary>
     private int CalculateStarCount(int successCount, int mistakeCount, float playTime)
     {
-        // ±âÁØ: ±âº» 3Á¡ ¸¸Á¡ ½ÃÀÛ -> °¨Á¡ ¹æ½Ä Àû¿ë
+        // ê¸°ì¤€: ê¸°ë³¸ 3ì  ë§Œì  ì‹œì‘ -> ê°ì  ë°©ì‹ ì ìš©
         int starCount = 3;
 
-        // Æä³ÎÆ¼ 1: ½Ç¼ö È½¼ö
+        // í˜ë„í‹° 1: ì‹¤ìˆ˜ íšŸìˆ˜
         if (mistakeCount >= 3) starCount -= 1;
 
-        // º¸³Ê½º/Æä³ÎÆ¼ 2: ÇÃ·¹ÀÌ ½Ã°£
-        // ¿¹: 5ºĞ(300ÃÊ) ÀÌ³» ¿Ï·á ½Ã º¸³Ê½º, 7ºĞ(420ÃÊ) ÃÊ°ú ½Ã °¨Á¡
+        // ë³´ë„ˆìŠ¤/í˜ë„í‹° 2: í”Œë ˆì´ ì‹œê°„
+        // ì˜ˆ: 5ë¶„(300ì´ˆ) ì´ë‚´ ì™„ë£Œ ì‹œ ë³´ë„ˆìŠ¤, 7ë¶„(420ì´ˆ) ì´ˆê³¼ ì‹œ ê°ì 
         float timeLimitForMaxStar = 300f;
         float timeLimitForMinStar = 420f;
 
         if (playTime <= timeLimitForMaxStar) starCount += 1;
         else if (playTime > timeLimitForMinStar) starCount -= 1;
 
-        // ÃÖÁ¾ Å¬·¥ÇÎ (0 ~ ÃÖ´ë º° °³¼ö)
+        // ìµœì¢… í´ë¨í•‘ (0 ~ ìµœëŒ€ ë³„ ê°œìˆ˜)
         return Mathf.Clamp(starCount, 0, starIcons.Length);
     }
 
@@ -292,24 +292,24 @@ public class OuttroUIManager : MonoBehaviour
 
     private void UpdateSummaryPage()
     {
-        // ÇØ´ç ÆäÀÌÁö¸¸ È°¼ºÈ­
+        // í•´ë‹¹ í˜ì´ì§€ë§Œ í™œì„±í™”
         for (int i = 0; i < summaryPages.Length; i++)
         {
             if (summaryPages[i] != null)
                 summaryPages[i].SetActive(i == currentPageIndex);
         }
 
-        // ÆäÀÌÁö ¹øÈ£ °»½Å
+        // í˜ì´ì§€ ë²ˆí˜¸ ê°±ì‹ 
         if (pageNumberText)
         {
             pageNumberText.text = $"{currentPageIndex + 1} / {summaryPages.Length}";
         }
 
-        // ½Ã°¢Àû ÇÇµå¹é (È­»ìÇ¥)
+        // ì‹œê°ì  í”¼ë“œë°± (í™”ì‚´í‘œ)
         if (prevBtnVisual) prevBtnVisual.SetActive(currentPageIndex > 0);
         if (nextBtnVisual) nextBtnVisual.SetActive(currentPageIndex < summaryPages.Length - 1);
 
-        // ¸¶Áö¸· ÆäÀÌÁö Ã³¸® (Intro ¹öÆ° Ç¥½Ã)
+        // ë§ˆì§€ë§‰ í˜ì´ì§€ ì²˜ë¦¬ (Intro ë²„íŠ¼ í‘œì‹œ)
         bool isLastPage = (currentPageIndex == summaryPages.Length - 1);
         if (pageNumber) pageNumber.SetActive(!isLastPage);
         if (introButton) introButton.SetActive(isLastPage);
@@ -320,7 +320,7 @@ public class OuttroUIManager : MonoBehaviour
     #region Visual Effects (Coroutines)
 
     /// <summary>
-    /// ÆĞ³ÎÀÇ CanvasGroup Alpha¸¦ Á¶ÀıÇÏ¿© ÆäÀÌµå ÀÎ/¾Æ¿ô ÇÕ´Ï´Ù.
+    /// íŒ¨ë„ì˜ CanvasGroup Alphaë¥¼ ì¡°ì ˆí•˜ì—¬ í˜ì´ë“œ ì¸/ì•„ì›ƒ í•©ë‹ˆë‹¤.
     /// </summary>
     private void FadePanel(GameObject panel, bool show)
     {
@@ -329,7 +329,7 @@ public class OuttroUIManager : MonoBehaviour
         CanvasGroup cg = panel.GetComponent<CanvasGroup>();
         if (cg == null) cg = panel.AddComponent<CanvasGroup>();
 
-        // Áßº¹ ½ÇÇà ¹æÁö
+        // ì¤‘ë³µ ì‹¤í–‰ ë°©ì§€
         if (panelCoroutines.ContainsKey(panel) && panelCoroutines[panel] != null)
         {
             StopCoroutine(panelCoroutines[panel]);
@@ -367,11 +367,11 @@ public class OuttroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀÌ¹ÌÁö(º°)ÀÇ Åõ¸íµµ¸¦ Á¶ÀıÇÏ°í, ¿Ï·á ÈÄ ÆŞ½º È¿°ú¸¦ ½ÇÇàÇÒÁö °áÁ¤ÇÕ´Ï´Ù.
+    /// ì´ë¯¸ì§€(ë³„)ì˜ íˆ¬ëª…ë„ë¥¼ ì¡°ì ˆí•˜ê³ , ì™„ë£Œ í›„ í„ìŠ¤ íš¨ê³¼ë¥¼ ì‹¤í–‰í• ì§€ ê²°ì •í•©ë‹ˆë‹¤.
     /// </summary>
     private IEnumerator FadeImageRoutine(Image targetImage, float targetAlpha, bool activeState, bool startPulseAfterFade)
     {
-        // È°¼ºÈ­ Ã³¸®
+        // í™œì„±í™” ì²˜ë¦¬
         if (activeState && !targetImage.gameObject.activeSelf)
         {
             targetImage.gameObject.SetActive(true);
@@ -387,7 +387,7 @@ public class OuttroUIManager : MonoBehaviour
         float startAlpha = color.a;
         float elapsed = 0f;
 
-        // 1. ÆäÀÌµå ¾Ö´Ï¸ŞÀÌ¼Ç
+        // 1. í˜ì´ë“œ ì• ë‹ˆë©”ì´ì…˜
         while (elapsed < imageFadeDuration)
         {
             elapsed += Time.deltaTime;
@@ -398,7 +398,7 @@ public class OuttroUIManager : MonoBehaviour
 
         targetImage.color = new Color(color.r, color.g, color.b, targetAlpha);
 
-        // 2. ÈÄÃ³¸® (ºñÈ°¼ºÈ­ ¶Ç´Â ÆŞ½º ½ÃÀÛ)
+        // 2. í›„ì²˜ë¦¬ (ë¹„í™œì„±í™” ë˜ëŠ” í„ìŠ¤ ì‹œì‘)
         if (!activeState)
         {
             targetImage.gameObject.SetActive(false);
@@ -411,7 +411,7 @@ public class OuttroUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÀÌ¹ÌÁö¸¦ ÁÖ±âÀûÀ¸·Î ±ôºıÀÌ°Ô(Pulse) ÇÕ´Ï´Ù.
+    /// ì´ë¯¸ì§€ë¥¼ ì£¼ê¸°ì ìœ¼ë¡œ ê¹œë¹¡ì´ê²Œ(Pulse) í•©ë‹ˆë‹¤.
     /// </summary>
     private IEnumerator PulseImageRoutine(Image targetImage)
     {
@@ -419,10 +419,10 @@ public class OuttroUIManager : MonoBehaviour
 
         while (true)
         {
-            // Sine ÆÄµ¿ (0~1)
+            // Sine íŒŒë™ (0~1)
             float alphaRatio = (Mathf.Sin(Time.time * pulseSpeed) + 1.0f) / 2.0f;
 
-            // Min ~ Original Alpha »çÀÌ º¸°£
+            // Min ~ Original Alpha ì‚¬ì´ ë³´ê°„
             float targetAlpha = Mathf.Lerp(minPulseAlpha, cachedOriginalAlpha, alphaRatio);
 
             targetImage.color = new Color(originalColor.r, originalColor.g, originalColor.b, targetAlpha);

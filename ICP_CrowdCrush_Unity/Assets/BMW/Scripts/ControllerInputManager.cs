@@ -1,13 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
 
 /// <summary>
-/// Unity New Input SystemÀ» ±â¹İÀ¸·Î XR ÄÁÆ®·Ñ·¯ÀÇ ÀÔ·ÂÀ» Áß¾Ó¿¡¼­ °ü¸®ÇÏ´Â ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// Unity New Input Systemì„ ê¸°ë°˜ìœ¼ë¡œ XR ì»¨íŠ¸ë¡¤ëŸ¬ì˜ ì…ë ¥ì„ ì¤‘ì•™ì—ì„œ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. InputActionAssetÀ» ·ÎµåÇÏ¿© XR ÄÁÆ®·Ñ·¯ÀÇ ¹öÆ°(A, B, X, Y), ±×¸³, Æ®¸®°Å, Á¶ÀÌ½ºÆ½ ÀÔ·ÂÀ» °¨ÁöÇÕ´Ï´Ù.<br/>
-/// 2. ÀÔ·Â »óÅÂ¸¦ bool ÇÁ·ÎÆÛÆ¼·Î Á¦°øÇÏ°Å³ª(Polling), Æ¯Á¤ ¹öÆ° Å¬¸¯ ½Ã ÀÌº¥Æ®¸¦ ¹ß»ı(Event)½ÃÅµ´Ï´Ù.<br/>
-/// 3. ´Ù¸¥ ½ºÅ©¸³Æ®¿¡¼­ ÀÌ ¸Å´ÏÀú¸¦ ÅëÇØ ÀÔ·ÂÀ» ½±°Ô ÂüÁ¶ÇÒ ¼ö ÀÖ½À´Ï´Ù.
+/// 1. InputActionAssetì„ ë¡œë“œí•˜ì—¬ XR ì»¨íŠ¸ë¡¤ëŸ¬ì˜ ë²„íŠ¼(A, B, X, Y), ê·¸ë¦½, íŠ¸ë¦¬ê±°, ì¡°ì´ìŠ¤í‹± ì…ë ¥ì„ ê°ì§€í•©ë‹ˆë‹¤.<br/>
+/// 2. ì…ë ¥ ìƒíƒœë¥¼ bool í”„ë¡œí¼í‹°ë¡œ ì œê³µí•˜ê±°ë‚˜(Polling), íŠ¹ì • ë²„íŠ¼ í´ë¦­ ì‹œ ì´ë²¤íŠ¸ë¥¼ ë°œìƒ(Event)ì‹œí‚µë‹ˆë‹¤.<br/>
+/// 3. ë‹¤ë¥¸ ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ì´ ë§¤ë‹ˆì €ë¥¼ í†µí•´ ì…ë ¥ì„ ì‰½ê²Œ ì°¸ì¡°í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class ControllerInputManager : MonoBehaviour
@@ -18,11 +18,11 @@ public class ControllerInputManager : MonoBehaviour
 
     private void Awake()
     {
-        // ½Ì±ÛÅæ ÆĞÅÏ: Áßº¹ »ı¼º ¹æÁö ¹× ¾À ÀüÈ¯ ½Ã À¯Áö
+        // ì‹±ê¸€í†¤ íŒ¨í„´: ì¤‘ë³µ ìƒì„± ë°©ì§€ ë° ì”¬ ì „í™˜ ì‹œ ìœ ì§€
         if (Instance == null)
         {
             Instance = this;
-            transform.parent = null; // ÃÖ»óÀ§ °èÃşÀ¸·Î ºĞ¸®
+            transform.parent = null; // ìµœìƒìœ„ ê³„ì¸µìœ¼ë¡œ ë¶„ë¦¬
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -36,7 +36,7 @@ public class ControllerInputManager : MonoBehaviour
     #region Inspector Settings
 
     [Header("Input Settings")]
-    [Tooltip("XR Interaction ToolkitÀÇ ±âº» Input Action AssetÀ» ÇÒ´çÇÏ¼¼¿ä.")]
+    [Tooltip("XR Interaction Toolkitì˜ ê¸°ë³¸ Input Action Assetì„ í• ë‹¹í•˜ì„¸ìš”.")]
     [SerializeField] private InputActionAsset inputActions;
 
     [Header("Debug")]
@@ -47,17 +47,17 @@ public class ControllerInputManager : MonoBehaviour
     #region Input State (Public Properties)
 
     // --- Grip & Trigger States ---
-    /// <summary>¿À¸¥¼Õ ±×¸³ ¹öÆ°ÀÌ ´­·ÁÀÖ´ÂÁö ¿©ºÎ</summary>
+    /// <summary>ì˜¤ë¥¸ì† ê·¸ë¦½ ë²„íŠ¼ì´ ëˆŒë ¤ìˆëŠ”ì§€ ì—¬ë¶€</summary>
     public bool IsRightGripHeld { get; private set; }
-    /// <summary>¿Ş¼Õ ±×¸³ ¹öÆ°ÀÌ ´­·ÁÀÖ´ÂÁö ¿©ºÎ</summary>
+    /// <summary>ì™¼ì† ê·¸ë¦½ ë²„íŠ¼ì´ ëˆŒë ¤ìˆëŠ”ì§€ ì—¬ë¶€</summary>
     public bool IsLeftGripHeld { get; private set; }
-    /// <summary>¿À¸¥¼Õ Æ®¸®°Å(°ËÁö) ¹öÆ°ÀÌ ´­·ÁÀÖ´ÂÁö ¿©ºÎ</summary>
+    /// <summary>ì˜¤ë¥¸ì† íŠ¸ë¦¬ê±°(ê²€ì§€) ë²„íŠ¼ì´ ëˆŒë ¤ìˆëŠ”ì§€ ì—¬ë¶€</summary>
     public bool IsRightTriggerHeld { get; private set; }
-    /// <summary>¿Ş¼Õ Æ®¸®°Å(°ËÁö) ¹öÆ°ÀÌ ´­·ÁÀÖ´ÂÁö ¿©ºÎ</summary>
+    /// <summary>ì™¼ì† íŠ¸ë¦¬ê±°(ê²€ì§€) ë²„íŠ¼ì´ ëˆŒë ¤ìˆëŠ”ì§€ ì—¬ë¶€</summary>
     public bool IsLeftTriggerHeld { get; private set; }
 
     // --- Joystick States ---
-    /// <summary>¿À¸¥¼Õ Á¶ÀÌ½ºÆ½ÀÇ ÀÔ·Â°ª (Vector2)</summary>
+    /// <summary>ì˜¤ë¥¸ì† ì¡°ì´ìŠ¤í‹±ì˜ ì…ë ¥ê°’ (Vector2)</summary>
     public Vector2 RightJoystickValue { get; private set; }
 
     #endregion
@@ -65,18 +65,18 @@ public class ControllerInputManager : MonoBehaviour
     #region Events
 
     // --- Button Click Events ---
-    /// <summary>¿À¸¥¼Õ A ¹öÆ°À» ´­·¶À» ¶§ ¹ß»ı</summary>
+    /// <summary>ì˜¤ë¥¸ì† A ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ ë°œìƒ</summary>
     public event Action OnAButtonDown;
-    /// <summary>¿À¸¥¼Õ B ¹öÆ°À» ´­·¶À» ¶§ ¹ß»ı</summary>
+    /// <summary>ì˜¤ë¥¸ì† B ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ ë°œìƒ</summary>
     public event Action OnBButtonDown;
-    /// <summary>¿Ş¼Õ Y ¹öÆ°À» ´­·¶À» ¶§ ¹ß»ı</summary>
+    /// <summary>ì™¼ì† Y ë²„íŠ¼ì„ ëˆŒë €ì„ ë•Œ ë°œìƒ</summary>
     public event Action OnYButtonDown;
 
     #endregion
 
     #region Internal Action References
 
-    // Action ÂüÁ¶ º¯¼öµé (Á÷Á¢ ÂüÁ¶ÇÏ¿© Enable/Disable °ü¸®)
+    // Action ì°¸ì¡° ë³€ìˆ˜ë“¤ (ì§ì ‘ ì°¸ì¡°í•˜ì—¬ Enable/Disable ê´€ë¦¬)
     private InputAction AButton, BButton, XButton, YButton;
     private InputAction RGripButton, LGripButton;
     private InputAction RTriggerButton, LTriggerButton;
@@ -97,7 +97,7 @@ public class ControllerInputManager : MonoBehaviour
         {
             inputActions.Disable();
         }
-        // C# ÀÌº¥Æ®(Action)´Â °´Ã¼ ÆÄ±« ½Ã GC°¡ Ã³¸®ÇÏ¹Ç·Î ¸í½ÃÀû null ÇÒ´çÀº ÇÊ¼ö°¡ ¾Æ´Ô
+        // C# ì´ë²¤íŠ¸(Action)ëŠ” ê°ì²´ íŒŒê´´ ì‹œ GCê°€ ì²˜ë¦¬í•˜ë¯€ë¡œ ëª…ì‹œì  null í• ë‹¹ì€ í•„ìˆ˜ê°€ ì•„ë‹˜
     }
 
     #endregion
@@ -105,7 +105,7 @@ public class ControllerInputManager : MonoBehaviour
     #region Initialization Logic
 
     /// <summary>
-    /// Input Action Asset¿¡¼­ ÇÊ¿äÇÑ ¾×¼Ç ¸Ê(Map)°ú ¾×¼Ç(Action)À» Ã£¾Æ ¹ÙÀÎµùÇÏ°í È°¼ºÈ­ÇÕ´Ï´Ù.
+    /// Input Action Assetì—ì„œ í•„ìš”í•œ ì•¡ì…˜ ë§µ(Map)ê³¼ ì•¡ì…˜(Action)ì„ ì°¾ì•„ ë°”ì¸ë”©í•˜ê³  í™œì„±í™”í•©ë‹ˆë‹¤.
     /// </summary>
     private void SetupInputActions()
     {
@@ -115,7 +115,7 @@ public class ControllerInputManager : MonoBehaviour
             return;
         }
 
-        // ÀüÃ¼ ¾×¼Ç È°¼ºÈ­
+        // ì „ì²´ ì•¡ì…˜ í™œì„±í™”
         inputActions.Enable();
 
         // 1. Right Controller Maps (Primary Buttons)
@@ -219,7 +219,7 @@ public class ControllerInputManager : MonoBehaviour
     private void OnXButtonPressed(InputAction.CallbackContext ctx)
     {
         if (isDebug) Debug.Log("X Button Pressed");
-        // X¹öÆ° ÀÌº¥Æ®´Â ÇÊ¿ä ½Ã Ãß°¡ (ÇöÀç´Â ·Î±×¸¸)
+        // Xë²„íŠ¼ ì´ë²¤íŠ¸ëŠ” í•„ìš” ì‹œ ì¶”ê°€ (í˜„ì¬ëŠ” ë¡œê·¸ë§Œ)
     }
 
     private void OnYButtonPressed(InputAction.CallbackContext ctx)

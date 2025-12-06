@@ -1,13 +1,13 @@
-using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.Locomotion; // XRI 3.x ÀÌµ¿ °ü·Ã
-using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation; // ÅÚ·¹Æ÷Æ® °ü·Ã
+ï»¿using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion; // XRI 3.x ì´ë™ ê´€ë ¨
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation; // í…”ë ˆí¬íŠ¸ ê´€ë ¨
 
 /// <summary>
-/// VR È¯°æ¿¡¼­ ÇÃ·¹ÀÌ¾îÀÇ ¸Ó¸®(Ä«¸Ş¶ó)¸¦ µû¶ó´Ù´Ï´Â World Space UI ½ºÅ©¸³Æ®ÀÔ´Ï´Ù.
+/// VR í™˜ê²½ì—ì„œ í”Œë ˆì´ì–´ì˜ ë¨¸ë¦¬(ì¹´ë©”ë¼)ë¥¼ ë”°ë¼ë‹¤ë‹ˆëŠ” World Space UI ìŠ¤í¬ë¦½íŠ¸ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. ÇÃ·¹ÀÌ¾îÀÇ ½Ã¼± ÀÌµ¿¿¡ µû¶ó UI°¡ ºÎµå·´°Ô ¶Ç´Â Áï½Ã µû¶ó¿É´Ï´Ù.<br/>
-/// 2. XRI ÅÚ·¹Æ÷Æ® ÀÌº¥Æ®¸¦ °¨ÁöÇÏ¿© ¼ø°£ ÀÌµ¿ ½Ã UI¸¦ Áï½Ã ÀçÁ¤·ÄÇÕ´Ï´Ù.<br/>
-/// 3. Æ¯Á¤ ÃàÀÇ È¸ÀüÀ» Àá°¡ UI°¡ Ç×»ó ¼öÁ÷/¼öÆòÀ» À¯ÁöÇÏµµ·Ï ÇÕ´Ï´Ù.
+/// 1. í”Œë ˆì´ì–´ì˜ ì‹œì„  ì´ë™ì— ë”°ë¼ UIê°€ ë¶€ë“œëŸ½ê²Œ ë˜ëŠ” ì¦‰ì‹œ ë”°ë¼ì˜µë‹ˆë‹¤.<br/>
+/// 2. XRI í…”ë ˆí¬íŠ¸ ì´ë²¤íŠ¸ë¥¼ ê°ì§€í•˜ì—¬ ìˆœê°„ ì´ë™ ì‹œ UIë¥¼ ì¦‰ì‹œ ì¬ì •ë ¬í•©ë‹ˆë‹¤.<br/>
+/// 3. íŠ¹ì • ì¶•ì˜ íšŒì „ì„ ì ê°€ UIê°€ í•­ìƒ ìˆ˜ì§/ìˆ˜í‰ì„ ìœ ì§€í•˜ë„ë¡ í•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class UIFollowHead : MonoBehaviour
@@ -15,30 +15,30 @@ public class UIFollowHead : MonoBehaviour
     #region Inspector Settings
 
     [Header("Target Settings")]
-    [Tooltip("UI°¡ µû¶ó´Ù´Ò Å¸°ÙÀÔ´Ï´Ù. (ÀÏ¹İÀûÀ¸·Î Main CameraÀÇ Transform)")]
+    [Tooltip("UIê°€ ë”°ë¼ë‹¤ë‹ íƒ€ê²Ÿì…ë‹ˆë‹¤. (ì¼ë°˜ì ìœ¼ë¡œ Main Cameraì˜ Transform)")]
     [SerializeField] private Transform targetHead;
 
-    [Tooltip("ÅÚ·¹Æ÷Æ® ÀÌº¥Æ®¸¦ °¨ÁöÇÒ ProviderÀÔ´Ï´Ù. (XR OriginÀÇ Locomotion System)")]
+    [Tooltip("í…”ë ˆí¬íŠ¸ ì´ë²¤íŠ¸ë¥¼ ê°ì§€í•  Providerì…ë‹ˆë‹¤. (XR Originì˜ Locomotion System)")]
     [SerializeField] private TeleportationProvider teleportationProvider;
 
     [Header("Follow Settings")]
-    [Tooltip("¸Ó¸®(Ä«¸Ş¶ó)·ÎºÎÅÍ UI°¡ ¶³¾îÁ® ÀÖÀ» °Å¸®(m)ÀÔ´Ï´Ù.")]
+    [Tooltip("ë¨¸ë¦¬(ì¹´ë©”ë¼)ë¡œë¶€í„° UIê°€ ë–¨ì–´ì ¸ ìˆì„ ê±°ë¦¬(m)ì…ë‹ˆë‹¤.")]
     [SerializeField] private float distance = 3.0f;
 
-    [Tooltip("UIÀÇ ³ôÀÌ(YÃà) ¿ÀÇÁ¼ÂÀÔ´Ï´Ù. (0ÀÌ¸é ´«³ôÀÌ, À½¼ö¸é ´«º¸´Ù ¾Æ·¡)")]
+    [Tooltip("UIì˜ ë†’ì´(Yì¶•) ì˜¤í”„ì…‹ì…ë‹ˆë‹¤. (0ì´ë©´ ëˆˆë†’ì´, ìŒìˆ˜ë©´ ëˆˆë³´ë‹¤ ì•„ë˜)")]
     [SerializeField] private float heightOffset = 0f;
 
-    [Tooltip("Ã¼Å© ½Ã: UI°¡ ¸ñÇ¥ À§Ä¡·Î ºÎµå·´°Ô ÀÌµ¿ÇÕ´Ï´Ù. (Lerp »ç¿ë)\nÃ¼Å© ÇØÁ¦: UI°¡ ¸Ó¸® À§Ä¡¿¡ Áï½Ã °íÁ¤µË´Ï´Ù. (Áö¿¬ ¾øÀ½, ¸Ö¹Ì ÃÖ¼ÒÈ­)")]
+    [Tooltip("ì²´í¬ ì‹œ: UIê°€ ëª©í‘œ ìœ„ì¹˜ë¡œ ë¶€ë“œëŸ½ê²Œ ì´ë™í•©ë‹ˆë‹¤. (Lerp ì‚¬ìš©)\nì²´í¬ í•´ì œ: UIê°€ ë¨¸ë¦¬ ìœ„ì¹˜ì— ì¦‰ì‹œ ê³ ì •ë©ë‹ˆë‹¤. (ì§€ì—° ì—†ìŒ, ë©€ë¯¸ ìµœì†Œí™”)")]
     [SerializeField] private bool enableSmoothFollow = false;
 
-    [Tooltip("µû¶ó¿À´Â ¼ÓµµÀÔ´Ï´Ù. (Enable Smooth Follow°¡ ÄÑÁ® ÀÖÀ» ¶§¸¸ Àû¿ë)")]
+    [Tooltip("ë”°ë¼ì˜¤ëŠ” ì†ë„ì…ë‹ˆë‹¤. (Enable Smooth Followê°€ ì¼œì ¸ ìˆì„ ë•Œë§Œ ì ìš©)")]
     [SerializeField] private float smoothSpeed = 20f;
 
     [Header("Rotation Constraints")]
-    [Tooltip("Ã¼Å© ½Ã: °í°³¸¦ ¼÷ÀÌ°Å³ª µé¾îµµ UI°¡ ´¯Áö ¾Ê°í Ç×»ó ¼öÁ÷À¸·Î ¼­ ÀÖ½À´Ï´Ù. (XÃà Pitch È¸Àü Àá±İ)")]
+    [Tooltip("ì²´í¬ ì‹œ: ê³ ê°œë¥¼ ìˆ™ì´ê±°ë‚˜ ë“¤ì–´ë„ UIê°€ ëˆ•ì§€ ì•Šê³  í•­ìƒ ìˆ˜ì§ìœ¼ë¡œ ì„œ ìˆìŠµë‹ˆë‹¤. (Xì¶• Pitch íšŒì „ ì ê¸ˆ)")]
     [SerializeField] private bool freezeXRotation = true;
 
-    [Tooltip("Ã¼Å© ½Ã: °í°³¸¦ ÁÂ¿ì·Î °¼¿ô°Å·Áµµ UI°¡ ±â¿ï¾îÁöÁö ¾Ê°í ¼öÆòÀ» À¯ÁöÇÕ´Ï´Ù. (ZÃà Roll È¸Àü Àá±İ)")]
+    [Tooltip("ì²´í¬ ì‹œ: ê³ ê°œë¥¼ ì¢Œìš°ë¡œ ê°¸ì›ƒê±°ë ¤ë„ UIê°€ ê¸°ìš¸ì–´ì§€ì§€ ì•Šê³  ìˆ˜í‰ì„ ìœ ì§€í•©ë‹ˆë‹¤. (Zì¶• Roll íšŒì „ ì ê¸ˆ)")]
     [SerializeField] private bool freezeZRotation = true;
 
     #endregion
@@ -46,8 +46,8 @@ public class UIFollowHead : MonoBehaviour
     #region Internal Variables
 
     /// <summary>
-    /// ¸¶Áö¸·À¸·Î À¯È¿Çß´ø '¹Ù¶óº¸´Â ¹æÇâ' º¤ÅÍÀÔ´Ï´Ù.
-    /// (ÇÃ·¹ÀÌ¾î°¡ ÇÏ´Ã/¶¥À» ¼öÁ÷À¸·Î ¹Ù¶óº¼ ¶§ ¹æÇâ º¤ÅÍ°¡ ¼Ò½ÇµÇ´Â °ÍÀ» ¹æÁö)
+    /// ë§ˆì§€ë§‰ìœ¼ë¡œ ìœ íš¨í–ˆë˜ 'ë°”ë¼ë³´ëŠ” ë°©í–¥' ë²¡í„°ì…ë‹ˆë‹¤.
+    /// (í”Œë ˆì´ì–´ê°€ í•˜ëŠ˜/ë•…ì„ ìˆ˜ì§ìœ¼ë¡œ ë°”ë¼ë³¼ ë•Œ ë°©í–¥ ë²¡í„°ê°€ ì†Œì‹¤ë˜ëŠ” ê²ƒì„ ë°©ì§€)
     /// </summary>
     private Vector3 lastProjectedForward = Vector3.forward;
 
@@ -57,20 +57,20 @@ public class UIFollowHead : MonoBehaviour
 
     private void OnEnable()
     {
-        // 1. Å¸°Ù Ä«¸Ş¶ó ÀÚµ¿ ÇÒ´ç (¾øÀ» °æ¿ì)
+        // 1. íƒ€ê²Ÿ ì¹´ë©”ë¼ ìë™ í• ë‹¹ (ì—†ì„ ê²½ìš°)
         if (targetHead == null)
         {
             Camera mainCam = Camera.main;
             if (mainCam != null) targetHead = mainCam.transform;
         }
 
-        // 2. ÅÚ·¹Æ÷Æ® ÇÁ·Î¹ÙÀÌ´õ ÀÚµ¿ ÇÒ´ç (¾øÀ» °æ¿ì)
+        // 2. í…”ë ˆí¬íŠ¸ í”„ë¡œë°”ì´ë” ìë™ í• ë‹¹ (ì—†ì„ ê²½ìš°)
         if (teleportationProvider == null)
         {
             teleportationProvider = FindAnyObjectByType<TeleportationProvider>();
         }
 
-        // 3. ÅÚ·¹Æ÷Æ® Á¾·á ÀÌº¥Æ® ±¸µ¶
+        // 3. í…”ë ˆí¬íŠ¸ ì¢…ë£Œ ì´ë²¤íŠ¸ êµ¬ë…
         if (teleportationProvider != null)
         {
             teleportationProvider.locomotionEnded += OnTeleportEnded;
@@ -79,7 +79,7 @@ public class UIFollowHead : MonoBehaviour
 
     private void OnDisable()
     {
-        // ÀÌº¥Æ® ±¸µ¶ ÇØÁ¦ (¸Ş¸ğ¸® ´©¼ö ¹æÁö)
+        // ì´ë²¤íŠ¸ êµ¬ë… í•´ì œ (ë©”ëª¨ë¦¬ ëˆ„ìˆ˜ ë°©ì§€)
         if (teleportationProvider != null)
         {
             teleportationProvider.locomotionEnded -= OnTeleportEnded;
@@ -90,24 +90,24 @@ public class UIFollowHead : MonoBehaviour
     {
         if (targetHead == null) return;
 
-        // Ä«¸Ş¶ó ÀÌµ¿ÀÌ ³¡³­ ÈÄ(LateUpdate) UI À§Ä¡¸¦ °è»êÇØ¾ß ¶³¸²(Jitter)ÀÌ ¹ß»ıÇÏÁö ¾ÊÀ½
+        // ì¹´ë©”ë¼ ì´ë™ì´ ëë‚œ í›„(LateUpdate) UI ìœ„ì¹˜ë¥¼ ê³„ì‚°í•´ì•¼ ë–¨ë¦¼(Jitter)ì´ ë°œìƒí•˜ì§€ ì•ŠìŒ
 
-        // 1. ¸ñÇ¥ À§Ä¡ °è»ê
+        // 1. ëª©í‘œ ìœ„ì¹˜ ê³„ì‚°
         Vector3 targetPosition = CalculateTargetPosition();
 
-        // 2. À§Ä¡ ¾÷µ¥ÀÌÆ® (º¸°£ vs Áï½Ã)
+        // 2. ìœ„ì¹˜ ì—…ë°ì´íŠ¸ (ë³´ê°„ vs ì¦‰ì‹œ)
         if (enableSmoothFollow)
         {
-            // Lerp¸¦ »ç¿ëÇÏ¿© ºÎµå·´°Ô ÀÌµ¿ (±Ş°İÇÑ È¸Àü ½Ã UI°¡ ½Ã¾ß ¹ÛÀ¸·Î ¹Ğ¸± ¼ö ÀÖÀ½)
+            // Lerpë¥¼ ì‚¬ìš©í•˜ì—¬ ë¶€ë“œëŸ½ê²Œ ì´ë™ (ê¸‰ê²©í•œ íšŒì „ ì‹œ UIê°€ ì‹œì•¼ ë°–ìœ¼ë¡œ ë°€ë¦´ ìˆ˜ ìˆìŒ)
             transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * smoothSpeed);
         }
         else
         {
-            // Áï½Ã ÀÌµ¿ (UI°¡ È­¸é¿¡ µü ºÙ¾îÀÖ´Â ´À³¦)
+            // ì¦‰ì‹œ ì´ë™ (UIê°€ í™”ë©´ì— ë”± ë¶™ì–´ìˆëŠ” ëŠë‚Œ)
             transform.position = targetPosition;
         }
 
-        // 3. È¸Àü ¾÷µ¥ÀÌÆ® (Ãà Àá±İ Àû¿ë)
+        // 3. íšŒì „ ì—…ë°ì´íŠ¸ (ì¶• ì ê¸ˆ ì ìš©)
         UpdateRotation();
     }
 
@@ -116,8 +116,8 @@ public class UIFollowHead : MonoBehaviour
     #region Core Logic
 
     /// <summary>
-    /// XRI ÅÚ·¹Æ÷Æ®°¡ ³¡³­ Á÷ÈÄ È£ÃâµË´Ï´Ù.
-    /// UI¸¦ °­Á¦·Î ¸ñÇ¥ À§Ä¡·Î ¼ø°£ ÀÌµ¿½ÃÄÑ, ÇÃ·¹ÀÌ¾î°¡ µµÂøÇßÀ» ¶§ UI°¡ ÀÌ¹Ì ¾Õ¿¡ ÀÖµµ·Ï ÇÕ´Ï´Ù.
+    /// XRI í…”ë ˆí¬íŠ¸ê°€ ëë‚œ ì§í›„ í˜¸ì¶œë©ë‹ˆë‹¤.
+    /// UIë¥¼ ê°•ì œë¡œ ëª©í‘œ ìœ„ì¹˜ë¡œ ìˆœê°„ ì´ë™ì‹œì¼œ, í”Œë ˆì´ì–´ê°€ ë„ì°©í–ˆì„ ë•Œ UIê°€ ì´ë¯¸ ì•ì— ìˆë„ë¡ í•©ë‹ˆë‹¤.
     /// </summary>
     private void OnTeleportEnded(LocomotionProvider provider)
     {
@@ -128,26 +128,26 @@ public class UIFollowHead : MonoBehaviour
     }
 
     /// <summary>
-    /// Å¸°Ù(¸Ó¸®)ÀÇ À§Ä¡¿Í ¹æÇâÀ» ±â¹İÀ¸·Î UI°¡ ¹èÄ¡µÉ ¿ùµå ÁÂÇ¥¸¦ °è»êÇÕ´Ï´Ù.
+    /// íƒ€ê²Ÿ(ë¨¸ë¦¬)ì˜ ìœ„ì¹˜ì™€ ë°©í–¥ì„ ê¸°ë°˜ìœ¼ë¡œ UIê°€ ë°°ì¹˜ë  ì›”ë“œ ì¢Œí‘œë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
     /// </summary>
     private Vector3 CalculateTargetPosition()
     {
-        // Ä«¸Ş¶óÀÇ ¾Õ¹æÇâ(Forward)À» °¡Á®¿ÀµÇ, YÃà(³ôÀÌ) ¼ººĞÀ» Á¦°ÅÇÏ¿© ¼öÆò º¤ÅÍ¸¸ ÃßÃâ
+        // ì¹´ë©”ë¼ì˜ ì•ë°©í–¥(Forward)ì„ ê°€ì ¸ì˜¤ë˜, Yì¶•(ë†’ì´) ì„±ë¶„ì„ ì œê±°í•˜ì—¬ ìˆ˜í‰ ë²¡í„°ë§Œ ì¶”ì¶œ
         Vector3 projectedForward = targetHead.forward;
         projectedForward.y = 0;
 
-        // ¿¹¿Ü Ã³¸®: ÇÏ´ÃÀÌ³ª ¶¥À» ¼öÁ÷À¸·Î ÃÄ´Ùº¸¸é ¼öÆò º¤ÅÍ ±æÀÌ°¡ 0¿¡ ¼ö·ÅÇÔ
+        // ì˜ˆì™¸ ì²˜ë¦¬: í•˜ëŠ˜ì´ë‚˜ ë•…ì„ ìˆ˜ì§ìœ¼ë¡œ ì³ë‹¤ë³´ë©´ ìˆ˜í‰ ë²¡í„° ê¸¸ì´ê°€ 0ì— ìˆ˜ë ´í•¨
         if (projectedForward.sqrMagnitude < 0.01f)
         {
-            projectedForward = lastProjectedForward; // ÀÌÀü ÇÁ·¹ÀÓÀÇ À¯È¿ÇÑ ¹æÇâ »ç¿ë
+            projectedForward = lastProjectedForward; // ì´ì „ í”„ë ˆì„ì˜ ìœ íš¨í•œ ë°©í–¥ ì‚¬ìš©
         }
         else
         {
             projectedForward.Normalize();
-            lastProjectedForward = projectedForward; // À¯È¿ÇÑ ¹æÇâ ÀúÀå
+            lastProjectedForward = projectedForward; // ìœ íš¨í•œ ë°©í–¥ ì €ì¥
         }
 
-        // ÃÖÁ¾ À§Ä¡ = ¸Ó¸® À§Ä¡ + (¹Ù¶óº¸´Â ¼öÆò ¹æÇâ * °Å¸®) + ³ôÀÌ ¿ÀÇÁ¼Â
+        // ìµœì¢… ìœ„ì¹˜ = ë¨¸ë¦¬ ìœ„ì¹˜ + (ë°”ë¼ë³´ëŠ” ìˆ˜í‰ ë°©í–¥ * ê±°ë¦¬) + ë†’ì´ ì˜¤í”„ì…‹
         Vector3 finalPos = targetHead.position + (projectedForward * distance);
         finalPos.y = targetHead.position.y + heightOffset;
 
@@ -155,29 +155,29 @@ public class UIFollowHead : MonoBehaviour
     }
 
     /// <summary>
-    /// Å¸°ÙÀ» ¹Ù¶óº¸µÇ, ¼³Á¤µÈ Ãà(X, Z)ÀÇ È¸ÀüÀ» Àá±Ş´Ï´Ù.
+    /// íƒ€ê²Ÿì„ ë°”ë¼ë³´ë˜, ì„¤ì •ëœ ì¶•(X, Z)ì˜ íšŒì „ì„ ì ê¸‰ë‹ˆë‹¤.
     /// </summary>
     private void UpdateRotation()
     {
-        // 1. ±âº»ÀûÀ¸·Î Ä«¸Ş¶ó°¡ º¸´Â ¹æÇâÀ» µû¶ó°¡µµ·Ï È¸Àü°ª °è»ê
+        // 1. ê¸°ë³¸ì ìœ¼ë¡œ ì¹´ë©”ë¼ê°€ ë³´ëŠ” ë°©í–¥ì„ ë”°ë¼ê°€ë„ë¡ íšŒì „ê°’ ê³„ì‚°
         Quaternion targetRotation = Quaternion.LookRotation(targetHead.forward);
 
-        // 2. ¿ÀÀÏ·¯ °¢µµ·Î º¯È¯ÇÏ¿© °³º° Ãà Á¦¾î
+        // 2. ì˜¤ì¼ëŸ¬ ê°ë„ë¡œ ë³€í™˜í•˜ì—¬ ê°œë³„ ì¶• ì œì–´
         Vector3 euler = targetRotation.eulerAngles;
 
-        // XÃà(Pitch) Àá±İ: °í°³ ¼÷ÀÓ/µé±â ¹«½Ã -> Ç×»ó ¼öÁ÷À¸·Î ¼­ ÀÖÀ½
+        // Xì¶•(Pitch) ì ê¸ˆ: ê³ ê°œ ìˆ™ì„/ë“¤ê¸° ë¬´ì‹œ -> í•­ìƒ ìˆ˜ì§ìœ¼ë¡œ ì„œ ìˆìŒ
         if (freezeXRotation)
         {
             euler.x = 0;
         }
 
-        // ZÃà(Roll) Àá±İ: °í°³ °¼¿ô°Å¸² ¹«½Ã -> Ç×»ó ¼öÆò¼± À¯Áö
+        // Zì¶•(Roll) ì ê¸ˆ: ê³ ê°œ ê°¸ì›ƒê±°ë¦¼ ë¬´ì‹œ -> í•­ìƒ ìˆ˜í‰ì„  ìœ ì§€
         if (freezeZRotation)
         {
             euler.z = 0;
         }
 
-        // 3. ¼öÁ¤µÈ È¸Àü°ª Àû¿ë
+        // 3. ìˆ˜ì •ëœ íšŒì „ê°’ ì ìš©
         transform.rotation = Quaternion.Euler(euler);
     }
 

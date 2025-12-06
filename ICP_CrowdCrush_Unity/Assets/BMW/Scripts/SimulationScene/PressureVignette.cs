@@ -1,11 +1,11 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 /// <summary>
-/// ¼ÎÀÌ´õ¿Í ¿¬µ¿ÇÏ¿© È­¸é °¡ÀåÀÚ¸®¸¦ ¾îµÓ°Ô ÇÏ°Å³ª »ö»óÀ» ÀÔÈ÷´Â ºñ³×ÆÃ(Vignette) È¿°ú¸¦ Á¦¾îÇÕ´Ï´Ù.
+/// ì…°ì´ë”ì™€ ì—°ë™í•˜ì—¬ í™”ë©´ ê°€ì¥ìë¦¬ë¥¼ ì–´ë‘¡ê²Œ í•˜ê±°ë‚˜ ìƒ‰ìƒì„ ì…íˆëŠ” ë¹„ë„¤íŒ…(Vignette) íš¨ê³¼ë¥¼ ì œì–´í•©ë‹ˆë‹¤.
 /// <para>
-/// 1. ½É¸®Àû ¾Ğ¹Ú°¨(Pressure) ¼öÄ¡¿¡ µû¶ó ½Ã¾ß°¡ Á¼¾ÆÁö´Â È¿°ú¸¦ ¿¬ÃâÇÕ´Ï´Ù.<br/>
-/// 2. Pulse ±â´ÉÀ» ÅëÇØ ½ÉÀå ¹Úµ¿Ã³·³ È­¸éÀÌ ¿ï··°Å¸®´Â È¿°ú¸¦ Áİ´Ï´Ù.<br/>
-/// 3. MaterialPropertyBlockÀ» »ç¿ëÇÏ¿© ·±Å¸ÀÓ ¼º´ÉÀ» ÃÖÀûÈ­ÇÕ´Ï´Ù.
+/// 1. ì‹¬ë¦¬ì  ì••ë°•ê°(Pressure) ìˆ˜ì¹˜ì— ë”°ë¼ ì‹œì•¼ê°€ ì¢ì•„ì§€ëŠ” íš¨ê³¼ë¥¼ ì—°ì¶œí•©ë‹ˆë‹¤.<br/>
+/// 2. Pulse ê¸°ëŠ¥ì„ í†µí•´ ì‹¬ì¥ ë°•ë™ì²˜ëŸ¼ í™”ë©´ì´ ìš¸ë ê±°ë¦¬ëŠ” íš¨ê³¼ë¥¼ ì¤ë‹ˆë‹¤.<br/>
+/// 3. MaterialPropertyBlockì„ ì‚¬ìš©í•˜ì—¬ ëŸ°íƒ€ì„ ì„±ëŠ¥ì„ ìµœì í™”í•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class PressureVignette : MonoBehaviour
@@ -13,24 +13,24 @@ public class PressureVignette : MonoBehaviour
     #region Inspector Settings
 
     [Header("Visual Settings")]
-    [Tooltip("ºñ³×ÆÃ È¿°úÀÇ »ö»óÀÔ´Ï´Ù. (ÁÖ·Î ºÓÀº»öÀÌ³ª °ËÀº»ö »ç¿ë)")]
+    [Tooltip("ë¹„ë„¤íŒ… íš¨ê³¼ì˜ ìƒ‰ìƒì…ë‹ˆë‹¤. (ì£¼ë¡œ ë¶‰ì€ìƒ‰ì´ë‚˜ ê²€ì€ìƒ‰ ì‚¬ìš©)")]
     [SerializeField] private Color vignetteColor = new Color(1f, 0f, 0f, 0.5f);
 
-    [Tooltip("ºñ³×ÆÃ °æ°èÀÇ ºÎµå·¯¿î Á¤µµÀÔ´Ï´Ù. (0¿¡ °¡±î¿ï¼ö·Ï ³¯Ä«·Î¿ò)")]
+    [Tooltip("ë¹„ë„¤íŒ… ê²½ê³„ì˜ ë¶€ë“œëŸ¬ìš´ ì •ë„ì…ë‹ˆë‹¤. (0ì— ê°€ê¹Œìš¸ìˆ˜ë¡ ë‚ ì¹´ë¡œì›€)")]
     [SerializeField] private float feathering = 0.5f;
 
     [Header("Pulse Settings")]
-    [Tooltip("Ã¼Å© ½Ã: ½ÉÀå ¹Úµ¿Ã³·³ È­¸éÀÌ ÁÖ±âÀûÀ¸·Î ¿ï··°Å¸³´Ï´Ù.")]
+    [Tooltip("ì²´í¬ ì‹œ: ì‹¬ì¥ ë°•ë™ì²˜ëŸ¼ í™”ë©´ì´ ì£¼ê¸°ì ìœ¼ë¡œ ìš¸ë ê±°ë¦½ë‹ˆë‹¤.")]
     [SerializeField] private bool usePulse = true;
 
-    [Tooltip("±âº» ¹Úµ¿ ¼ÓµµÀÔ´Ï´Ù.")]
+    [Tooltip("ê¸°ë³¸ ë°•ë™ ì†ë„ì…ë‹ˆë‹¤.")]
     [SerializeField] private float basePulseSpeed = 2.0f;
 
-    [Tooltip("¹Úµ¿ ½Ã Á¶¸®°³(Aperture) Å©±âÀÇ º¯È­ ÆøÀÔ´Ï´Ù.")]
+    [Tooltip("ë°•ë™ ì‹œ ì¡°ë¦¬ê°œ(Aperture) í¬ê¸°ì˜ ë³€í™” í­ì…ë‹ˆë‹¤.")]
     [SerializeField] private float pulseMagnitude = 0.05f;
 
     [Header("Debug (Play Mode Only)")]
-    [Tooltip("Å×½ºÆ®¿ë °­µµ ½½¶óÀÌ´õÀÔ´Ï´Ù. ÇÃ·¹ÀÌ ¸ğµå¿¡¼­ ½Ç½Ã°£À¸·Î Á¶ÀıÇØ º¼ ¼ö ÀÖ½À´Ï´Ù.")]
+    [Tooltip("í…ŒìŠ¤íŠ¸ìš© ê°•ë„ ìŠ¬ë¼ì´ë”ì…ë‹ˆë‹¤. í”Œë ˆì´ ëª¨ë“œì—ì„œ ì‹¤ì‹œê°„ìœ¼ë¡œ ì¡°ì ˆí•´ ë³¼ ìˆ˜ ìˆìŠµë‹ˆë‹¤.")]
     [Range(0f, 1f)]
     [SerializeField] private float testIntensity = 0f;
 
@@ -42,11 +42,11 @@ public class PressureVignette : MonoBehaviour
     private MaterialPropertyBlock propBlock;
 
     /// <summary>
-    /// ÇöÀç Àû¿ëµÈ ¾Ğ¹Ú°¨ °­µµ (0.0 ~ 1.0)
+    /// í˜„ì¬ ì ìš©ëœ ì••ë°•ê° ê°•ë„ (0.0 ~ 1.0)
     /// </summary>
     private float currentIntensity = 0f;
 
-    // Shader Property IDs (¼º´ÉÀ» À§ÇØ ¹Ì¸® ÇØ½Ì)
+    // Shader Property IDs (ì„±ëŠ¥ì„ ìœ„í•´ ë¯¸ë¦¬ í•´ì‹±)
     private static readonly int ApertureSizeID = Shader.PropertyToID("_ApertureSize");
     private static readonly int VignetteColorID = Shader.PropertyToID("_VignetteColor");
     private static readonly int FeatheringEffectID = Shader.PropertyToID("_FeatheringEffect");
@@ -60,19 +60,19 @@ public class PressureVignette : MonoBehaviour
         meshRenderer = GetComponent<MeshRenderer>();
         propBlock = new MaterialPropertyBlock();
 
-        // ÃÊ±âÈ­: È¿°ú¸¦ º¸ÀÌÁö ¾Ê°Ô ¼³Á¤ (Á¶¸®°³ ¿ÏÀü °³¹æ)
+        // ì´ˆê¸°í™”: íš¨ê³¼ë¥¼ ë³´ì´ì§€ ì•Šê²Œ ì„¤ì • (ì¡°ë¦¬ê°œ ì™„ì „ ê°œë°©)
         UpdateVignette(1.0f);
     }
 
     private void Update()
     {
-        // µğ¹ö±×¿ë: InspectorÀÇ ½½¶óÀÌ´õ °ªÀÌ º¯°æµÇ¸é ½Ç½Ã°£ Àû¿ë
+        // ë””ë²„ê·¸ìš©: Inspectorì˜ ìŠ¬ë¼ì´ë” ê°’ì´ ë³€ê²½ë˜ë©´ ì‹¤ì‹œê°„ ì ìš©
         if (testIntensity > 0)
         {
             currentIntensity = testIntensity;
         }
 
-        // ½Ã°¢ È¿°ú ¸Å ÇÁ·¹ÀÓ °»½Å (Pulse ¾Ö´Ï¸ŞÀÌ¼Ç ¶§¹®)
+        // ì‹œê° íš¨ê³¼ ë§¤ í”„ë ˆì„ ê°±ì‹  (Pulse ì• ë‹ˆë©”ì´ì…˜ ë•Œë¬¸)
         UpdateVisuals();
     }
 
@@ -81,22 +81,22 @@ public class PressureVignette : MonoBehaviour
     #region Public API
 
     /// <summary>
-    /// ºñ³×ÆÃ È¿°úÀÇ °­µµ¸¦ ¼³Á¤ÇÕ´Ï´Ù.
+    /// ë¹„ë„¤íŒ… íš¨ê³¼ì˜ ê°•ë„ë¥¼ ì„¤ì •í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="intensity">0.0(¾øÀ½) ~ 1.0(ÃÖ´ë) »çÀÌÀÇ °ª</param>
+    /// <param name="intensity">0.0(ì—†ìŒ) ~ 1.0(ìµœëŒ€) ì‚¬ì´ì˜ ê°’</param>
     public void SetIntensity(float intensity)
     {
         currentIntensity = Mathf.Clamp01(intensity);
-        testIntensity = currentIntensity; // µğ¹ö±× ½½¶óÀÌ´õ µ¿±âÈ­
+        testIntensity = currentIntensity; // ë””ë²„ê·¸ ìŠ¬ë¼ì´ë” ë™ê¸°í™”
 
-        // °­µµ°¡ ¹Ì¹ÌÇÏ¸é ÄÄÆ÷³ÍÆ® ÀÚÃ¼¸¦ ²¨¼­ ¿¬»ê Àı¾à (ÃÖÀûÈ­)
-        // ´Ü, Pulse ¾Ö´Ï¸ŞÀÌ¼ÇÀÌ ÀÚ¿¬½º·´°Ô »ç¶óÁö°Ô ÇÏ·Á¸é ÀÓ°è°ªÀ» Àß Á¶ÀıÇØ¾ß ÇÔ
+        // ê°•ë„ê°€ ë¯¸ë¯¸í•˜ë©´ ì»´í¬ë„ŒíŠ¸ ìì²´ë¥¼ êº¼ì„œ ì—°ì‚° ì ˆì•½ (ìµœì í™”)
+        // ë‹¨, Pulse ì• ë‹ˆë©”ì´ì…˜ì´ ìì—°ìŠ¤ëŸ½ê²Œ ì‚¬ë¼ì§€ê²Œ í•˜ë ¤ë©´ ì„ê³„ê°’ì„ ì˜ ì¡°ì ˆí•´ì•¼ í•¨
         bool shouldEnable = currentIntensity > 0.01f;
 
         if (enabled != shouldEnable)
         {
             enabled = shouldEnable;
-            if (!enabled) UpdateVignette(1.0f); // ²¨Áú ¶§ ±¸¸Û ¿ÏÀüÈ÷ ¿­±â
+            if (!enabled) UpdateVignette(1.0f); // êº¼ì§ˆ ë•Œ êµ¬ë© ì™„ì „íˆ ì—´ê¸°
         }
     }
 
@@ -105,33 +105,33 @@ public class PressureVignette : MonoBehaviour
     #region Internal Logic
 
     /// <summary>
-    /// ÇöÀç °­µµ¿Í ½Ã°£(Time)À» ±â¹İÀ¸·Î ÃÖÁ¾ Á¶¸®°³ Å©±â¸¦ °è»êÇÕ´Ï´Ù.
+    /// í˜„ì¬ ê°•ë„ì™€ ì‹œê°„(Time)ì„ ê¸°ë°˜ìœ¼ë¡œ ìµœì¢… ì¡°ë¦¬ê°œ í¬ê¸°ë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
     /// </summary>
     private void UpdateVisuals()
     {
-        // 1. ±âº» Á¶¸®°³ Å©±â °è»ê (°­µµ°¡ ³ôÀ»¼ö·Ï 0.3±îÁö ÁÙ¾îµê)
+        // 1. ê¸°ë³¸ ì¡°ë¦¬ê°œ í¬ê¸° ê³„ì‚° (ê°•ë„ê°€ ë†’ì„ìˆ˜ë¡ 0.3ê¹Œì§€ ì¤„ì–´ë“¦)
         float minAperture = 0.3f;
         float targetAperture = Mathf.Lerp(1.0f, minAperture, currentIntensity);
 
-        // 2. Pulse(¹Úµ¿) È¿°ú Àû¿ë
+        // 2. Pulse(ë°•ë™) íš¨ê³¼ ì ìš©
         if (usePulse && currentIntensity > 0.1f)
         {
-            // °­µµ°¡ ³ôÀ»¼ö·Ï ´õ »¡¸® ¶Ü
+            // ê°•ë„ê°€ ë†’ì„ìˆ˜ë¡ ë” ë¹¨ë¦¬ ëœ€
             float dynamicSpeed = basePulseSpeed + (currentIntensity * 5.0f);
 
-            // Sin ÆÄµ¿À» ÀÌ¿ëÇØ Å©±â º¯È­ (°­µµ¿¡ ºñ·ÊÇÏ¿© ÁøÆø Ä¿Áü)
+            // Sin íŒŒë™ì„ ì´ìš©í•´ í¬ê¸° ë³€í™” (ê°•ë„ì— ë¹„ë¡€í•˜ì—¬ ì§„í­ ì»¤ì§)
             float pulseOffset = Mathf.Sin(Time.time * dynamicSpeed) * pulseMagnitude * currentIntensity;
 
             targetAperture += pulseOffset;
         }
 
-        // 3. ÃÖÁ¾°ª Àû¿ë
+        // 3. ìµœì¢…ê°’ ì ìš©
         UpdateVignette(Mathf.Clamp01(targetAperture));
     }
 
     /// <summary>
-    /// MaterialPropertyBlockÀ» »ç¿ëÇÏ¿© ¼ÎÀÌ´õ¿¡ °ªÀ» Àü´ŞÇÕ´Ï´Ù.
-    /// (Material ÀÎ½ºÅÏ½º¸¦ »ı¼ºÇÏÁö ¾Ê¾Æ ¹èÄªÀÌ ±úÁöÁö ¾ÊÀ½)
+    /// MaterialPropertyBlockì„ ì‚¬ìš©í•˜ì—¬ ì…°ì´ë”ì— ê°’ì„ ì „ë‹¬í•©ë‹ˆë‹¤.
+    /// (Material ì¸ìŠ¤í„´ìŠ¤ë¥¼ ìƒì„±í•˜ì§€ ì•Šì•„ ë°°ì¹­ì´ ê¹¨ì§€ì§€ ì•ŠìŒ)
     /// </summary>
     private void UpdateVignette(float apertureSize)
     {

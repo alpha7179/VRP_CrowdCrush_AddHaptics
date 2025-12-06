@@ -1,14 +1,14 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 using System.Collections;
 
 /// <summary>
-/// °ÔÀÓÀÇ ÀüÃ¼ »ı¸íÁÖ±â(Lifecycle), ¾À ÀüÈ¯, Àü¿ª »óÅÂ(ÀÏ½ÃÁ¤Áö µî)¸¦ °ü¸®ÇÏ´Â ÃÖ»óÀ§ ¸Å´ÏÀúÀÔ´Ï´Ù.
+/// ê²Œì„ì˜ ì „ì²´ ìƒëª…ì£¼ê¸°(Lifecycle), ì”¬ ì „í™˜, ì „ì—­ ìƒíƒœ(ì¼ì‹œì •ì§€ ë“±)ë¥¼ ê´€ë¦¬í•˜ëŠ” ìµœìƒìœ„ ë§¤ë‹ˆì €ì…ë‹ˆë‹¤.
 /// <para>
-/// 1. °ÔÀÓÀÇ ÀÏ½ÃÁ¤Áö ¹× Àç°³ ±â´ÉÀ» Á¦¾îÇÏ°í ÀÌº¥Æ®¸¦ ¹ßÇàÇÕ´Ï´Ù.<br/>
-/// 2. SceneTransitionManager¸¦ ÅëÇØ ¾À ÀüÈ¯À» ¿äÃ»ÇÕ´Ï´Ù.<br/>
-/// 3. °ÔÀÓ Å¬¸®¾î ¹× °ÔÀÓ ¿À¹ö »óÅÂ¸¦ °ü¸®ÇÏ°í ÀÌº¥Æ®¸¦ ÀüÆÄÇÕ´Ï´Ù.
+/// 1. ê²Œì„ì˜ ì¼ì‹œì •ì§€ ë° ì¬ê°œ ê¸°ëŠ¥ì„ ì œì–´í•˜ê³  ì´ë²¤íŠ¸ë¥¼ ë°œí–‰í•©ë‹ˆë‹¤.<br/>
+/// 2. SceneTransitionManagerë¥¼ í†µí•´ ì”¬ ì „í™˜ì„ ìš”ì²­í•©ë‹ˆë‹¤.<br/>
+/// 3. ê²Œì„ í´ë¦¬ì–´ ë° ê²Œì„ ì˜¤ë²„ ìƒíƒœë¥¼ ê´€ë¦¬í•˜ê³  ì´ë²¤íŠ¸ë¥¼ ì „íŒŒí•©ë‹ˆë‹¤.
 /// </para>
 /// </summary>
 public class GameManager : MonoBehaviour
@@ -19,11 +19,11 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        // ½Ì±ÛÅæ ÆĞÅÏ: Áßº¹ »ı¼º ¹æÁö ¹× ¾À ÀüÈ¯ ½Ã ÆÄ±« ¹æÁö
+        // ì‹±ê¸€í†¤ íŒ¨í„´: ì¤‘ë³µ ìƒì„± ë°©ì§€ ë° ì”¬ ì „í™˜ ì‹œ íŒŒê´´ ë°©ì§€
         if (Instance == null)
         {
             Instance = this;
-            transform.parent = null; // ÃÖ»óÀ§ °èÃşÀ¸·Î ºĞ¸®
+            transform.parent = null; // ìµœìƒìœ„ ê³„ì¸µìœ¼ë¡œ ë¶„ë¦¬
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     #region Inspector Settings
 
     [Header("Debug Settings")]
-    [Tooltip("µğ¹ö±× ·Î±× Ãâ·Â ¿©ºÎ¸¦ ¼³Á¤ÇÕ´Ï´Ù.")]
+    [Tooltip("ë””ë²„ê·¸ ë¡œê·¸ ì¶œë ¥ ì—¬ë¶€ë¥¼ ì„¤ì •í•©ë‹ˆë‹¤.")]
     [SerializeField] private bool isDebug = true;
 
     #endregion
@@ -46,12 +46,12 @@ public class GameManager : MonoBehaviour
 
     [Header("Game State Info")]
     /// <summary>
-    /// ÇöÀç °ÔÀÓÀÌ ÀÏ½ÃÁ¤Áö »óÅÂÀÎÁö ¿©ºÎÀÔ´Ï´Ù.
+    /// í˜„ì¬ ê²Œì„ì´ ì¼ì‹œì •ì§€ ìƒíƒœì¸ì§€ ì—¬ë¶€ì…ë‹ˆë‹¤.
     /// </summary>
     public bool IsPaused = false;
 
     /// <summary>
-    /// ÇöÀç È°¼ºÈ­µÈ ¾ÀÀÇ ÀÌ¸§ÀÔ´Ï´Ù.
+    /// í˜„ì¬ í™œì„±í™”ëœ ì”¬ì˜ ì´ë¦„ì…ë‹ˆë‹¤.
     /// </summary>
     public string CurrentSceneName;
 
@@ -60,22 +60,22 @@ public class GameManager : MonoBehaviour
     #region Events
 
     /// <summary>
-    /// ÀÏ½ÃÁ¤Áö »óÅÂ°¡ º¯°æµÉ ¶§ ¹ß»ıÇÏ´Â ÀÌº¥Æ®ÀÔ´Ï´Ù. (bool: isPaused)
+    /// ì¼ì‹œì •ì§€ ìƒíƒœê°€ ë³€ê²½ë  ë•Œ ë°œìƒí•˜ëŠ” ì´ë²¤íŠ¸ì…ë‹ˆë‹¤. (bool: isPaused)
     /// </summary>
     public event Action<bool> OnPauseStateChanged;
 
     /// <summary>
-    /// ¾À ·Îµå°¡ ¿Ï·áµÇ¾úÀ» ¶§ ¹ß»ıÇÏ´Â ÀÌº¥Æ®ÀÔ´Ï´Ù. (string: sceneName)
+    /// ì”¬ ë¡œë“œê°€ ì™„ë£Œë˜ì—ˆì„ ë•Œ ë°œìƒí•˜ëŠ” ì´ë²¤íŠ¸ì…ë‹ˆë‹¤. (string: sceneName)
     /// </summary>
     public event Action<string> OnSceneLoaded;
 
     /// <summary>
-    /// °ÔÀÓ Å¬¸®¾î(¸ñÇ¥ ´Ş¼º) ½Ã ¹ß»ıÇÏ´Â ÀÌº¥Æ®ÀÔ´Ï´Ù.
+    /// ê²Œì„ í´ë¦¬ì–´(ëª©í‘œ ë‹¬ì„±) ì‹œ ë°œìƒí•˜ëŠ” ì´ë²¤íŠ¸ì…ë‹ˆë‹¤.
     /// </summary>
     public event Action OnGameClear;
 
     /// <summary>
-    /// °ÔÀÓ ¿À¹ö(½ÇÆĞ) ½Ã ¹ß»ıÇÏ´Â ÀÌº¥Æ®ÀÔ´Ï´Ù.
+    /// ê²Œì„ ì˜¤ë²„(ì‹¤íŒ¨) ì‹œ ë°œìƒí•˜ëŠ” ì´ë²¤íŠ¸ì…ë‹ˆë‹¤.
     /// </summary>
     public event Action OnGameOver;
 
@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
 
     private void OnEnable()
     {
-        // À¯´ÏÆ¼ ³»Àå ¾À ·Îµå ÀÌº¥Æ®¸¦ ±¸µ¶ÇÏ¿© »óÅÂ ¸®¼Â ·ÎÁ÷À» ¼öÇàÇÕ´Ï´Ù.
+        // ìœ ë‹ˆí‹° ë‚´ì¥ ì”¬ ë¡œë“œ ì´ë²¤íŠ¸ë¥¼ êµ¬ë…í•˜ì—¬ ìƒíƒœ ë¦¬ì…‹ ë¡œì§ì„ ìˆ˜í–‰í•©ë‹ˆë‹¤.
         SceneManager.sceneLoaded += HandleSceneLoaded;
     }
 
@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // ½ÃÀÛ ½Ã ÇöÀç ¾À ÀÌ¸§ ÀúÀå
+        // ì‹œì‘ ì‹œ í˜„ì¬ ì”¬ ì´ë¦„ ì €ì¥
         CurrentSceneName = SceneManager.GetActiveScene().name;
     }
 
@@ -105,30 +105,30 @@ public class GameManager : MonoBehaviour
     #region Public API
 
     /// <summary>
-    /// °ÔÀÓÀÇ ÀÏ½ÃÁ¤Áö »óÅÂ¸¦ Åä±Û(Toggle)ÇÕ´Ï´Ù.
-    /// <para>Time.timeScaleÀ» Á¶ÀıÇÏ¿© ¹°¸® ¿¬»ê ¹× ½Ã°£À» ¸ØÃß°Å³ª Àç°³ÇÕ´Ï´Ù.</para>
+    /// ê²Œì„ì˜ ì¼ì‹œì •ì§€ ìƒíƒœë¥¼ í† ê¸€(Toggle)í•©ë‹ˆë‹¤.
+    /// <para>Time.timeScaleì„ ì¡°ì ˆí•˜ì—¬ ë¬¼ë¦¬ ì—°ì‚° ë° ì‹œê°„ì„ ë©ˆì¶”ê±°ë‚˜ ì¬ê°œí•©ë‹ˆë‹¤.</para>
     /// </summary>
     public void TogglePause()
     {
-        // ÀÎÆ®·Î ¾À µî ÀÏ½ÃÁ¤Áö°¡ ºÒÇÊ¿äÇÑ ¾À ¿¹¿Ü Ã³¸®
+        // ì¸íŠ¸ë¡œ ì”¬ ë“± ì¼ì‹œì •ì§€ê°€ ë¶ˆí•„ìš”í•œ ì”¬ ì˜ˆì™¸ ì²˜ë¦¬
         if (CurrentSceneName.Equals("Main_Intro ", StringComparison.OrdinalIgnoreCase)) return;
 
         IsPaused = !IsPaused;
 
-        // ½Ã°£ Á¤Áö/Àç°³ Àû¿ë
+        // ì‹œê°„ ì •ì§€/ì¬ê°œ ì ìš©
         Time.timeScale = IsPaused ? 0f : 1f;
 
-        // »óÅÂ º¯°æ ÀÌº¥Æ® ÀüÆÄ
+        // ìƒíƒœ ë³€ê²½ ì´ë²¤íŠ¸ ì „íŒŒ
         OnPauseStateChanged?.Invoke(IsPaused);
 
         if (isDebug) Debug.Log($"[GameManager] Pause State Changed: {IsPaused}");
     }
 
     /// <summary>
-    /// ÁöÁ¤µÈ ÀÌ¸§ÀÇ ¾ÀÀ» ·ÎµåÇÕ´Ï´Ù.
-    /// <para>SceneTransitionManager°¡ Á¸ÀçÇÏ¸é ÆäÀÌµå È¿°ú¸¦ »ç¿ëÇÏ°í, ¾øÀ¸¸é Áï½Ã ·ÎµåÇÕ´Ï´Ù.</para>
+    /// ì§€ì •ëœ ì´ë¦„ì˜ ì”¬ì„ ë¡œë“œí•©ë‹ˆë‹¤.
+    /// <para>SceneTransitionManagerê°€ ì¡´ì¬í•˜ë©´ í˜ì´ë“œ íš¨ê³¼ë¥¼ ì‚¬ìš©í•˜ê³ , ì—†ìœ¼ë©´ ì¦‰ì‹œ ë¡œë“œí•©ë‹ˆë‹¤.</para>
     /// </summary>
-    /// <param name="sceneName">ÀÌµ¿ÇÒ ¾ÀÀÇ ÀÌ¸§</param>
+    /// <param name="sceneName">ì´ë™í•  ì”¬ì˜ ì´ë¦„</param>
     public void LoadScene(string sceneName)
     {
         if (SceneTransitionManager.Instance != null)
@@ -138,14 +138,14 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // ºñ»ó¿ë Fallback: ¸Å´ÏÀú°¡ ¾øÀ» °æ¿ì Á÷Á¢ ·Îµå
+            // ë¹„ìƒìš© Fallback: ë§¤ë‹ˆì €ê°€ ì—†ì„ ê²½ìš° ì§ì ‘ ë¡œë“œ
             if (isDebug) Debug.LogWarning("[GameManager] SceneTransitionManager not found. Loading directly.");
             StartCoroutine(LoadSceneRoutine(sceneName));
         }
     }
 
     /// <summary>
-    /// °ÔÀÓ Å¬¸®¾î(¹Ì¼Ç ¼º°ø) ÀÌº¥Æ®¸¦ ¹ß»ı½ÃÅµ´Ï´Ù.
+    /// ê²Œì„ í´ë¦¬ì–´(ë¯¸ì…˜ ì„±ê³µ) ì´ë²¤íŠ¸ë¥¼ ë°œìƒì‹œí‚µë‹ˆë‹¤.
     /// </summary>
     public void TriggerGameClear()
     {
@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// °ÔÀÓ ¿À¹ö(¹Ì¼Ç ½ÇÆĞ) ÀÌº¥Æ®¸¦ ¹ß»ı½ÃÅµ´Ï´Ù.
+    /// ê²Œì„ ì˜¤ë²„(ë¯¸ì…˜ ì‹¤íŒ¨) ì´ë²¤íŠ¸ë¥¼ ë°œìƒì‹œí‚µë‹ˆë‹¤.
     /// </summary>
     public void TriggerGameOver()
     {
@@ -163,7 +163,7 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¾ÖÇÃ¸®ÄÉÀÌ¼ÇÀ» Á¾·áÇÕ´Ï´Ù. (¿¡µğÅÍ¿¡¼­´Â ÇÃ·¹ÀÌ ¸ğµå Áß´Ü)
+    /// ì• í”Œë¦¬ì¼€ì´ì…˜ì„ ì¢…ë£Œí•©ë‹ˆë‹¤. (ì—ë””í„°ì—ì„œëŠ” í”Œë ˆì´ ëª¨ë“œ ì¤‘ë‹¨)
     /// </summary>
     public void QuitGame()
     {
@@ -180,24 +180,24 @@ public class GameManager : MonoBehaviour
     #region Internal Logic
 
     /// <summary>
-    /// ¾À ·Îµå°¡ ¿Ï·áµÇ¸é È£ÃâµÇ´Â Äİ¹éÀÔ´Ï´Ù. °ÔÀÓ »óÅÂ¸¦ ÃÊ±âÈ­ÇÕ´Ï´Ù.
+    /// ì”¬ ë¡œë“œê°€ ì™„ë£Œë˜ë©´ í˜¸ì¶œë˜ëŠ” ì½œë°±ì…ë‹ˆë‹¤. ê²Œì„ ìƒíƒœë¥¼ ì´ˆê¸°í™”í•©ë‹ˆë‹¤.
     /// </summary>
     private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         CurrentSceneName = scene.name;
 
-        // ¾ÀÀÌ ¹Ù²î¸é ÀÏ½ÃÁ¤Áö ÇØÁ¦ ¹× ½Ã°£ Á¤»óÈ­
+        // ì”¬ì´ ë°”ë€Œë©´ ì¼ì‹œì •ì§€ í•´ì œ ë° ì‹œê°„ ì •ìƒí™”
         Time.timeScale = 1f;
         IsPaused = false;
 
-        // ¾À ·Îµå ¿Ï·á ÀÌº¥Æ® ÀüÆÄ (UI °»½Å µî)
+        // ì”¬ ë¡œë“œ ì™„ë£Œ ì´ë²¤íŠ¸ ì „íŒŒ (UI ê°±ì‹  ë“±)
         OnSceneLoaded?.Invoke(scene.name);
 
         if (isDebug) Debug.Log($"[GameManager] Scene Loaded & State Reset: {scene.name}");
     }
 
     /// <summary>
-    /// SceneTransitionManager°¡ ¾øÀ» ¶§ »ç¿ëÇÏ´Â ºñ»ó¿ë ¾À ·Îµå ÄÚ·çÆ¾ÀÔ´Ï´Ù.
+    /// SceneTransitionManagerê°€ ì—†ì„ ë•Œ ì‚¬ìš©í•˜ëŠ” ë¹„ìƒìš© ì”¬ ë¡œë“œ ì½”ë£¨í‹´ì…ë‹ˆë‹¤.
     /// </summary>
     private IEnumerator LoadSceneRoutine(string sceneName)
     {
@@ -206,7 +206,7 @@ public class GameManager : MonoBehaviour
         {
             yield return null;
         }
-        // ·Îµå ¿Ï·á ÈÄ Ã³¸®´Â HandleSceneLoaded¿¡¼­ ¼öÇàµË´Ï´Ù.
+        // ë¡œë“œ ì™„ë£Œ í›„ ì²˜ë¦¬ëŠ” HandleSceneLoadedì—ì„œ ìˆ˜í–‰ë©ë‹ˆë‹¤.
     }
 
     #endregion
