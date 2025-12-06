@@ -8165,6 +8165,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1728794055665185702, guid: 710da7678f42e774ba6496d61df66701, type: 3}
+      propertyPath: moveKeywords.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1728794055665185702, guid: 710da7678f42e774ba6496d61df66701, type: 3}
+      propertyPath: 'moveKeywords.Array.data[2]'
+      value: Move
+      objectReference: {fileID: 0}
     - target: {fileID: 8010777341028280518, guid: 710da7678f42e774ba6496d61df66701, type: 3}
       propertyPath: m_Name
       value: ProjectManager
@@ -28998,6 +29006,10 @@ PrefabInstance:
     - target: {fileID: 5935574410890726126, guid: 59d5c52a691ae054b887a3ceee0b10db, type: 3}
       propertyPath: m_Name
       value: XROrigin
+      objectReference: {fileID: 0}
+    - target: {fileID: 8997325476800561659, guid: 59d5c52a691ae054b887a3ceee0b10db, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
