@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using TMPro;
@@ -67,7 +67,7 @@ public class IngameUIManager : MonoBehaviour
     [SerializeField] public Image[] pressureGaugeImages;
     [SerializeField] public Image[] pressureHighlightImages;
 
-    private readonly string[] PressureState = new string[] { "정상", "주의", "경고", "압박", "위험", "최대 위험" };
+    private readonly string[] PressureState = new string[] { "안전", "경고", "압박", "위험", "마비", "치명" };
 
     #endregion
 

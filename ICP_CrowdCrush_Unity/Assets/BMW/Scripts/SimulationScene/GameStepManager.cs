@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 
@@ -366,7 +366,7 @@ public class GameStepManager : MonoBehaviour
 
         if (uiManager)
         {
-            uiManager.UpdatePressureGauge(3);
+            uiManager.UpdatePressureGauge(1);
             uiManager.OpenPressurePanel();
         }
         SavePlayerPosition();
@@ -385,7 +385,7 @@ public class GameStepManager : MonoBehaviour
         SetZoneActive(targetIndex, false);
         isZoneReached = false;
 
-        if (uiManager) uiManager.UpdatePressureGauge(2);
+        if (uiManager) uiManager.UpdatePressureGauge(0);
         yield return StartCoroutine(ShowFeedbackAndDelay(1));
         yield return new WaitForSeconds(nextStepDuration);
 
@@ -400,7 +400,7 @@ public class GameStepManager : MonoBehaviour
         SetZoneActive(targetIndex, false);
         isZoneReached = false;
 
-        if (uiManager) uiManager.UpdatePressureGauge(4);
+        if (uiManager) uiManager.UpdatePressureGauge(2);
 
         yield return StartCoroutine(ShowStepTextAndDelay(2));
 
@@ -423,7 +423,7 @@ public class GameStepManager : MonoBehaviour
 
         if (uiManager)
         {
-            uiManager.UpdatePressureGauge(3);
+            uiManager.UpdatePressureGauge(1);
             uiManager.SetPressureIntensity(0.0f);
         }
 
@@ -437,7 +437,7 @@ public class GameStepManager : MonoBehaviour
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Move2;
 
-        if (uiManager) uiManager.UpdatePressureGauge(4);
+        if (uiManager) uiManager.UpdatePressureGauge(2);
         SavePlayerPosition();
 
         yield return StartCoroutine(ShowStepTextAndDelay(3));
@@ -454,7 +454,7 @@ public class GameStepManager : MonoBehaviour
         SetZoneActive(targetIndex, false);
         isZoneReached = false;
 
-        if (uiManager) uiManager.UpdatePressureGauge(3);
+        if (uiManager) uiManager.UpdatePressureGauge(1);
         yield return StartCoroutine(ShowFeedbackAndDelay(3));
         yield return new WaitForSeconds(nextStepDuration);
 
@@ -469,7 +469,7 @@ public class GameStepManager : MonoBehaviour
         SetZoneActive(targetIndex, false);
         isZoneReached = false;
 
-        if (uiManager) uiManager.UpdatePressureGauge(4);
+        if (uiManager) uiManager.UpdatePressureGauge(3);
 
         yield return StartCoroutine(ShowStepTextAndDelay(4));
 
@@ -494,7 +494,7 @@ public class GameStepManager : MonoBehaviour
 
         SetZoneActive(targetIndex, false);
 
-        if (uiManager) uiManager.UpdatePressureGauge(3);
+        if (uiManager) uiManager.UpdatePressureGauge(1);
         yield return StartCoroutine(ShowFeedbackAndDelay(4));
 
         isActionCompleted = false;
@@ -537,7 +537,7 @@ public class GameStepManager : MonoBehaviour
 
         SetZoneActive(targetIndex, false);
 
-        if (uiManager) uiManager.UpdatePressureGauge(3);
+        if (uiManager) uiManager.UpdatePressureGauge(2);
         yield return StartCoroutine(ShowFeedbackAndDelay(5));
 
         isZoneReached = false;
@@ -548,7 +548,7 @@ public class GameStepManager : MonoBehaviour
         // Phase 6: 최종 탈출
         // ---------------------------------------------------------------------------------
         currentPhase = GamePhase.Escape;
-        if (uiManager) uiManager.UpdatePressureGauge(2);
+        if (uiManager) uiManager.UpdatePressureGauge(0);
 
         yield return StartCoroutine(ShowStepTextAndDelay(6));
 
