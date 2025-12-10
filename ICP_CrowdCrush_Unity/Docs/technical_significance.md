@@ -11,27 +11,44 @@
 
 ### 2. Body Ownership & Embodiment (신체 소유감 및 체화)
 
-가상 공간에서 '나'라는 존재를 인식하고 몰입하기 위해서는 시각적, 감각적 일체감이 중요합니다.
+가상 공간에서 '나'라는 존재를 인식하고 몰입하기 위해서는 시각적 일체감이 중요합니다.
 
-- **Visual Consistency (Arm Asset)**: 단순히 손이나 컨트롤러 모델이 아닌, **팔까지 연결된 에셋**을 사용하여 시각적 불일치를 해소했습니다. 이는 사용자가 내려다보았을 때 가상의 팔을 자신의 팔로 인식하게 하는(Ownership) 기초가 됩니다.
-- **Continuous Locomotion**: 텔레포트가 아닌 **Continuous Move & Turn**을 사용하여, 사용자의 의지대로 공간을 이동하는 감각(Sense of Agency)을 제공합니다.
-- **Physical Interaction**: **Direct Interaction**(기둥 잡기)과 **Gesture**(방어 자세)는 버튼 조작이 아닌 신체적 행위를 요구합니다. 이는 "내 몸이 가상 환경에 물리적으로 관여하고 있다"는 강력한 체화(Embodied Cognition) 효과를 줍니다.
+- **Visual Consistency (Arm Asset)**: 단순히 공중에 떠 있는 손(Floating Hands) 모델이 아닌, **팔(Arm)까지 연결된 에셋**을 사용하여 시각적 불일치를 해소했습니다. 사용자가 내려다보았을 때 가상의 팔을 자신의 팔로 인식하게 하여(Ownership), 훈련 상황에 대한 주체적 몰입을 유도합니다.
 
-### 3. Ray Interaction: 조작 편의성 및 정보 접근성 확보
+### 3. Locomotion: 자유 이동과 멀미 저감의 균형
+
+텔레포트(Teleport) 방식은 멀미가 적지만, 공간 이동의 연속성을 끊어버려 "위험 지역을 빠져나간다"는 긴박함을 저하할 수 있습니다.
+
+- **Continuous Movement**: 본 프로젝트는 `PlayerManager.cs`를 통해 **Continuous Move(자유 이동)**와 **Continuous Turn(연속 회전)**을 기본 이동 방식으로 채택하였습니다. 사용자는 조이스틱을 이용해 실제 걷는 것처럼 부드럽게 이동하며 사고 현장을 누빕니다.
+- **Safety Technology**: 자유 이동 방식의 가장 큰 약점인 사이버 멀미(Cybersickness)를 해결하기 위해 standard XR Component인 **TunnelingVignette**를 적용하였습니다. 이는 플레이어가 이동하거나 회전할 때만 선택적으로 시야를 좁혀(**Dynamic FOV Reduction**), 광류(Optical Flow)로 인한 전정 기관의 혼란을 억제합니다.
+
+### 4. Ray Interaction: 조작 편의성 및 정보 접근성 확보
 
 복잡한 재난 상황에서 UI 조작이나 원거리 선택이 불편하면 훈련의 흐름이 끊기게 됩니다.
 
 - **Code Implementation**: `PlayerManager.cs`에서 제어하는 **XR Ray Interactor**는 손이 닿지 않는 거리의 UI 패널이나 오브젝트를 레이저 포인터처럼 직관적으로 선택하게 합니다.
 - **Significance**: 이는 사용자가 훈련 외적인 조작(UI 확인, 메뉴 선택) 스트레스 없이, 빠르고 정확하게 필요한 정보를 습득할 수 있게 하여 인지 부하(Cognitive Load)를 줄여줍니다.
 
-### 4. UI: 공간 단절 없는 인터페이스
+### 5. Direct Interaction: 물리적 체험을 통한 생존 감각 체득
+
+생존 기술 훈련의 핵심은 머리로 아는 것이 아니라 몸으로 기억하는 것입니다.
+
+- **Code Implementation**: `ClimbHandle.cs`와 `XR Direct Interactor`를 통해 구현된 직접 상호작용은 사용자가 기둥이나 벽을 잡을 때 반드시 손을 뻗어 물리적으로 접촉하게 만듭니다. 버튼을 누르는 추상적 행위가 아니라 실제 근육을 사용하는 행위입니다.
+- **Significance**: "무언가를 잡고 버틴다"는 물리적 감각은 사용자의 신체 소유감(Body Ownership)을 강화하고, 실제 위기 상황에서도 즉각적인 신체 반응이 나오도록 하는 **체화된 인지(Embodied Cognition)**를 형성합니다.
+
+### 6. NUI: 신체 자세 인식
+
+- **Implementation**: `GestureManager.cs`는 버튼이 아닌 플레이어의 실제 자세(ABC 포즈)를 인식합니다.
+- **Significance**: "키를 눌러 방어한다"가 아닌 **"내 몸을 움츠려 방어한다"**는 경험은, 단순한 게임 플레이를 넘어선 실전 훈련으로서의 가치를 증명합니다.
+
+### 7. UI: 공간 단절 없는 인터페이스
 
 VR 환경에서 화면에 고정된(Overlay) UI는 사용자의 초점 심도(Depth Focus) 충돌을 일으키고 현존감을 저해하는 주요 요인입니다.
 
-- **Spatial UI**: `UIFollowHead.cs`는 Lerp 알고리즘을 사용해 UI가 플레이어의 시선을 부드럽게 유영하듯 따라오게 만들었으며, `UIBillboard.cs`는 3D 공간 내에서 항상 정면을 응시하도록 합니다. 이는 HUD 정보가 '게임 UI'가 아닌, **미래형 전술 고글이나 증강 정보(AR)**처럼 느껴지게 합니다.
+- **Spatial UI**: **IntroUIManager.cs**는 메뉴와 인터페이스를 3D 공간(World Space) 내에 배치하여 사용자가 UI를 조작하는 동안에도 가상 세계의 몰입이 유지되도록 합니다. 화면에 달라붙는 HUD 방식 대신 공간 속에 위치한 스크린을 사용하는 방식입니다.
 - **Diegetic Layout**: 상단(게이지)-중앙(텍스트)-하단(진행바)의 기능적 배치를 통해 사용자의 시야 흐름을 방해하지 않는 최적의 몰입 환경을 제공합니다.
 
-### 5. UX: 다중 감각을 통한 본능적 위기 전달
+### 8. UX: 다중 감각을 통한 본능적 위기 전달
 
 단순한 시각적 알림만으로는 실제 재난 상황의 긴박함을 전달하기 어렵습니다. 본 프로젝트는 시각, 청각, 촉각이 통합된 **Multi-modal Feedback System**을 구축했습니다.
 
@@ -39,7 +56,3 @@ VR 환경에서 화면에 고정된(Overlay) UI는 사용자의 초점 심도(De
 - **Auditory (비명 및 환경음)**: 위험 지역 진입 시 군중의 날카로운 비명 소리와 혼란스러운 환경 사운드를 출력하여 청각적 공포를 조성합니다.
 - **Haptic (컨트롤러 진동)**: 사용자가 기둥을 잡거나 자세를 취하는 상호작용을 수행할 때 컨트롤러에 물리적 진동 햅틱을 전달하여 행동의 확실성을 부여합니다.
 - **Significance**: 이러한 공감각적 피드백 루프는 사용자의 뇌가 가상 상황을 실제 위협으로 착각하게 만드는 **타당성 착각(Plausibility Illusion)**을 강력하게 유발하여 훈련 효과를 각인시킵니다.
-
-### 6. Technical Safety: 멀미 저감 기술
-
-- **TunnelingVignette**: 자유 이동(Continuous Locomotion) 시 발생하는 멀미를 막기 위해 **TunnelingVignette**를 적용했습니다. 이동/회전 시에만 시야각을 동적으로 줄여 전정 기관의 혼란을 기술적으로 방지합니다.
