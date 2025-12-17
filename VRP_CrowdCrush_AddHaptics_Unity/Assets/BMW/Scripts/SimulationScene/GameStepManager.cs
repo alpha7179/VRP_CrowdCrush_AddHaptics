@@ -54,9 +54,9 @@ public class GameStepManager : MonoBehaviour
 
     #region Internal State & Debug
 
-    private enum GamePhase
+    public enum GamePhase
     {
-        Caution, Tutorial, Move1, ABCPose, Move2, HoldPillar, ClimbUp, Escape, Finished
+        Caution, Tutorial, Move1, ABCPose, Move2, HoldPillar, ClimbUp, Escape, Finished, Null
     }
 
     [Header("Debug Info")]

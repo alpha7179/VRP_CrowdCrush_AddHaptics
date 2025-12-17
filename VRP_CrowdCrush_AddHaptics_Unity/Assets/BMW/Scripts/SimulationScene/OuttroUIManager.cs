@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -200,9 +200,9 @@ public class OuttroUIManager : MonoBehaviour
 
         if (DataManager.Instance != null)
         {
-            successCount = DataManager.Instance.SuccessCount;
-            mistakeCount = DataManager.Instance.MistakeCount;
-            playTime = DataManager.Instance.PlayTime;
+            successCount = DataManager.Instance.GetSuccessCount();
+            mistakeCount = DataManager.Instance.GetMistakeCount();
+            playTime = DataManager.Instance.GetPlayTime();
         }
 
         // 2. 별점 계산 로직

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
 using System.Collections;
@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
     /// 현재 활성화된 씬의 이름입니다.
     /// </summary>
     public string CurrentSceneName;
+    [SerializeField] private GameScene currentScene;
+    public enum GameScene { Menu, Simulator }
 
     #endregion
 
@@ -98,6 +100,16 @@ public class GameManager : MonoBehaviour
     {
         // 시작 시 현재 씬 이름 저장
         CurrentSceneName = SceneManager.GetActiveScene().name;
+        currentScene = GameScene.Menu;
+    }
+
+    private void GameSceneChange(string value)
+    {
+        if (CurrentSceneName != value)
+        {
+            currentScene = (currentScene == GameScene.Menu) ? GameScene.Simulator : GameScene.Menu;
+            CurrentSceneName = value;
+        }
     }
 
     #endregion
@@ -184,7 +196,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void HandleSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        CurrentSceneName = scene.name;
+        GameSceneChange(scene.name);
 
         // 씬이 바뀌면 일시정지 해제 및 시간 정상화
         Time.timeScale = 1f;

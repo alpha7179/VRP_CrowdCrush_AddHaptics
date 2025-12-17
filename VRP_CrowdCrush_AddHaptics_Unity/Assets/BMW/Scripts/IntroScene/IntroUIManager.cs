@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
@@ -57,9 +57,15 @@ public class IntroUIManager : MonoBehaviour
 
     [Header("Settings Panels Elements")]
     [Tooltip("오디오 볼륨 슬라이더")]
-    [SerializeField] private Slider audioSlider;
+    [SerializeField] private Slider MasterVolumeSlider;
+    [SerializeField] private Slider NARVolumeSlider;
+    [SerializeField] private Slider SFXVolumeSlider;
+    [SerializeField] private Slider AMBVolumeSlider;
     [Tooltip("오디오 볼륨 수치 텍스트 (0-100)")]
-    [SerializeField] private TextMeshProUGUI audioText;
+    [SerializeField] private TextMeshProUGUI MasterVolumeText;
+    [SerializeField] private TextMeshProUGUI NARVolumeText;
+    [SerializeField] private TextMeshProUGUI SFXVolumeText;
+    [SerializeField] private TextMeshProUGUI AMBVolumeText;
 
     [Tooltip("멀미 방지 모드 슬라이더 (0: OFF, 1: ON)")]
     [SerializeField] private Slider modeSlider;
@@ -99,17 +105,47 @@ public class IntroUIManager : MonoBehaviour
     private void InitializeSettings()
     {
         // 1. 오디오 슬라이더 설정
-        audioSlider.minValue = 0;
-        audioSlider.maxValue = 100;
-        audioSlider.wholeNumbers = true;
+        MasterVolumeSlider.minValue = 0;
+        MasterVolumeSlider.maxValue = 100;
+        MasterVolumeSlider.wholeNumbers = true;
+
+        NARVolumeSlider.minValue = 0;
+        NARVolumeSlider.maxValue = 100;
+        NARVolumeSlider.wholeNumbers = true;
+
+        SFXVolumeSlider.minValue = 0;
+        SFXVolumeSlider.maxValue = 100;
+        SFXVolumeSlider.wholeNumbers = true;
+
+        AMBVolumeSlider.minValue = 0;
+        AMBVolumeSlider.maxValue = 100;
+        AMBVolumeSlider.wholeNumbers = true;
 
         // DataManager가 있으면 저장된 볼륨 가져오기 (0.0~1.0 -> 0~100 변환)
-        float currentVol = DataManager.Instance != null ? DataManager.Instance.MasterVolume : 1.0f;
-        int displayVol = Mathf.RoundToInt(currentVol * 100f);
+        float currentMasterVol = DataManager.Instance != null ? DataManager.Instance.GetMasterVolume() : 1.0f;
+        int displayMasterVol = Mathf.RoundToInt(currentMasterVol * 100f);
+        float currentNARVol = DataManager.Instance != null ? DataManager.Instance.GetNARVolume() : 1.0f;
+        int displayNARVol = Mathf.RoundToInt(currentNARVol * 100f);
+        float currentSFXVol = DataManager.Instance != null ? DataManager.Instance.GetSFXVolume() : 1.0f;
+        int displaySFXVol = Mathf.RoundToInt(currentSFXVol * 100f);
+        float currentAMBVol = DataManager.Instance != null ? DataManager.Instance.GetAMBVolume() : 1.0f;
+        int displayAMBVol = Mathf.RoundToInt(currentAMBVol * 100f);
 
-        audioSlider.value = displayVol;
-        OnAudioSliderValueChanged(displayVol); // 텍스트 갱신
-        audioSlider.onValueChanged.AddListener(OnAudioSliderValueChanged);
+        MasterVolumeSlider.value = displayMasterVol;
+        OnMasterVolumeSliderValueChanged(displayMasterVol);
+        MasterVolumeSlider.onValueChanged.AddListener(OnMasterVolumeSliderValueChanged);
+
+        NARVolumeSlider.value = displayNARVol;
+        OnNARVolumeSliderValueChanged(displayNARVol);
+        NARVolumeSlider.onValueChanged.AddListener(OnNARVolumeSliderValueChanged);
+
+        SFXVolumeSlider.value = displaySFXVol;
+        OnSFXVolumeSliderValueChanged(displaySFXVol);
+        SFXVolumeSlider.onValueChanged.AddListener(OnSFXVolumeSliderValueChanged);
+
+        AMBVolumeSlider.value = displayAMBVol;
+        OnAMBVolumeSliderValueChanged(displayAMBVol);
+        AMBVolumeSlider.onValueChanged.AddListener(OnAMBVolumeSliderValueChanged);
 
 
         // 2. 모드 슬라이더 설정
@@ -207,7 +243,7 @@ public class IntroUIManager : MonoBehaviour
             place1Panel.SetActive(false);
             place1Border.SetActive(true);
 
-            DataManager.Instance.SelectedMap = "Subway";
+            DataManager.Instance.SetSelectedMap("Subway");
         }
     }
 
@@ -221,7 +257,7 @@ public class IntroUIManager : MonoBehaviour
             place2Panel.SetActive(false);
             place2Border.SetActive(true);
 
-            DataManager.Instance.SelectedMap = "Street";
+            DataManager.Instance.SetSelectedMap("Street");
         }
     }
 
@@ -230,7 +266,7 @@ public class IntroUIManager : MonoBehaviour
     /// </summary>
     public void OnClickPlayButton()
     {
-        if (DataManager.Instance.SelectedMap != "Street") return;
+        if (DataManager.Instance.GetSelectedMap() != "Street") return;
 
         if (isDebug) Debug.Log("체험을 시작합니다.");
 
@@ -300,17 +336,59 @@ public class IntroUIManager : MonoBehaviour
     /// <summary>
     /// 오디오 슬라이더 값 변경 시 호출 (0 ~ 100)
     /// </summary>
-    private void OnAudioSliderValueChanged(float value)
+    private void OnMasterVolumeSliderValueChanged(float value)
     {
         int intValue = Mathf.RoundToInt(value);
 
         // UI 텍스트 갱신
-        if (audioText != null) audioText.text = intValue.ToString();
+        if (MasterVolumeText != null) MasterVolumeText.text = intValue.ToString();
 
         // DataManager에 반영 (0.0 ~ 1.0)
         if (DataManager.Instance != null)
         {
-            DataManager.Instance.SetVolume(intValue / 100f);
+            DataManager.Instance.SetMasterVolume(intValue / 100f);
+        }
+    }
+
+    private void OnNARVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+
+        // UI 텍스트 갱신
+        if (NARVolumeText != null) NARVolumeText.text = intValue.ToString();
+
+        // DataManager에 반영 (0.0 ~ 1.0)
+        if (DataManager.Instance != null)
+        {
+            DataManager.Instance.SetNARVolume(intValue / 100f);
+        }
+    }
+
+    private void OnSFXVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+
+        // UI 텍스트 갱신
+        if (SFXVolumeText != null) SFXVolumeText.text = intValue.ToString();
+
+        // DataManager에 반영 (0.0 ~ 1.0)
+        if (DataManager.Instance != null)
+        {
+            DataManager.Instance.SetSFXVolume(intValue / 100f);
+        }
+    }
+
+    private void OnAMBVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+
+        // UI 텍스트 갱신
+        if (AMBVolumeText != null) AMBVolumeText.text = intValue.ToString();
+
+        // DataManager에 반영 (0.0 ~ 1.0)
+        if (DataManager.Instance != null)
+        {
+            DataManager.Instance.SetAMBVolume(intValue / 100f);
         }
     }
 
