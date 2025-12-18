@@ -3,15 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.XR;
 using static GameManager;
-
-/// <summary>
-/// 게임의 전체 시나리오 흐름(튜토리얼 -> 이동 -> 액션 -> 탈출)을 순차적으로 제어하는 메인 매니저입니다.
-/// <para>
-/// 1. 각 게임 페이즈(Phase)별로 미션을 부여하고 성공/실패를 판정합니다.<br/>
-/// 2. PlayerManager를 통해 이동(Locomotion) 권한을 미션 중에만 부여합니다.<br/>
-/// 3. IngameUIManager와 연동하여 안내 텍스트, 타이머, 피드백을 표시합니다.
-/// </para>
-/// </summary>
+using static AudioManager;
 
 public class GameStepManager : MonoBehaviour
 {
@@ -63,13 +55,11 @@ public class GameStepManager : MonoBehaviour
     #region Haptic & Audio Helpers
     private void TriggerHaptic(float rawAmplitude, float duration)
     {
-        // [진동 정규화 적용]
         float finalAmplitude = rawAmplitude;
         if (DataManager.Instance != null)
         {
             finalAmplitude = DataManager.Instance.GetAdjustedHapticStrength(rawAmplitude);
         }
-
         if (finalAmplitude <= 0.01f) return;
 
         var devices = new List<InputDevice>();
@@ -86,42 +76,87 @@ public class GameStepManager : MonoBehaviour
     private void UpdateAmbience(GamePhase phase)
     {
         if (AudioManager.Instance == null) return;
+
+        // 1. 군중 소리 (AMB 채널 - 깔리는 배경음)
+        // 페이즈에 따라 군중 소리 크기/밀집도 변경
         switch (phase)
         {
-            case GamePhase.Tutorial: case GamePhase.Move1: AudioManager.Instance.PlayAMB(AMBType.Crowd, 0); break;
-            case GamePhase.ABCPose: case GamePhase.Move2: case GamePhase.HoldPillar: AudioManager.Instance.PlayAMB(AMBType.Crowd, 1); break;
-            case GamePhase.ClimbUp: case GamePhase.Escape: AudioManager.Instance.PlayAMB(AMBType.Crowd, 2); break;
+            case GamePhase.Tutorial:
+            case GamePhase.Move1:
+                AudioManager.Instance.PlayAMB(AMBType.Crowd, 0);
+                break;
+            case GamePhase.ABCPose:
+            case GamePhase.Move2:
+            case GamePhase.HoldPillar:
+                AudioManager.Instance.PlayAMB(AMBType.Crowd, 1);
+                break;
+            case GamePhase.ClimbUp:
+            case GamePhase.Escape:
+                AudioManager.Instance.PlayAMB(AMBType.Crowd, 2);
+                break;
         }
 
-        bool playSiren = (phase >= GamePhase.Move2);
-        float sirenVolumeScale = 0f;
-        if (phase >= GamePhase.Escape) sirenVolumeScale = 1.0f;
-        else if (phase >= GamePhase.ClimbUp) sirenVolumeScale = 0.7f;
-        else if (phase >= GamePhase.Move2) sirenVolumeScale = 0.4f;
-
-        if (playSiren)
+        // 2. 경찰/앰뷸런스/이명 소리 (SFX Layer - 겹치는 소리 & 점점 커짐)
+        // Move2 단계부터 시작
+        if (phase >= GamePhase.Move2 && phase != GamePhase.Finished)
         {
+            // (1) 소리 재생 (아직 안 켜져 있으면 켬)
+            // 경찰: 셔플 재생 / 앰뷸런스: 단일 루프 / 이명: 단일 루프
+            AudioManager.Instance.PlayShuffleSFX(SFXType.Police, true);
+            AudioManager.Instance.PlaySFX(SFXType.Ambulance, true, true);
             AudioManager.Instance.PlaySFX(SFXType.EarRinging, true, true);
-            AudioManager.Instance.SetLoopingSFXScale(SFXType.EarRinging, sirenVolumeScale);
+
+            // (2) 볼륨 스케일 계산 (점점 크게)
+            float policeVol = 0.3f;
+            float ambulanceVol = 0.3f;
+            float ringingVol = 0.3f;
+
+            if (phase == GamePhase.Move2)
+            {
+                policeVol = 0.4f; ambulanceVol = 0.4f; ringingVol = 0.2f;
+            }
+            else if (phase == GamePhase.HoldPillar)
+            {
+                policeVol = 0.6f; ambulanceVol = 0.6f; ringingVol = 0.4f;
+            }
+            else if (phase == GamePhase.ClimbUp)
+            {
+                policeVol = 0.8f; ambulanceVol = 0.8f; ringingVol = 0.6f;
+            }
+            else if (phase == GamePhase.Escape)
+            {
+                policeVol = 1.0f; ambulanceVol = 1.0f; ringingVol = 0.8f;
+            }
+            
+            // (3) 볼륨 적용 
+            AudioManager.Instance.SetLoopingSFXScale(SFXType.Police, policeVol);
+            AudioManager.Instance.SetLoopingSFXScale(SFXType.Ambulance, ambulanceVol);
+            AudioManager.Instance.SetLoopingSFXScale(SFXType.EarRinging, ringingVol);
+        }
+        else
+        {
+            // 해당 단계가 아니면 소리 끄기 (선택 사항 - 여기서는 유지하다가 Finish에서 끔)
+            // if (phase < GamePhase.Move2) ... StopSFX...
         }
     }
     #endregion
 
     #region UI & Logic Helper Coroutines
-    private IEnumerator ShowStepTextAndDelay(int instructionIndex, GamePhase phase)
+    private IEnumerator ShowStepTextAndDelay(int instructionIndex, GamePhase phase, int narIndex = 0)
     {
         SetInteractionLimit(true);
         if (uiManager) { uiManager.CloseFeedBack(); uiManager.UpdateInstruction(instructionIndex); uiManager.OpenInstructionPanel(); }
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayNAR(GameScene.Simulator, phase, instructionIndex);
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayNAR(GameScene.Simulator, phase, narIndex);
         float timer = 0f; while (uiManager.GetDisplayPanel() && timer < instructionDuration) { timer += Time.deltaTime; yield return null; }
         if (uiManager && uiManager.GetDisplayPanel()) uiManager.CloseInstructionPanel();
         SetInteractionLimit(false);
     }
 
-    private IEnumerator ShowFeedbackAndDelay(int feedbackIndex, GamePhase phase, bool isNegative = false)
+    private IEnumerator ShowFeedbackAndDelay(int feedbackIndex, GamePhase phase, bool isNegative = false, int narIndex = 1)
     {
         SetInteractionLimit(true);
         if (uiManager) { uiManager.CloseInstruction(); if (!isNegative) uiManager.UpdateFeedBack(feedbackIndex); else uiManager.UpdateNegativeFeedback(feedbackIndex); uiManager.OpenInstructionPanel(); }
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayNAR(GameScene.Simulator, phase, narIndex);
         if (AudioManager.Instance != null) { SFXType sfx = isNegative ? SFXType.Fail_Feedback : SFXType.Success_Feedback; AudioManager.Instance.PlaySFX(sfx); }
         if (!isNegative) TriggerHaptic(0.8f, 0.3f); else TriggerHaptic(0.4f, 0.1f);
         float timer = 0f; while (uiManager.GetDisplayPanel() && timer < feedbackDuration) { timer += Time.deltaTime; yield return null; }
@@ -154,7 +189,7 @@ public class GameStepManager : MonoBehaviour
     private IEnumerator ReturnToSavedPositionRoutine()
     {
         if (PlayerManager.Instance != null) PlayerManager.Instance.SetLocomotion(false);
-        yield return StartCoroutine(ShowFeedbackAndDelay(0, GamePhase.Caution, true));
+        yield return StartCoroutine(ShowFeedbackAndDelay(0, GamePhase.Move1, true, 2));
         if (PlayerTransform != null && startPosition != Vector3.zero) PlayerTransform.position = startPosition;
         if (PlayerManager.Instance != null) PlayerManager.Instance.SetLocomotion(true);
     }
@@ -169,9 +204,9 @@ public class GameStepManager : MonoBehaviour
         currentPhase = GamePhase.Caution;
         if (AudioManager.Instance != null) AudioManager.Instance.PlayAMB(AMBType.Crowd, 0);
         if (uiManager) { uiManager.SetDisplayPanel(true); uiManager.OpenCautionPanel(); }
-        if (AudioManager.Instance != null) AudioManager.Instance.PlayNAR(GameScene.Simulator, GamePhase.Caution, 0);
         yield return new WaitUntil(() => !uiManager.GetDisplayPanel()); yield return new WaitForSeconds(nextStepDuration);
         if (uiManager) { uiManager.SetDisplayPanel(true); uiManager.OpenSituationPanel(); }
+        if (AudioManager.Instance != null) AudioManager.Instance.PlayNAR(GameScene.Simulator, GamePhase.Caution, 0);
         yield return new WaitUntil(() => !uiManager.GetDisplayPanel()); yield return new WaitForSeconds(nextStepDuration);
 
         // Phase 0: Tutorial

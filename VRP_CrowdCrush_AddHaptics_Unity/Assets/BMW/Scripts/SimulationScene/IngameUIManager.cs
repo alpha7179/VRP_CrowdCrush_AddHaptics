@@ -83,7 +83,7 @@ public class IngameUIManager : MonoBehaviour
     {
         InitializeUI();
         InitializeEvents();
-        InitializePressureSound();
+        // 시작 시에는 소리를 재생하지 않음 (레벨 0 가정)
     }
 
     private void OnEnable()
@@ -133,14 +133,15 @@ public class IngameUIManager : MonoBehaviour
         if (GameManager.Instance != null) GameManager.Instance.OnPauseStateChanged += HandlePauseState;
     }
 
-    private void InitializePressureSound()
+    // [복구됨] 압박 사운드 재생 메서드 (isLoop: true 필수)
+    private void PlayPressureSounds()
     {
         if (AudioManager.Instance != null)
         {
+            // 루프 재생 시작
             AudioManager.Instance.PlaySFX(SFXType.heartbeat, isLoop: true);
             AudioManager.Instance.PlaySFX(SFXType.breath, isLoop: true);
             AudioManager.Instance.PlaySFX(SFXType.EarRinging, isLoop: true);
-            UpdatePressureSoundVolume(0);
         }
     }
 
@@ -244,7 +245,7 @@ public class IngameUIManager : MonoBehaviour
     #endregion
 
     #region Public UI API (Panel Control)
-    public void OpenCautionPanel() { if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(SFXType.Fail_Feedback); FadePanel(cautionPanel, true); SetDisplayPanel(true); }
+    public void OpenCautionPanel() { if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(SFXType.Pause_Feedback); FadePanel(cautionPanel, true); SetDisplayPanel(true); }
     public void CloseCautionPanel() { FadePanel(cautionPanel, false); SetDisplayPanel(false); }
     public void OpenSituationPanel() { if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(SFXType.Pause_Feedback); FadePanel(situationPanel, true); SetDisplayPanel(true); }
     public void CloseSituationPanel() { FadePanel(situationPanel, false); SetDisplayPanel(false); }
@@ -275,8 +276,22 @@ public class IngameUIManager : MonoBehaviour
 
     public void UpdatePressureGauge(int level)
     {
+        // 0 -> 1 이상: 소리 재생 시작
+        if (currentPressureLevel == 0 && level > 0)
+        {
+            PlayPressureSounds();
+        }
+        // 1 이상 -> 0: 소리 정지
+        else if (level == 0)
+        {
+            StopAllPressureSounds();
+        }
+
         currentPressureLevel = level;
+
+        // [중요] 볼륨 업데이트는 소리 재생 명령 이후에 수행하여 즉시 적용
         UpdatePressureSoundVolume(level);
+
         if (pressureStateText) { int stateIndex = Mathf.Clamp(level, 0, PressureState.Length - 1); pressureStateText.text = PressureState[stateIndex]; }
         float maxLevel = 5.0f; float intensity = Mathf.Clamp01((float)level / maxLevel); SetPressureIntensity(intensity);
         if (pressureGaugeImages == null) return; int targetIndex = level - 1;
@@ -295,8 +310,12 @@ public class IngameUIManager : MonoBehaviour
     private void UpdatePressureSoundVolume(int level)
     {
         if (AudioManager.Instance == null) return;
+
+        // [수정] float로 명확하게 캐스팅하여 비율 계산 (0.2, 0.4, 0.6, 0.8, 1.0)
         float maxLevel = 5.0f;
         float ratio = Mathf.Clamp01((float)level / maxLevel);
+
+        // LoopSFXScale은 현재 볼륨 대비 비율을 설정합니다.
         AudioManager.Instance.SetLoopingSFXScale(SFXType.heartbeat, ratio);
         AudioManager.Instance.SetLoopingSFXScale(SFXType.breath, ratio);
         AudioManager.Instance.SetLoopingSFXScale(SFXType.EarRinging, ratio);

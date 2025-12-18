@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq; // 딕셔너리 안전한 순회를 위해 사용
-using Unity.Tutorials.Core.Editor;
 using UnityEngine;
 using static GameManager;
 using static GameStepManager;
@@ -18,14 +16,16 @@ public enum SFXType
     heartbeat,
     breath,
     EarRinging,
+
+    Ambulance,
+    Police,
+
     None
 }
 
 public enum AMBType
 {
     Crowd,
-    Ambulance,
-    Police,
     None
 }
 #endregion
@@ -35,7 +35,7 @@ public enum AMBType
 public struct SFXData
 {
     public SFXType type;
-    public AudioClip clip;
+    public List<AudioClip> clips; // 셔플을 위해 리스트로 변경
 }
 
 [Serializable]
@@ -46,17 +46,19 @@ public struct AMBData
 }
 
 /// <summary>
-/// 반복 재생되는 SFX의 상태를 관리하는 내부 클래스
+/// 반복 재생되는 SFX 관리 컨테이너
 /// </summary>
 public class LoopingSFXContainer
 {
     public AudioSource source;
-    public float fadeFactor; // 0.0 ~ 1.0 (페이드 진행률)
+    public float fadeFactor; // 0.0 ~ 1.0 (페이드)
+    public float volumeScale; // 0.0 ~ 1.0 (게임 로직상 볼륨 크기)
 
     public LoopingSFXContainer(AudioSource src, float initialFade)
     {
         source = src;
         fadeFactor = initialFade;
+        volumeScale = 1.0f;
     }
 }
 #endregion
@@ -68,12 +70,17 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region Inspector Fields
+
+    [Header("Debug Settings")]
+    [SerializeField] private bool isDebug = true;
+
     [Header("Audio Sources")]
-    [Tooltip("볼륨 참조용 (실제 소리 출력용 아님)")]
-    public AudioSource volSource;
     public AudioSource narSource;
-    public AudioSource sfxSource; // 단발성(OneShot) 전용
-    public AudioSource ambSource;
+    public AudioSource sfxSource; // 단발성
+
+    [Header("AMB Sources (Cross-Fade)")]
+    public AudioSource ambSourceA;
+    public AudioSource ambSourceB;
 
     [Header("Clip Data")]
     public List<SFXData> sfxList = new List<SFXData>();
@@ -92,16 +99,19 @@ public class AudioManager : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float defaultFadeTime = 1.0f;
 
-    // 딕셔너리 (데이터 검색용)
-    private Dictionary<SFXType, AudioClip> _sfxMap = new Dictionary<SFXType, AudioClip>();
+    // 데이터 관리
+    private Dictionary<SFXType, List<AudioClip>> _sfxMap = new Dictionary<SFXType, List<AudioClip>>();
     private Dictionary<AMBType, List<AudioClip>> _ambMap = new Dictionary<AMBType, List<AudioClip>>();
 
-    // 활성화된 반복 SFX 관리 (Key: Type, Value: Container)
+    // 실행 중인 루프/셔플 SFX 관리
     private Dictionary<SFXType, LoopingSFXContainer> _activeLoopingSFX = new Dictionary<SFXType, LoopingSFXContainer>();
+    private Dictionary<SFXType, Coroutine> _activeShuffleRoutines = new Dictionary<SFXType, Coroutine>();
 
-    // AMB 페이드 제어용 변수
-    private Coroutine _ambCoroutine;
-    private float _ambFadeFactor = 1.0f; // AMB의 현재 페이드 상태 (0~1)
+    // AMB 제어 변수
+    private Coroutine _ambCrossFadeCoroutine;
+    private bool _isUsingSourceA = false;
+    private float _fadeFactorA = 0f;
+    private float _fadeFactorB = 0f;
 
     #endregion
 
@@ -114,6 +124,9 @@ public class AudioManager : MonoBehaviour
             transform.parent = null;
             DontDestroyOnLoad(gameObject);
             InitializeDictionaries();
+
+            if (ambSourceA != null) ambSourceA.loop = true;
+            if (ambSourceB != null) ambSourceB.loop = true;
         }
         else
         {
@@ -125,38 +138,28 @@ public class AudioManager : MonoBehaviour
     {
         if (DataManager.Instance == null) return;
 
-        // 1. 현재 설정된 볼륨 값 가져오기 (0.0 ~ 1.0)
-        float masterVol = (float)DataManager.Instance.GetMasterVolume() / 100f;
-        float narVol = (float)DataManager.Instance.GetNARVolume() / 100f;
-        float sfxVol = (float)DataManager.Instance.GetSFXVolume() / 100f;
-        float ambVol = (float)DataManager.Instance.GetAMBVolume() / 100f;
+        float masterVol = DataManager.Instance.GetMasterVolume();
+        float narVol = DataManager.Instance.GetNARVolume();
+        float sfxVol = DataManager.Instance.GetSFXVolume();
+        float ambVol = DataManager.Instance.GetAMBVolume();
 
-        // 2. NAR 볼륨 적용 (Master * Category)
         narSource.volume = masterVol * narVol;
-
-        // 3. SFX (OneShot) 볼륨 적용
-        // 주의: PlayOneShot은 발사될 때의 볼륨을 따르지만, Source 자체 볼륨을 바꿔두면 다음 발사 시 적용됨.
-        // 이미 발사된 OneShot 소리는 개별 제어가 불가능하므로, Source 볼륨을 계속 갱신해줌.
         sfxSource.volume = masterVol * sfxVol;
 
-        // 4. AMB 볼륨 적용 (Master * Category * FadeFactor)
-        // 코루틴은 _ambFadeFactor만 건드리고, 실제 볼륨 적용은 여기서 함.
-        if (ambSource.isPlaying)
-        {
-            ambSource.volume = masterVol * ambVol * _ambFadeFactor;
-        }
+        // AMB Volume Update
+        if (ambSourceA.isPlaying) ambSourceA.volume = masterVol * ambVol * _fadeFactorA;
+        if (ambSourceB.isPlaying) ambSourceB.volume = masterVol * ambVol * _fadeFactorB;
 
-        // 5. Looping SFX 볼륨 적용 (Master * SFX * FadeFactor)
+        // Looping/Shuffle SFX Volume Update
+        // * 중요: Scale 값을 곱해줘야 점점 커지는 효과 적용됨
         if (_activeLoopingSFX.Count > 0)
         {
-            // 딕셔너리 순회 중 수정 오류 방지를 위해 ToList 사용 권장되나, Update에서는 값만 바꾸므로 foreach 가능
-            // 단, Coroutine에서 Remove가 발생할 수 있으므로 null 체크 필수
             foreach (var kvp in _activeLoopingSFX)
             {
                 LoopingSFXContainer container = kvp.Value;
                 if (container != null && container.source != null)
                 {
-                    container.source.volume = masterVol * sfxVol * container.fadeFactor;
+                    container.source.volume = masterVol * sfxVol * container.fadeFactor * container.volumeScale;
                 }
             }
         }
@@ -169,7 +172,7 @@ public class AudioManager : MonoBehaviour
         _sfxMap.Clear();
         foreach (var item in sfxList)
         {
-            if (!_sfxMap.ContainsKey(item.type)) _sfxMap.Add(item.type, item.clip);
+            if (!_sfxMap.ContainsKey(item.type)) _sfxMap.Add(item.type, item.clips);
         }
 
         _ambMap.Clear();
@@ -189,19 +192,15 @@ public class AudioManager : MonoBehaviour
 
     public void PlayNAR(AudioClip clip)
     {
-        // 중첩 방지: 기존 나레이션 정지
         if (narSource.isPlaying) narSource.Stop();
-
         narSource.clip = clip;
         narSource.Play();
-        // 볼륨은 Update에서 자동 적용됨
     }
 
     public void StopNAR() => narSource.Stop();
 
     private AudioClip GetNarClip(GameScene scene, GamePhase phase, int num, int tipPage)
     {
-        // (기존 분기 로직과 동일, 생략 없이 사용 가능)
         switch (scene)
         {
             case GameScene.Menu: return GetSafeClip(nar_tip, tipPage);
@@ -229,70 +228,100 @@ public class AudioManager : MonoBehaviour
     }
     #endregion
 
-    #region SFX Logic
+    #region SFX Logic (OneShot, Loop, Shuffle)
 
+    // 1. 단발성 또는 단일 루프 재생
     public void PlaySFX(SFXType type, bool isLoop = false, bool useFade = false)
     {
         if (!_sfxMap.ContainsKey(type)) return;
-        AudioClip clip = _sfxMap[type];
+        List<AudioClip> clips = _sfxMap[type];
+        if (clips == null || clips.Count == 0) return;
 
-        // 1. 반복 재생 (Loop)
+        AudioClip clip = clips[0]; // 첫 번째 클립 사용
+
         if (isLoop)
         {
             if (_activeLoopingSFX.ContainsKey(type)) return; // 이미 재생 중
 
-            // 새 AudioSource 생성
             AudioSource loopSource = gameObject.AddComponent<AudioSource>();
             loopSource.clip = clip;
             loopSource.loop = true;
-            loopSource.spatialBlend = 0f; // 2D Sound
+            loopSource.spatialBlend = 0f;
             loopSource.playOnAwake = false;
 
-            // 컨테이너 생성 (초기 FadeFactor 설정)
             float startFactor = useFade ? 0f : 1f;
             LoopingSFXContainer container = new LoopingSFXContainer(loopSource, startFactor);
-
             _activeLoopingSFX.Add(type, container);
-            loopSource.Play(); // 볼륨은 Update에서 0으로 시작해서 올라감
 
-            if (useFade)
-            {
-                StartCoroutine(FadeLoopingSFXRoutine(type, 0f, 1f, defaultFadeTime));
-            }
+            loopSource.Play();
+
+            if (useFade) StartCoroutine(FadeLoopingSFXRoutine(type, 0f, 1f, defaultFadeTime));
         }
-        // 2. 단발성 재생 (OneShot)
         else
         {
-            if (useFade)
-            {
-                // 페이드가 있는 OneShot은 제어를 위해 임시 소스 필요
-                StartCoroutine(PlayOneShotWithFadeRoutine(clip, defaultFadeTime));
-            }
-            else
-            {
-                // 일반 OneShot은 Update의 볼륨 제어를 받기 위해 현재 볼륨으로 재생
-                // *주의: PlayOneShot은 호출 시점의 볼륨으로 고정됨. 
-                // 즉, 재생 중에 마스터 볼륨을 줄여도 이미 나간 소리는 안 줄어듦 (유니티 특징).
-                // 완벽한 실시간 제어를 원하면 모든 SFX를 개별 AudioSource로 만들어야 하지만, 성능상 타협함.
-                sfxSource.PlayOneShot(clip, sfxSource.volume);
-            }
+            // OneShot
+            if (useFade) StartCoroutine(PlayOneShotWithFadeRoutine(clip, defaultFadeTime));
+            else sfxSource.PlayOneShot(clip, sfxSource.volume);
+        }
+    }
+
+    // 2. [신규] 셔플 루프 재생 (여러 클립을 랜덤하게 섞어서 무한 재생) - 경찰차용
+    public void PlayShuffleSFX(SFXType type, bool useFade = true)
+    {
+        if (!_sfxMap.ContainsKey(type)) return;
+        if (_activeLoopingSFX.ContainsKey(type)) return; // 이미 재생 중
+
+        List<AudioClip> clips = _sfxMap[type];
+        if (clips == null || clips.Count == 0) return;
+
+        // 소스 생성
+        AudioSource loopSource = gameObject.AddComponent<AudioSource>();
+        loopSource.loop = false; // 직접 제어하므로 false
+        loopSource.spatialBlend = 0f;
+
+        float startFactor = useFade ? 0f : 1f;
+        LoopingSFXContainer container = new LoopingSFXContainer(loopSource, startFactor);
+        _activeLoopingSFX.Add(type, container);
+
+        // 셔플 코루틴 시작
+        Coroutine routine = StartCoroutine(ShuffleSFXLogic(type, loopSource, clips));
+        _activeShuffleRoutines.Add(type, routine);
+
+        if (useFade) StartCoroutine(FadeLoopingSFXRoutine(type, 0f, 1f, defaultFadeTime));
+    }
+
+    // 셔플 로직 코루틴
+    private IEnumerator ShuffleSFXLogic(SFXType type, AudioSource source, List<AudioClip> clips)
+    {
+        while (true)
+        {
+            // 랜덤 클립 선택
+            AudioClip nextClip = clips[UnityEngine.Random.Range(0, clips.Count)];
+            source.clip = nextClip;
+            source.Play();
+
+            // 클립 길이만큼 대기 (끝나면 다음 것 재생)
+            // 0.1초 정도 겹치게 하거나 딱 맞게 대기
+            yield return new WaitForSeconds(nextClip.length);
+
+            // 안전장치: 소스가 삭제되었으면 종료
+            if (source == null) yield break;
         }
     }
 
     public void StopSFX(SFXType type, bool useFade = false)
     {
+        // 셔플 루틴이 있다면 정지
+        if (_activeShuffleRoutines.ContainsKey(type))
+        {
+            StopCoroutine(_activeShuffleRoutines[type]);
+            _activeShuffleRoutines.Remove(type);
+        }
+
         if (_activeLoopingSFX.ContainsKey(type))
         {
-            if (useFade)
-            {
-                // Fade Out -> End
-                StartCoroutine(FadeLoopingSFXRoutine(type, 1f, 0f, defaultFadeTime, true));
-            }
-            else
-            {
-                // 즉시 정지 및 제거
-                RemoveLoopingSource(type);
-            }
+            if (useFade) StartCoroutine(FadeLoopingSFXRoutine(type, 1f, 0f, defaultFadeTime, true));
+            else RemoveLoopingSource(type);
         }
     }
 
@@ -312,23 +341,37 @@ public class AudioManager : MonoBehaviour
     public void StopAllSFX()
     {
         sfxSource.Stop();
-        // 반복 재생 중인 것들 모두 정리
         List<SFXType> keys = new List<SFXType>(_activeLoopingSFX.Keys);
-        foreach (var key in keys) RemoveLoopingSource(key);
+        foreach (var key in keys) StopSFX(key, false);
     }
 
+    // [중요] 볼륨 크기 조절 메서드 (점점 크게 하기 위해 필수)
     public void SetLoopingSFXScale(SFXType type, float scale)
     {
         if (_activeLoopingSFX.TryGetValue(type, out var container))
         {
-            // FadeFactor를 볼륨 스케일 용도로 재활용하거나 별도 변수를 두어 제어
-            // 여기서는 부드러운 전환을 위해 코루틴을 사용해 FadeFactor를 목표값으로 이동시킴
-            StartCoroutine(FadeLoopingSFXRoutine(type, container.fadeFactor, scale, 0.5f));
+            // 부드럽게 목표 스케일로 이동
+            StartCoroutine(SmoothVolumeScaleRoutine(container, scale, 1.0f));
         }
     }
+
+    private IEnumerator SmoothVolumeScaleRoutine(LoopingSFXContainer container, float targetScale, float duration)
+    {
+        float startScale = container.volumeScale;
+        float timer = 0f;
+        while (timer < duration)
+        {
+            if (container == null) yield break;
+            timer += Time.deltaTime;
+            container.volumeScale = Mathf.Lerp(startScale, targetScale, timer / duration);
+            yield return null;
+        }
+        if (container != null) container.volumeScale = targetScale;
+    }
+
     #endregion
 
-    #region AMB Logic
+    #region AMB Logic (Crowd Only)
     public void PlayAMB(AMBType type, int num = 0)
     {
         if (!_ambMap.ContainsKey(type)) return;
@@ -339,106 +382,85 @@ public class AudioManager : MonoBehaviour
         PlayAMB(clips[idx]);
     }
 
-    public void PlayAMB(AudioClip clip)
+    public void PlayAMB(AudioClip nextClip)
     {
-        if (ambSource.clip == clip && ambSource.isPlaying && _ambCoroutine == null) return;
+        if (ambSourceA.isPlaying && ambSourceA.clip == nextClip && _isUsingSourceA) return;
+        if (ambSourceB.isPlaying && ambSourceB.clip == nextClip && !_isUsingSourceA) return;
 
-        if (_ambCoroutine != null) StopCoroutine(_ambCoroutine);
-        _ambCoroutine = StartCoroutine(ChangeAMBRoutine(clip, defaultFadeTime));
+        if (_ambCrossFadeCoroutine != null) StopCoroutine(_ambCrossFadeCoroutine);
+
+        AudioSource incoming = _isUsingSourceA ? ambSourceB : ambSourceA;
+        AudioSource outgoing = _isUsingSourceA ? ambSourceA : ambSourceB;
+        _isUsingSourceA = !_isUsingSourceA;
+
+        _ambCrossFadeCoroutine = StartCoroutine(CrossFadeAMBRoutine(incoming, outgoing, nextClip, defaultFadeTime));
     }
 
     public void StopAMB(float duration = 1.0f)
     {
-        if (_ambCoroutine != null) StopCoroutine(_ambCoroutine);
-        _ambCoroutine = StartCoroutine(FadeOutAMBRoutine(duration));
+        if (_ambCrossFadeCoroutine != null) StopCoroutine(_ambCrossFadeCoroutine);
+        _ambCrossFadeCoroutine = StartCoroutine(FadeOutAllAMBRoutine(duration));
     }
     #endregion
 
-    #region Coroutines (Fade Logic - Factor Control Only)
-
-    // AMB 교체: Fade Out Factor -> Clip Change -> Fade In Factor
-    private IEnumerator ChangeAMBRoutine(AudioClip nextClip, float duration)
+    #region Coroutines (Audio Logic)
+    private IEnumerator CrossFadeAMBRoutine(AudioSource inSource, AudioSource outSource, AudioClip nextClip, float duration)
     {
-        float halfDuration = duration * 0.5f;
-
-        // 1. Fade Out (Factor 1 -> 0)
-        if (ambSource.isPlaying)
-        {
-            float timer = 0f;
-            float startFactor = _ambFadeFactor;
-            while (timer < halfDuration)
-            {
-                timer += Time.deltaTime;
-                _ambFadeFactor = Mathf.Lerp(startFactor, 0f, timer / halfDuration);
-                yield return null;
-            }
-            _ambFadeFactor = 0f;
-            ambSource.Stop();
-        }
-
-        // 2. Change Clip
-        ambSource.clip = nextClip;
-        ambSource.Play();
-
-        // 3. Fade In (Factor 0 -> 1)
-        float inTimer = 0f;
-        while (inTimer < halfDuration)
-        {
-            inTimer += Time.deltaTime;
-            _ambFadeFactor = Mathf.Lerp(0f, 1f, inTimer / halfDuration);
-            yield return null;
-        }
-        _ambFadeFactor = 1f;
-        _ambCoroutine = null;
-    }
-
-    private IEnumerator FadeOutAMBRoutine(float duration)
-    {
-        if (!ambSource.isPlaying) yield break;
+        inSource.clip = nextClip;
+        inSource.loop = true;
+        inSource.Play();
 
         float timer = 0f;
-        float startFactor = _ambFadeFactor;
+        float startOutFactor = (outSource == ambSourceA) ? _fadeFactorA : _fadeFactorB;
 
         while (timer < duration)
         {
             timer += Time.deltaTime;
-            _ambFadeFactor = Mathf.Lerp(startFactor, 0f, timer / duration);
+            float ratio = timer / duration;
+            if (inSource == ambSourceA) _fadeFactorA = Mathf.Lerp(0f, 1f, ratio); else _fadeFactorB = Mathf.Lerp(0f, 1f, ratio);
+            if (outSource == ambSourceA) _fadeFactorA = Mathf.Lerp(startOutFactor, 0f, ratio); else _fadeFactorB = Mathf.Lerp(startOutFactor, 0f, ratio);
             yield return null;
         }
-
-        _ambFadeFactor = 0f;
-        ambSource.Stop();
-        _ambCoroutine = null;
+        if (inSource == ambSourceA) _fadeFactorA = 1f; else _fadeFactorB = 1f;
+        if (outSource == ambSourceA) _fadeFactorA = 0f; else _fadeFactorB = 0f;
+        outSource.Stop();
+        _ambCrossFadeCoroutine = null;
     }
 
-    // Looping SFX Fade (Factor 조절)
-    // isStopAfter: 페이드 아웃 후 파괴할지 여부
+    private IEnumerator FadeOutAllAMBRoutine(float duration)
+    {
+        float timer = 0f;
+        float startA = _fadeFactorA;
+        float startB = _fadeFactorB;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            float ratio = timer / duration;
+            _fadeFactorA = Mathf.Lerp(startA, 0f, ratio);
+            _fadeFactorB = Mathf.Lerp(startB, 0f, ratio);
+            yield return null;
+        }
+        _fadeFactorA = 0f; _fadeFactorB = 0f;
+        ambSourceA.Stop(); ambSourceB.Stop();
+        _ambCrossFadeCoroutine = null;
+    }
+
     private IEnumerator FadeLoopingSFXRoutine(SFXType type, float startFactor, float endFactor, float duration, bool isStopAfter = false)
     {
         if (!_activeLoopingSFX.ContainsKey(type)) yield break;
-
         LoopingSFXContainer container = _activeLoopingSFX[type];
         float timer = 0f;
-
         while (timer < duration)
         {
-            // 도중에 소스가 사라졌으면 중단
             if (container == null || container.source == null) yield break;
-
             timer += Time.deltaTime;
             container.fadeFactor = Mathf.Lerp(startFactor, endFactor, timer / duration);
             yield return null;
         }
-
         container.fadeFactor = endFactor;
-
-        if (isStopAfter)
-        {
-            RemoveLoopingSource(type);
-        }
+        if (isStopAfter) RemoveLoopingSource(type);
     }
 
-    // OneShot with Fade (임시 소스 사용, 실시간 볼륨 계산 포함)
     private IEnumerator PlayOneShotWithFadeRoutine(AudioClip clip, float duration)
     {
         AudioSource tempSource = gameObject.AddComponent<AudioSource>();
@@ -446,55 +468,15 @@ public class AudioManager : MonoBehaviour
         tempSource.loop = false;
         tempSource.spatialBlend = 0f;
         tempSource.Play();
-
         float timer = 0f;
         float fadeDuration = Mathf.Min(duration, clip.length / 2);
-
-        // Fade In
-        while (timer < fadeDuration)
-        {
-            timer += Time.deltaTime;
-            float fadeFactor = Mathf.Lerp(0f, 1f, timer / fadeDuration);
-            // 실시간 볼륨 계산 (Master * SFX * Fade)
-            UpdateTempSourceVolume(tempSource, fadeFactor);
-            yield return null;
-        }
-
-        // Sustain
+        while (timer < fadeDuration) { timer += Time.deltaTime; tempSource.volume = Mathf.Lerp(0f, 1f, timer / fadeDuration); yield return null; }
         float sustainTime = clip.length - (fadeDuration * 2);
-        if (sustainTime > 0)
-        {
-            float sustainTimer = 0f;
-            while (sustainTimer < sustainTime)
-            {
-                sustainTimer += Time.deltaTime;
-                UpdateTempSourceVolume(tempSource, 1f); // Fade 1.0 유지
-                yield return null;
-            }
-        }
-
-        // Fade Out
+        if (sustainTime > 0) yield return new WaitForSeconds(sustainTime);
         timer = 0f;
-        while (timer < fadeDuration)
-        {
-            timer += Time.deltaTime;
-            float fadeFactor = Mathf.Lerp(1f, 0f, timer / fadeDuration);
-            UpdateTempSourceVolume(tempSource, fadeFactor);
-            yield return null;
-        }
-
-        tempSource.Stop();
-        Destroy(tempSource);
+        while (timer < fadeDuration) { timer += Time.deltaTime; tempSource.volume = Mathf.Lerp(1f, 0f, timer / fadeDuration); yield return null; }
+        tempSource.Stop(); Destroy(tempSource);
     }
-
-    private void UpdateTempSourceVolume(AudioSource src, float fadeFactor)
-    {
-        if (DataManager.Instance == null) return;
-        float master = (float)DataManager.Instance.GetMasterVolume() / 100f;
-        float sfx = (float)DataManager.Instance.GetSFXVolume() / 100f;
-        src.volume = master * sfx * fadeFactor;
-    }
-
     #endregion
 
     #region Helpers

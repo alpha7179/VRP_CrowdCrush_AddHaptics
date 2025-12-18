@@ -139,7 +139,7 @@ public class GestureManager : MonoBehaviour
 
     public bool IsHoldingClimbHandle()
     {
-        return ClimbHandle.ActiveGrabCount > 0;
+        return ClimbHandle.ActiveGrabCount > 1;
     }
     #endregion
 }
