@@ -40,6 +40,7 @@ public class DataManager : MonoBehaviour
     private const string KEY_SFXVOLUME = "SFXVolume";
     private const string KEY_AMBVOLUME = "AMBVolume";
     private const string KEY_HAPTIC_INTENSITY = "HapticIntensity";
+    private const string KEY_BODYHAPTIC_INTENSITY = "BodyHapticIntensity";
     private const string KEY_MOTION_SICKNESS = "MotionSickness";
 
     #endregion
@@ -51,6 +52,7 @@ public class DataManager : MonoBehaviour
     public event Action<float> OnSFXVolumeChanged;
     public event Action<float> OnAMBVolumeChanged;
     public event Action<float> OnHapticIntensityChanged;
+    public event Action<float> OnBodyHapticIntensityChanged;
 
     // 멀미 모드 변경 이벤트 (켜짐/꺼짐)
     public event Action<bool> OnMotionSicknessChanged;
@@ -68,6 +70,7 @@ public class DataManager : MonoBehaviour
     [Header("Haptic Settings (Vibration)")]
     [Tooltip("유저가 설정하는 진동 세기 (마스터)")]
     [SerializeField][Range(0f, 1f)] private float HapticIntensity = 1.0f;
+    [SerializeField][Range(0f, 1f)] private float BodyHapticIntensity = 1.0f;
 
     [Tooltip("하드웨어 진동의 최소 임계값")]
     [SerializeField][Range(0f, 1f)] private float MinHapticLimit = 0.0f;
@@ -158,6 +161,23 @@ public class DataManager : MonoBehaviour
         return Mathf.Lerp(effectiveMin, effectiveMax, input);
     }
 
+    public void SetBodyHapticIntensity(float intensity)
+    {
+        float newValue = Mathf.Clamp01(intensity);
+        if (Mathf.Approximately(BodyHapticIntensity, newValue)) return;
+        BodyHapticIntensity = newValue;
+        OnBodyHapticIntensityChanged?.Invoke(BodyHapticIntensity);
+    }
+    public float GetBodyHapticIntensity() => BodyHapticIntensity;
+
+    public float GetAdjustedBodyHapticStrength(float rawInputStrength)
+    {
+        float input = Mathf.Clamp01(rawInputStrength);
+        float effectiveMax = MaxHapticLimit * BodyHapticIntensity;
+        float effectiveMin = (BodyHapticIntensity > 0.01f) ? MinHapticLimit : 0f;
+        return Mathf.Lerp(effectiveMin, effectiveMax, input);
+    }
+
     // --- Other Settings (멀미 모드) ---
     public void SetMotionSicknessMode(bool isEnabled)
     {
@@ -174,6 +194,7 @@ public class DataManager : MonoBehaviour
         PlayerPrefs.SetFloat(KEY_SFXVOLUME, SFXVolume);
         PlayerPrefs.SetFloat(KEY_AMBVOLUME, AMBVolume);
         PlayerPrefs.SetFloat(KEY_HAPTIC_INTENSITY, HapticIntensity);
+        PlayerPrefs.SetFloat(KEY_BODYHAPTIC_INTENSITY, BodyHapticIntensity);
         PlayerPrefs.SetInt(KEY_MOTION_SICKNESS, IsAntiMotionSicknessMode ? 1 : 0);
         PlayerPrefs.Save();
         Debug.Log("[DataManager] Settings Saved.");
@@ -186,9 +207,10 @@ public class DataManager : MonoBehaviour
         SFXVolume = PlayerPrefs.GetFloat(KEY_SFXVOLUME, 1.0f);
         AMBVolume = PlayerPrefs.GetFloat(KEY_AMBVOLUME, 1.0f);
         HapticIntensity = PlayerPrefs.GetFloat(KEY_HAPTIC_INTENSITY, 1.0f);
+        BodyHapticIntensity = PlayerPrefs.GetFloat(KEY_BODYHAPTIC_INTENSITY, 1.0f);
         IsAntiMotionSicknessMode = PlayerPrefs.GetInt(KEY_MOTION_SICKNESS, 0) == 1;
 
-        Debug.Log($"[DataManager] Settings Loaded. Haptic: {HapticIntensity}, AntiMotion: {IsAntiMotionSicknessMode}");
+        Debug.Log($"[DataManager] Settings Loaded. Hand Haptic: {HapticIntensity}, Body Haptic: {BodyHapticIntensity}, AntiMotion: {IsAntiMotionSicknessMode}");
     }
 
     #endregion

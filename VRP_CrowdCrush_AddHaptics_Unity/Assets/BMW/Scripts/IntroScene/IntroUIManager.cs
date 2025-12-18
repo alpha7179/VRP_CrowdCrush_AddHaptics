@@ -1,8 +1,10 @@
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using TMPro;
+using UnityEngine;
+using UnityEngine.InputSystem.Haptics;
+using UnityEngine.UI;
 using UnityEngine.XR;
 
 /// <summary>
@@ -58,10 +60,13 @@ public class IntroUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI AMBVolumeText;
 
     [Header("Settings - Haptic")]
+    [SerializeField] private GameObject bhatics;
     [Tooltip("진동 세기 조절 슬라이더")]
     [SerializeField] private Slider HandHapticVolumeSlider;
+    [SerializeField] private Slider BodyHapticVolumeSlider;
     [Tooltip("진동 세기 텍스트 (0-100)")]
     [SerializeField] private TextMeshProUGUI HandHapticVolumeText;
+    [SerializeField] private TextMeshProUGUI BodyHapticVolumeText;
 
     [Header("Settings - Lang & Mode")]
     [Tooltip("멀미 방지 모드 슬라이더")]
@@ -99,6 +104,7 @@ public class IntroUIManager : MonoBehaviour
 
         // 햅틱 슬라이더 설정
         SetupSlider(HandHapticVolumeSlider, 0, 100);
+        SetupSlider(BodyHapticVolumeSlider, 0, 100);
 
         // DataManager 값 불러오기 및 리스너 등록
         if (DataManager.Instance != null)
@@ -109,7 +115,8 @@ public class IntroUIManager : MonoBehaviour
             SetSliderValueAndListener(AMBVolumeSlider, DataManager.Instance.GetAMBVolume() * 100f, OnAMBVolumeSliderValueChanged);
 
             // 햅틱 값 적용
-            SetSliderValueAndListener(HandHapticVolumeSlider, DataManager.Instance.GetHapticIntensity() * 100f, OnHapticVolumeSliderValueChanged);
+            SetSliderValueAndListener(HandHapticVolumeSlider, DataManager.Instance.GetHapticIntensity() * 100f, OnHandHapticVolumeSliderValueChanged);
+            SetSliderValueAndListener(BodyHapticVolumeSlider, DataManager.Instance.GetBodyHapticIntensity() * 100f, OnBodyHapticVolumeSliderValueChanged);
         }
 
         // 2. 모드 슬라이더 설정
@@ -277,11 +284,21 @@ public class IntroUIManager : MonoBehaviour
         if (DataManager.Instance != null) DataManager.Instance.SetAMBVolume(intValue / 100f);
     }
 
-    private void OnHapticVolumeSliderValueChanged(float value)
+    private void OnHandHapticVolumeSliderValueChanged(float value)
     {
         int intValue = Mathf.RoundToInt(value);
         if (HandHapticVolumeText != null) HandHapticVolumeText.text = intValue.ToString();
         if (DataManager.Instance != null) DataManager.Instance.SetHapticIntensity(intValue / 100f);
+    }
+
+    private void OnBodyHapticVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+        if (BodyHapticVolumeText != null) BodyHapticVolumeText.text = intValue.ToString();
+        if (DataManager.Instance != null) DataManager.Instance.SetBodyHapticIntensity(intValue / 100f);
+
+        if (intValue == 0) ActivateBhatics(false);
+        else if (!bhatics.activeSelf && intValue != 0) ActivateBhatics(true);
     }
 
     private void OnModeSliderValueChanged(float value)
@@ -329,6 +346,18 @@ public class IntroUIManager : MonoBehaviour
             Color c = buttonToActivate.color; c.a = 1.0f; buttonToActivate.color = c;
             currentMainButton = buttonToActivate;
         }
+    }
+
+    public void ActivateBhatics(bool active)
+    {
+        /*
+         * if (bhatics.activeSelf) bhatics.SetActive(false);
+         * else bhatics.SetActive(true);
+        */
+
+        bhatics.SetActive(active);
+
+        if (isDebug) Debug.Log($"bhatics Object가 {bhatics.activeSelf} 되었습니다.");
     }
     #endregion
 }
