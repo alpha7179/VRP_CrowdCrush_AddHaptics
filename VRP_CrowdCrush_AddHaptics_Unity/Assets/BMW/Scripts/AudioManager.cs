@@ -316,6 +316,16 @@ public class AudioManager : MonoBehaviour
         List<SFXType> keys = new List<SFXType>(_activeLoopingSFX.Keys);
         foreach (var key in keys) RemoveLoopingSource(key);
     }
+
+    public void SetLoopingSFXScale(SFXType type, float scale)
+    {
+        if (_activeLoopingSFX.TryGetValue(type, out var container))
+        {
+            // FadeFactor를 볼륨 스케일 용도로 재활용하거나 별도 변수를 두어 제어
+            // 여기서는 부드러운 전환을 위해 코루틴을 사용해 FadeFactor를 목표값으로 이동시킴
+            StartCoroutine(FadeLoopingSFXRoutine(type, container.fadeFactor, scale, 0.5f));
+        }
+    }
     #endregion
 
     #region AMB Logic
