@@ -1,38 +1,33 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.XR;
 
 /// <summary>
-/// 인트로 씬의 UI 흐름(패널 전환, 메뉴 조작, 게임 시작)을 총괄하는 매니저입니다.
+/// 인트로 씬의 UI 흐름 및 설정을 관리합니다.
 /// <para>
 /// 1. 최상위 패널(Intro vs Start)과 하위 콘텐츠 패널(Place, Manual, Tips, Setting)을 관리합니다.<br/>
 /// 2. DataManager와 연동하여 볼륨 및 편의 모드 설정을 초기화하고 변경합니다.<br/>
 /// 3. 팁(Tips) 패널의 페이지 넘김 기능을 처리합니다.
 /// </para>
 /// </summary>
+
 public class IntroUIManager : MonoBehaviour
 {
     #region Inspector Settings (Panels)
-
     [Header("Top Level Panels")]
-    [Tooltip("게임 시작 전 '터치하여 시작' 등을 표시하는 첫 화면 패널")]
     [SerializeField] private GameObject introPanel;
-
-    [Tooltip("메인 메뉴 버튼들이 포함된 시작 패널")]
     [SerializeField] private GameObject startPanel;
 
-    [Header("Sub Panels (Inside StartPanel)")]
-    [Tooltip("장소 선택 패널")]
+    [Header("Sub Panels")]
     [SerializeField] private GameObject placePanel;
     [SerializeField] private Image placeButton;
-    [Tooltip("조작 설명 패널")]
     [SerializeField] private GameObject manualPanel;
     [SerializeField] private Image manualButton;
-    [Tooltip("팁(도움말) 패널")]
     [SerializeField] private GameObject tipsPanel;
     [SerializeField] private Image tipsButton;
-    [Tooltip("환경 설정 패널")]
     [SerializeField] private GameObject settingPanel;
     [SerializeField] private Image settingButton;
 
@@ -41,102 +36,114 @@ public class IntroUIManager : MonoBehaviour
     [SerializeField] private GameObject place1Panel;
     [SerializeField] private GameObject place2Border;
     [SerializeField] private GameObject place2Panel;
-
     #endregion
 
     #region Inspector Settings (UI Elements)
-
-    [Header("Tips Panels Elements")]
+    [Header("Tips Elements")]
     [SerializeField] private GameObject tip1;
     [SerializeField] private GameObject tip2;
     [SerializeField] private GameObject tip3;
     [SerializeField] private GameObject tip4;
     [SerializeField] private GameObject tip5;
-    [Tooltip("현재 팁 페이지 번호를 표시할 텍스트")]
     [SerializeField] private TextMeshProUGUI tipPageText;
 
-    [Header("Settings Panels Elements")]
-    [Tooltip("오디오 볼륨 슬라이더")]
-    [SerializeField] private Slider audioSlider;
-    [Tooltip("오디오 볼륨 수치 텍스트 (0-100)")]
-    [SerializeField] private TextMeshProUGUI audioText;
+    [Header("Settings - Audio")]
+    [SerializeField] private Slider MasterVolumeSlider;
+    [SerializeField] private Slider NARVolumeSlider;
+    [SerializeField] private Slider SFXVolumeSlider;
+    [SerializeField] private Slider AMBVolumeSlider;
+    [SerializeField] private TextMeshProUGUI MasterVolumeText;
+    [SerializeField] private TextMeshProUGUI NARVolumeText;
+    [SerializeField] private TextMeshProUGUI SFXVolumeText;
+    [SerializeField] private TextMeshProUGUI AMBVolumeText;
 
-    [Tooltip("멀미 방지 모드 슬라이더 (0: OFF, 1: ON)")]
+    [Header("Settings - Haptic")]
+    [Tooltip("진동 세기 조절 슬라이더")]
+    [SerializeField] private Slider HandHapticVolumeSlider;
+    [Tooltip("진동 세기 텍스트 (0-100)")]
+    [SerializeField] private TextMeshProUGUI HandHapticVolumeText;
+
+    [Header("Settings - Lang & Mode")]
+    [Tooltip("멀미 방지 모드 슬라이더")]
     [SerializeField] private Slider modeSlider;
-    [Tooltip("멀미 방지 모드 상태 텍스트 (ON/OFF)")]
     [SerializeField] private TextMeshProUGUI modeText;
 
     [Header("Debug")]
     [SerializeField] private bool isDebug = true;
-
     #endregion
 
     #region Internal State
-
     private GameObject currentTopPanel;
     private GameObject currentMainPanel;
     private Image currentMainButton;
-
     private int tipPageNum = 1;
-
     #endregion
 
     #region Unity Lifecycle
-
     private void Start()
     {
         InitializeSettings();
         InitializeUIState();
     }
-
     #endregion
 
     #region Initialization
 
-    /// <summary>
-    /// DataManager의 저장된 값을 불러와 UI(슬라이더)에 반영합니다.
-    /// </summary>
     private void InitializeSettings()
     {
         // 1. 오디오 슬라이더 설정
-        audioSlider.minValue = 0;
-        audioSlider.maxValue = 100;
-        audioSlider.wholeNumbers = true;
+        SetupSlider(MasterVolumeSlider, 0, 100);
+        SetupSlider(NARVolumeSlider, 0, 100);
+        SetupSlider(SFXVolumeSlider, 0, 100);
+        SetupSlider(AMBVolumeSlider, 0, 100);
 
-        // DataManager가 있으면 저장된 볼륨 가져오기 (0.0~1.0 -> 0~100 변환)
-        float currentVol = DataManager.Instance != null ? DataManager.Instance.MasterVolume : 1.0f;
-        int displayVol = Mathf.RoundToInt(currentVol * 100f);
+        // 햅틱 슬라이더 설정
+        SetupSlider(HandHapticVolumeSlider, 0, 100);
 
-        audioSlider.value = displayVol;
-        OnAudioSliderValueChanged(displayVol); // 텍스트 갱신
-        audioSlider.onValueChanged.AddListener(OnAudioSliderValueChanged);
+        // DataManager 값 불러오기 및 리스너 등록
+        if (DataManager.Instance != null)
+        {
+            SetSliderValueAndListener(MasterVolumeSlider, DataManager.Instance.GetMasterVolume() * 100f, OnMasterVolumeSliderValueChanged);
+            SetSliderValueAndListener(NARVolumeSlider, DataManager.Instance.GetNARVolume() * 100f, OnNARVolumeSliderValueChanged);
+            SetSliderValueAndListener(SFXVolumeSlider, DataManager.Instance.GetSFXVolume() * 100f, OnSFXVolumeSliderValueChanged);
+            SetSliderValueAndListener(AMBVolumeSlider, DataManager.Instance.GetAMBVolume() * 100f, OnAMBVolumeSliderValueChanged);
 
+            // 햅틱 값 적용
+            SetSliderValueAndListener(HandHapticVolumeSlider, DataManager.Instance.GetHapticIntensity() * 100f, OnHapticVolumeSliderValueChanged);
+        }
 
         // 2. 모드 슬라이더 설정
-        modeSlider.minValue = 0;
-        modeSlider.maxValue = 1;
-        modeSlider.wholeNumbers = true;
-
-        // DataManager가 있으면 저장된 모드 가져오기 (bool -> 0/1)
+        SetupSlider(modeSlider, 0, 1);
         bool isModeOn = DataManager.Instance != null && DataManager.Instance.IsAntiMotionSicknessMode;
-
         modeSlider.value = isModeOn ? 1 : 0;
-        OnModeSliderValueChanged(isModeOn ? 1 : 0); // 텍스트 갱신
+        OnModeSliderValueChanged(isModeOn ? 1 : 0); // 텍스트 초기화
         modeSlider.onValueChanged.AddListener(OnModeSliderValueChanged);
     }
 
-    /// <summary>
-    /// 앱 시작 시 패널들의 초기 상태(활성/비활성)를 설정합니다.
-    /// </summary>
+    private void SetupSlider(Slider slider, float min, float max)
+    {
+        if (slider == null) return;
+        slider.minValue = min;
+        slider.maxValue = max;
+        slider.wholeNumbers = true;
+    }
+
+    private void SetSliderValueAndListener(Slider slider, float value, UnityEngine.Events.UnityAction<float> action)
+    {
+        if (slider == null) return;
+        int intVal = Mathf.RoundToInt(value);
+        slider.value = intVal;
+        action.Invoke(intVal);
+        slider.onValueChanged.AddListener(action);
+    }
+
     private void InitializeUIState()
     {
-        // 하위 패널 모두 비활성화
         if (placePanel) placePanel.SetActive(false);
         if (manualPanel) manualPanel.SetActive(false);
         if (tipsPanel) tipsPanel.SetActive(false);
         if (settingPanel) settingPanel.SetActive(false);
 
-        // 최상위 패널: IntroPanel 활성화
         if (startPanel) startPanel.SetActive(false);
         if (introPanel) introPanel.SetActive(true);
 
@@ -146,249 +153,182 @@ public class IntroUIManager : MonoBehaviour
 
     #endregion
 
-    #region UI Event Handlers (Navigation)
+    #region Interaction Helpers (Sound & Haptic)
 
-    /// <summary>
-    /// [Intro 패널 클릭 시] IntroPanel을 닫고 StartPanel(메인 메뉴)을 엽니다.
-    /// </summary>
-    public void OnClickIntroButton()
+    private void PlayUIInteraction()
     {
-        if (isDebug) Debug.Log("IntroButton Clicked");
-        SwitchTopPanel(startPanel);
-
-        // StartPanel 진입 시 기본으로 '장소 선택' 패널을 보여줌
-        SwitchMainPanel(placePanel, placeButton);
-    }
-
-    /// <summary>
-    /// [장소 선택 버튼]
-    /// </summary>
-    public void OnClickPlaceButton()
-    {
-        SwitchMainPanel(placePanel, placeButton);
-
-    }
-
-    /// <summary>
-    /// [매뉴얼 버튼]
-    /// </summary>
-    public void OnClickManualButton()
-    {
-        SwitchMainPanel(manualPanel, manualButton);
-    }
-
-    /// <summary>
-    /// [설정 버튼]
-    /// </summary>
-    public void OnClickSettingButton()
-    {
-        SwitchMainPanel(settingPanel, settingButton);
-    }
-
-    /// <summary>
-    /// [팁 버튼] 팁 패널을 열고 1페이지로 초기화합니다.
-    /// </summary>
-    public void OnClickTipsButton()
-    {
-        SwitchMainPanel(tipsPanel, tipsButton);
-        ResetTipPage();
-    }
-
-    /// <summary>
-    /// [장소 선택 버튼] 이미지 홠성화됩니다.
-    /// </summary>
-    public void OnClickPlace1()
-    {
-        if (place2Panel != null && place2Border != null && place1Panel != null && place1Border != null)
+        if (AudioManager.Instance != null)
         {
-            place2Panel.SetActive(true);
-            place2Border.SetActive(false);
-
-            place1Panel.SetActive(false);
-            place1Border.SetActive(true);
-
-            DataManager.Instance.SelectedMap = "Subway";
+            AudioManager.Instance.PlaySFX(SFXType.UI_Click);
         }
+        TriggerHapticImpulse();
     }
 
-    public void OnClickPlace2()
+    private void TriggerHapticImpulse(float rawAmplitude = 0.5f, float duration = 0.1f)
     {
-        if (place2Panel != null && place2Border != null && place1Panel != null && place1Border != null)
-        {
-            place1Panel.SetActive(true);
-            place1Border.SetActive(false);
-
-            place2Panel.SetActive(false);
-            place2Border.SetActive(true);
-
-            DataManager.Instance.SelectedMap = "Street";
-        }
-    }
-
-    /// <summary>
-    /// [체험 시작 버튼] 시뮬레이션 씬으로 전환합니다.
-    /// </summary>
-    public void OnClickPlayButton()
-    {
-        if (DataManager.Instance.SelectedMap != "Street") return;
-
-        if (isDebug) Debug.Log("체험을 시작합니다.");
-
-        // 설정값 저장 (혹시 변경 후 저장이 안 되었을 경우 대비)
+        float finalAmplitude = rawAmplitude;
         if (DataManager.Instance != null)
         {
-            DataManager.Instance.SaveSettings();
+            finalAmplitude = DataManager.Instance.GetAdjustedHapticStrength(rawAmplitude);
         }
 
-        // 씬 전환
-        if (GameManager.Instance != null)
+        if (finalAmplitude <= 0.01f) return;
+
+        var inputDevices = new List<InputDevice>();
+        InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, inputDevices);
+
+        foreach (var device in inputDevices)
         {
-            GameManager.Instance.LoadScene("Main_Street");
-        }
-        else
-        {
-            // SceneTransitionManager가 존재하면 사용하고, 없으면 일반 SceneManager 사용
-            // (void 함수에는 ?? 연산자를 사용할 수 없으므로 if문으로 분리)
-            if (SceneTransitionManager.Instance != null)
+            if (device.TryGetHapticCapabilities(out var capabilities) && capabilities.supportsImpulse)
             {
-                SceneTransitionManager.Instance.LoadScene("Main_Street");
-            }
-            else
-            {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Main_Street");
+                device.SendHapticImpulse(0, finalAmplitude, duration);
             }
         }
     }
 
     #endregion
 
+    #region UI Event Handlers (Navigation)
+    public void OnClickIntroButton()
+    {
+        PlayUIInteraction();
+        if (isDebug) Debug.Log("IntroButton Clicked");
+        SwitchTopPanel(startPanel);
+        SwitchMainPanel(placePanel, placeButton);
+    }
+    public void OnClickPlaceButton() { PlayUIInteraction(); SwitchMainPanel(placePanel, placeButton); }
+    public void OnClickManualButton() { PlayUIInteraction(); SwitchMainPanel(manualPanel, manualButton); }
+    public void OnClickSettingButton() { PlayUIInteraction(); SwitchMainPanel(settingPanel, settingButton); }
+    public void OnClickTipsButton() { PlayUIInteraction(); SwitchMainPanel(tipsPanel, tipsButton); ResetTipPage(); }
+
+    public void OnClickPlace1()
+    {
+        PlayUIInteraction();
+        if (place2Panel && place2Border && place1Panel && place1Border)
+        {
+            place2Panel.SetActive(true); place2Border.SetActive(false);
+            place1Panel.SetActive(false); place1Border.SetActive(true);
+            if (DataManager.Instance != null) DataManager.Instance.SetSelectedMap("Subway");
+        }
+    }
+    public void OnClickPlace2()
+    {
+        PlayUIInteraction();
+        if (place2Panel && place2Border && place1Panel && place1Border)
+        {
+            place1Panel.SetActive(true); place1Border.SetActive(false);
+            place2Panel.SetActive(false); place2Border.SetActive(true);
+            if (DataManager.Instance != null) DataManager.Instance.SetSelectedMap("Street");
+        }
+    }
+    public void OnClickPlayButton()
+    {
+        PlayUIInteraction();
+        if (DataManager.Instance != null && DataManager.Instance.GetSelectedMap() != "Street") return;
+        if (DataManager.Instance != null) DataManager.Instance.SaveSettings();
+
+        string targetScene = "Main_Street";
+        if (GameManager.Instance != null) GameManager.Instance.LoadScene(targetScene);
+        else if (SceneTransitionManager.Instance != null) SceneTransitionManager.Instance.LoadScene(targetScene);
+        else UnityEngine.SceneManagement.SceneManager.LoadScene(targetScene);
+    }
+    #endregion
+
     #region UI Event Handlers (Tips)
-
-    public void OnClickPreTipButton()
-    {
-        if (tipPageNum <= 1) return;
-        UpdateTipsPanelPage(tipPageNum - 1);
-    }
-
-    public void OnClickNextTipButton()
-    {
-        if (tipPageNum >= 5) return;
-        UpdateTipsPanelPage(tipPageNum + 1);
-    }
-
-    private void ResetTipPage()
-    {
-        UpdateTipsPanelPage(1);
-    }
-
+    public void OnClickPreTipButton() { PlayUIInteraction(); if (tipPageNum > 1) UpdateTipsPanelPage(tipPageNum - 1); }
+    public void OnClickNextTipButton() { PlayUIInteraction(); if (tipPageNum < 5) UpdateTipsPanelPage(tipPageNum + 1); }
+    private void ResetTipPage() => UpdateTipsPanelPage(1);
     private void UpdateTipsPanelPage(int newPage)
     {
         tipPageNum = newPage;
         tipPageText.text = $"{tipPageNum}/5";
-
         if (tip1) tip1.SetActive(tipPageNum == 1);
         if (tip2) tip2.SetActive(tipPageNum == 2);
         if (tip3) tip3.SetActive(tipPageNum == 3);
         if (tip4) tip4.SetActive(tipPageNum == 4);
         if (tip5) tip5.SetActive(tipPageNum == 5);
     }
-
     #endregion
 
     #region UI Event Handlers (Settings)
 
-    /// <summary>
-    /// 오디오 슬라이더 값 변경 시 호출 (0 ~ 100)
-    /// </summary>
-    private void OnAudioSliderValueChanged(float value)
+    private void OnMasterVolumeSliderValueChanged(float value)
     {
         int intValue = Mathf.RoundToInt(value);
-
-        // UI 텍스트 갱신
-        if (audioText != null) audioText.text = intValue.ToString();
-
-        // DataManager에 반영 (0.0 ~ 1.0)
-        if (DataManager.Instance != null)
-        {
-            DataManager.Instance.SetVolume(intValue / 100f);
-        }
+        if (MasterVolumeText != null) MasterVolumeText.text = intValue.ToString();
+        if (DataManager.Instance != null) DataManager.Instance.SetMasterVolume(intValue / 100f);
+    }
+    private void OnNARVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+        if (NARVolumeText != null) NARVolumeText.text = intValue.ToString();
+        if (DataManager.Instance != null) DataManager.Instance.SetNARVolume(intValue / 100f);
+    }
+    private void OnSFXVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+        if (SFXVolumeText != null) SFXVolumeText.text = intValue.ToString();
+        if (DataManager.Instance != null) DataManager.Instance.SetSFXVolume(intValue / 100f);
+    }
+    private void OnAMBVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+        if (AMBVolumeText != null) AMBVolumeText.text = intValue.ToString();
+        if (DataManager.Instance != null) DataManager.Instance.SetAMBVolume(intValue / 100f);
     }
 
-    /// <summary>
-    /// 모드 슬라이더 값 변경 시 호출 (0 or 1)
-    /// </summary>
+    private void OnHapticVolumeSliderValueChanged(float value)
+    {
+        int intValue = Mathf.RoundToInt(value);
+        if (HandHapticVolumeText != null) HandHapticVolumeText.text = intValue.ToString();
+        if (DataManager.Instance != null) DataManager.Instance.SetHapticIntensity(intValue / 100f);
+    }
+
     private void OnModeSliderValueChanged(float value)
     {
         int intValue = Mathf.RoundToInt(value);
         bool isModeOn = (intValue == 1);
+        if (modeText != null) modeText.text = isModeOn ? "ON" : "OFF";
 
-        // UI 텍스트 갱신
-        if (modeText != null)
-        {
-            modeText.text = isModeOn ? "ON" : "OFF";
-        }
-
-        // DataManager에 반영
-        if (DataManager.Instance != null)
-        {
-            DataManager.Instance.SetMotionSicknessMode(isModeOn);
-        }
+        // DataManager에 저장 및 이벤트 발생 -> PlayerManager가 수신
+        if (DataManager.Instance != null) DataManager.Instance.SetMotionSicknessMode(isModeOn);
     }
 
     #endregion
 
     #region Helper Methods (Panel Switching)
-
     private void SwitchTopPanel(GameObject panelToActivate)
     {
         if (currentTopPanel == panelToActivate) return;
-
         if (currentTopPanel != null) currentTopPanel.SetActive(false);
-
         panelToActivate.SetActive(true);
         currentTopPanel = panelToActivate;
     }
-
     private void SwitchMainPanel(GameObject panelToActivate, Image buttonToActivate)
     {
         if (currentMainPanel == panelToActivate) return;
-
-        // 팁 패널을 닫을 때는 내부 페이지들도 정리
         if (currentMainPanel == tipsPanel)
         {
-            if (tip1) tip1.SetActive(false);
-            if (tip2) tip2.SetActive(false);
-            if (tip3) tip3.SetActive(false);
-            if (tip4) tip4.SetActive(false);
-            if (tip5) tip5.SetActive(false);
+            if (tip1) tip1.SetActive(false); if (tip2) tip2.SetActive(false);
+            if (tip3) tip3.SetActive(false); if (tip4) tip4.SetActive(false); if (tip5) tip5.SetActive(false);
         }
-
         if (currentMainPanel == placePanel)
         {
-            if (place2Panel) place2Panel.SetActive(true);
-            if (place2Border) place2Border.SetActive(false);
-            if (place1Panel) place1Panel.SetActive(true);
-            if (place1Border) place1Border.SetActive(false);
+            if (place2Panel) place2Panel.SetActive(true); if (place2Border) place2Border.SetActive(false);
+            if (place1Panel) place1Panel.SetActive(true); if (place1Border) place1Border.SetActive(false);
         }
-
         if (currentMainPanel != null) currentMainPanel.SetActive(false);
         if (currentMainButton != null)
         {
-            Color currentColor = currentMainButton.color;
-            currentColor.a = 0.0f;
-            currentMainButton.color = currentColor;
+            Color c = currentMainButton.color; c.a = 0.0f; currentMainButton.color = c;
         }
-
-        
         panelToActivate.SetActive(true);
         currentMainPanel = panelToActivate;
-
-        Color newColor = buttonToActivate.color;
-        newColor.a = 1.0f;
-        buttonToActivate.color = newColor;
-        currentMainButton = buttonToActivate;
-
+        if (buttonToActivate != null)
+        {
+            Color c = buttonToActivate.color; c.a = 1.0f; buttonToActivate.color = c;
+            currentMainButton = buttonToActivate;
+        }
     }
-
     #endregion
 }

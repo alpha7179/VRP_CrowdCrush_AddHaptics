@@ -1,13 +1,15 @@
-﻿using UnityEngine;
+using System;
+using UnityEngine;
 
 /// <summary>
 /// 사용자의 설정값(볼륨, 편의 기능)과 게임 세션 데이터(점수, 시간 등)를 관리하는 매니저입니다.
 /// <para>
 /// 1. PlayerPrefs를 사용하여 설정을 기기에 영구 저장하거나 불러옵니다.<br/>
 /// 2. 게임 플레이 중 발생하는 통계 데이터(성공/실패 횟수, 플레이 시간)를 추적합니다.<br/>
-/// 3. 씬이 변경되어도 데이터가 유지되도록 Singleton으로 동작합니다.
+/// 3. Observer 패턴(Action)을 적용하여 볼륨 변경 시에만 이벤트를 호출합니다.
 /// </para>
 /// </summary>
+
 public class DataManager : MonoBehaviour
 {
     #region Singleton
@@ -19,10 +21,8 @@ public class DataManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            transform.parent = null; // 최상위 계층으로 분리
+            transform.parent = null;
             DontDestroyOnLoad(gameObject);
-
-            // 초기화 시 저장된 설정을 불러옵니다.
             LoadSettings();
         }
         else
@@ -35,128 +35,160 @@ public class DataManager : MonoBehaviour
 
     #region Constants (Keys)
 
-    // PlayerPrefs 저장 키
-    private const string KEY_VOLUME = "MasterVolume";
+    private const string KEY_MASTERVOLUME = "MasterVolume";
+    private const string KEY_NARVOLUME = "NARVolume";
+    private const string KEY_SFXVOLUME = "SFXVolume";
+    private const string KEY_AMBVOLUME = "AMBVolume";
+    private const string KEY_HAPTIC_INTENSITY = "HapticIntensity";
     private const string KEY_MOTION_SICKNESS = "MotionSickness";
 
     #endregion
 
-    #region User Settings
+    #region Events (Observer Pattern)
 
-    [Header("User Settings")]
-    [Tooltip("전체 마스터 볼륨 (0.0 ~ 1.0)")]
-    [Range(0f, 1f)] public float MasterVolume = 1.0f;
+    public event Action<float> OnMasterVolumeChanged;
+    public event Action<float> OnNARVolumeChanged;
+    public event Action<float> OnSFXVolumeChanged;
+    public event Action<float> OnAMBVolumeChanged;
+    public event Action<float> OnHapticIntensityChanged;
 
-    [Tooltip("멀미 방지 모드 활성화 여부 (FOV 축소, 비네팅 등 적용용)")]
+    // 멀미 모드 변경 이벤트 (켜짐/꺼짐)
+    public event Action<bool> OnMotionSicknessChanged;
+
+    #endregion
+
+    #region User Settings Fields
+
+    [Header("Audio Settings")]
+    [SerializeField][Range(0f, 1f)] private float MasterVolume = 1.0f;
+    [SerializeField][Range(0f, 1f)] private float NARVolume = 1.0f;
+    [SerializeField][Range(0f, 1f)] private float SFXVolume = 1.0f;
+    [SerializeField][Range(0f, 1f)] private float AMBVolume = 1.0f;
+
+    [Header("Haptic Settings (Vibration)")]
+    [Tooltip("유저가 설정하는 진동 세기 (마스터)")]
+    [SerializeField][Range(0f, 1f)] private float HapticIntensity = 1.0f;
+
+    [Tooltip("하드웨어 진동의 최소 임계값")]
+    [SerializeField][Range(0f, 1f)] private float MinHapticLimit = 0.0f;
+
+    [Tooltip("하드웨어 진동의 최대 한계값")]
+    [SerializeField][Range(0f, 1f)] private float MaxHapticLimit = 1.0f;
+
+    [Header("Game Settings")]
+    [Tooltip("멀미 방지 모드 활성화 여부")]
     public bool IsAntiMotionSicknessMode = false;
 
     #endregion
 
-    #region Session Data
-
+    #region Session Data Fields
     [Header("Session Data")]
-    [Tooltip("미션 성공 횟수")]
-    public int SuccessCount = 0;
-
-    [Tooltip("실수 횟수")]
-    public int MistakeCount = 0;
-
-    [Tooltip("총 플레이 시간 (초 단위)")]
-    public float PlayTime = 0f;
-
-    [Tooltip("현재 선택된 맵 이름")]
-    public string SelectedMap = null;
-
+    [SerializeField] private int SuccessCount = 0;
+    [SerializeField] private int MistakeCount = 0;
+    [SerializeField] private float PlayTime = 0f;
+    [SerializeField] private string SelectedMap = null;
     #endregion
 
     #region Session Management API
-
-    /// <summary>
-    /// 새로운 게임 세션을 시작할 때 데이터를 초기화합니다.
-    /// </summary>
-    public void InitializeSessionData()
-    {
-        SuccessCount = 0;
-        MistakeCount = 0;
-        PlayTime = 0f;
-        // SelectedMap은 유지 (로비에서 선택하고 들어왔을 수 있으므로)
-        Debug.Log("[DataManager] Session Data Initialized.");
-    }
-
-    /// <summary>
-    /// 성공 횟수를 1 증가시킵니다.
-    /// </summary>
-    public void AddSuccessCount()
-    {
-        SuccessCount++;
-    }
-
-    /// <summary>
-    /// 실수 횟수를 1 증가시킵니다.
-    /// </summary>
-    public void AddMistakeCount()
-    {
-        MistakeCount++;
-    }
-
-    /// <summary>
-    /// 플레이 시간을 누적합니다.
-    /// </summary>
-    /// <param name="timeToAdd">추가할 시간(초)</param>
-    public void AddPlayTime(float timeToAdd)
-    {
-        PlayTime += timeToAdd;
-        // 너무 자주 로그가 찍히는 것을 방지하려면 아래 줄은 주석 처리 가능
-        // Debug.Log($"[DataManager] PlayTime updated: {PlayTime:F2} seconds");
-    }
-
+    public void InitializeSessionData() { SuccessCount = 0; MistakeCount = 0; PlayTime = 0f; Debug.Log("[DataManager] Session Data Initialized."); }
+    public void AddSuccessCount() => SuccessCount++;
+    public int GetSuccessCount() => SuccessCount;
+    public void AddMistakeCount() => MistakeCount++;
+    public int GetMistakeCount() => MistakeCount;
+    public void AddPlayTime(float timeToAdd) => PlayTime += timeToAdd;
+    public float GetPlayTime() => PlayTime;
+    public void SetSelectedMap(string value) => SelectedMap = value;
+    public string GetSelectedMap() => SelectedMap;
     #endregion
 
     #region Settings Management API
 
-    /// <summary>
-    /// 마스터 볼륨을 설정하고 즉시 적용합니다. (AudioListener 전역 볼륨 제어)
-    /// </summary>
-    /// <param name="volume">0.0 ~ 1.0 사이의 볼륨 값</param>
-    public void SetVolume(float volume)
+    // --- Audio Setters ---
+    public void SetMasterVolume(float volume)
     {
-        MasterVolume = Mathf.Clamp01(volume);
-        AudioListener.volume = MasterVolume;
+        float newValue = Mathf.Clamp01(volume);
+        if (Mathf.Approximately(MasterVolume, newValue)) return;
+        MasterVolume = newValue;
+        OnMasterVolumeChanged?.Invoke(MasterVolume);
+    }
+    public float GetMasterVolume() => MasterVolume;
+
+    public void SetNARVolume(float volume)
+    {
+        float newValue = Mathf.Clamp01(volume);
+        if (Mathf.Approximately(NARVolume, newValue)) return;
+        NARVolume = newValue;
+        OnNARVolumeChanged?.Invoke(NARVolume);
+    }
+    public float GetNARVolume() => NARVolume;
+
+    public void SetSFXVolume(float volume)
+    {
+        float newValue = Mathf.Clamp01(volume);
+        if (Mathf.Approximately(SFXVolume, newValue)) return;
+        SFXVolume = newValue;
+        OnSFXVolumeChanged?.Invoke(SFXVolume);
+    }
+    public float GetSFXVolume() => SFXVolume;
+
+    public void SetAMBVolume(float volume)
+    {
+        float newValue = Mathf.Clamp01(volume);
+        if (Mathf.Approximately(AMBVolume, newValue)) return;
+        AMBVolume = newValue;
+        OnAMBVolumeChanged?.Invoke(AMBVolume);
+    }
+    public float GetAMBVolume() => AMBVolume;
+
+    // --- Haptic Setters & Logic ---
+    public void SetHapticIntensity(float intensity)
+    {
+        float newValue = Mathf.Clamp01(intensity);
+        if (Mathf.Approximately(HapticIntensity, newValue)) return;
+        HapticIntensity = newValue;
+        OnHapticIntensityChanged?.Invoke(HapticIntensity);
+    }
+    public float GetHapticIntensity() => HapticIntensity;
+
+    public float GetAdjustedHapticStrength(float rawInputStrength)
+    {
+        float input = Mathf.Clamp01(rawInputStrength);
+        float effectiveMax = MaxHapticLimit * HapticIntensity;
+        float effectiveMin = (HapticIntensity > 0.01f) ? MinHapticLimit : 0f;
+        return Mathf.Lerp(effectiveMin, effectiveMax, input);
     }
 
-    /// <summary>
-    /// 멀미 방지 모드(Anti-Motion Sickness)를 설정합니다.
-    /// </summary>
+    // --- Other Settings (멀미 모드) ---
     public void SetMotionSicknessMode(bool isEnabled)
     {
+        if (IsAntiMotionSicknessMode == isEnabled) return;
         IsAntiMotionSicknessMode = isEnabled;
+        OnMotionSicknessChanged?.Invoke(IsAntiMotionSicknessMode);
     }
 
-    /// <summary>
-    /// 현재 설정값(볼륨, 멀미 모드)을 PlayerPrefs에 저장합니다.
-    /// </summary>
+    // --- Save & Load ---
     public void SaveSettings()
     {
-        PlayerPrefs.SetFloat(KEY_VOLUME, MasterVolume);
+        PlayerPrefs.SetFloat(KEY_MASTERVOLUME, MasterVolume);
+        PlayerPrefs.SetFloat(KEY_NARVOLUME, NARVolume);
+        PlayerPrefs.SetFloat(KEY_SFXVOLUME, SFXVolume);
+        PlayerPrefs.SetFloat(KEY_AMBVOLUME, AMBVolume);
+        PlayerPrefs.SetFloat(KEY_HAPTIC_INTENSITY, HapticIntensity);
         PlayerPrefs.SetInt(KEY_MOTION_SICKNESS, IsAntiMotionSicknessMode ? 1 : 0);
         PlayerPrefs.Save();
-
         Debug.Log("[DataManager] Settings Saved.");
     }
 
-    /// <summary>
-    /// 저장된 설정값을 불러와 적용합니다. 저장된 값이 없으면 기본값을 사용합니다.
-    /// </summary>
     public void LoadSettings()
     {
-        // 기본값: 볼륨 1.0, 멀미모드 OFF(0)
-        MasterVolume = PlayerPrefs.GetFloat(KEY_VOLUME, 1.0f);
+        MasterVolume = PlayerPrefs.GetFloat(KEY_MASTERVOLUME, 1.0f);
+        NARVolume = PlayerPrefs.GetFloat(KEY_NARVOLUME, 1.0f);
+        SFXVolume = PlayerPrefs.GetFloat(KEY_SFXVOLUME, 1.0f);
+        AMBVolume = PlayerPrefs.GetFloat(KEY_AMBVOLUME, 1.0f);
+        HapticIntensity = PlayerPrefs.GetFloat(KEY_HAPTIC_INTENSITY, 1.0f);
         IsAntiMotionSicknessMode = PlayerPrefs.GetInt(KEY_MOTION_SICKNESS, 0) == 1;
 
-        // 불러온 값 즉시 적용
-        AudioListener.volume = MasterVolume;
-
-        Debug.Log($"[DataManager] Settings Loaded - Volume: {MasterVolume}, Anti-Motion: {IsAntiMotionSicknessMode}");
+        Debug.Log($"[DataManager] Settings Loaded. Haptic: {HapticIntensity}, AntiMotion: {IsAntiMotionSicknessMode}");
     }
 
     #endregion
