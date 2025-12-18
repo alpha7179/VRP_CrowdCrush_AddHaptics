@@ -126,6 +126,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &682428342623524275
 GameObject:
@@ -19529,6 +19531,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &1311920074310355705
 GameObject:
@@ -39037,6 +39041,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &2387900836149608266
 GameObject:
@@ -44196,6 +44202,8 @@ MonoBehaviour:
       m_AllowFreeYMovement: 1
       m_AllowFreeZMovement: 1
     m_Variable: {fileID: 0}
+  hapticIntensity: 0.5
+  hapticDuration: 0.1
 --- !u!135 &2080606468815204453
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -59130,6 +59138,8 @@ MonoBehaviour:
       m_AllowFreeYMovement: 1
       m_AllowFreeZMovement: 1
     m_Variable: {fileID: 0}
+  hapticIntensity: 0.5
+  hapticDuration: 0.1
 --- !u!135 &5673320102166610155
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -69062,6 +69072,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &5199664340553470286
 GameObject:
@@ -69189,6 +69201,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &5341393354810910920
 GameObject:
@@ -74246,6 +74260,8 @@ MonoBehaviour:
       m_AllowFreeYMovement: 1
       m_AllowFreeZMovement: 1
     m_Variable: {fileID: 0}
+  hapticIntensity: 0.5
+  hapticDuration: 0.1
 --- !u!135 &1312795626819600286
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -84178,6 +84194,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &6077174357202193393
 GameObject:
@@ -89202,6 +89220,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &6563087489532531348
 GameObject:
@@ -98863,6 +98883,8 @@ MonoBehaviour:
   isGoal: 1
   isDanger: 0
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &7079147567219268817
 GameObject:
@@ -118315,6 +118337,8 @@ MonoBehaviour:
   isGoal: 0
   isDanger: 1
   playerTag: Player
+  hapticIntensity: 0.5
+  hapticDuration: 0.2
   isDebug: 1
 --- !u!1 &7981590146627825171
 GameObject:
@@ -123356,6 +123380,8 @@ MonoBehaviour:
       m_AllowFreeYMovement: 1
       m_AllowFreeZMovement: 1
     m_Variable: {fileID: 0}
+  hapticIntensity: 0.5
+  hapticDuration: 0.1
 --- !u!135 &5751598896826045543
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -77,14 +77,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65b627a0bc3f9374cb8cf8d3c8caf4b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  head: {fileID: 0}
-  leftHand: {fileID: 0}
-  rightHand: {fileID: 0}
-  chestYOffset: 0.35
-  chestDistanceThreshold: 0.45
-  handsDistanceThreshold: 0.3
-  currentHandDist: 0
-  currentLeftDist: 0
-  currentRightDist: 0
-  isGestureDetected: 0
-  isButtonOverride: 0
+  headTransform: {fileID: 0}
+  leftHandTransform: {fileID: 0}
+  rightHandTransform: {fileID: 0}
+  detectionDistance: 0.4
+  triggerThreshold: 0.8
+  useTriggerFailSafe: 1
+  rangeEnterSFX: 0
+  rangeEnterHapticIntensity: 0.3
+  rangeEnterHapticDuration: 0.1
+  holdingHapticIntensity: 0.05

@@ -120,7 +120,7 @@ MonoBehaviour:
   fadeCanvas: {fileID: 4592260057928594500}
   fadeDuration: 1
   distFromCamera: 0.2
-  uiCameraTag: UI Camera
+  uiCameraTag: UICamera
 --- !u!225 &4434821196411402175
 CanvasGroup:
   m_ObjectHideFlags: 0
