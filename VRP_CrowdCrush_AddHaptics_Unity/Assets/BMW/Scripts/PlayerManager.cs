@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+// [중요] XR Interaction Toolkit 네임스페이스 추가
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Locomotion;
 
 /// <summary>
 /// 플레이어의 기능(이동, 상호작용) 및 편의 설정(멀미 모드)을 관리하는 매니저입니다.
@@ -8,7 +11,6 @@ using System.Collections.Generic;
 public class PlayerManager : MonoBehaviour
 {
     #region Singleton
-
     public static PlayerManager Instance { get; private set; }
 
     private void Awake()
@@ -24,11 +26,9 @@ public class PlayerManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
     #endregion
 
     #region Inspector Settings
-
     [Header("Target Object Names")]
     [Tooltip("플레이어의 최상위 부모 객체 이름 (XR Origin 검색용 키워드)")]
     [SerializeField] private string originKeyword = "XROrigin";
@@ -36,23 +36,14 @@ public class PlayerManager : MonoBehaviour
     [Tooltip("멀미 방지 비네팅 오브젝트 이름 (Main Camera의 자식이어야 함)")]
     [SerializeField] private string vignetteKeyword = "TunnelingVignette";
 
-    [Header("Locomotion Settings")]
-    [SerializeField] private string locomotionKeyword = "Locomotion";
-    [SerializeField] private string[] moveKeywords = { "Turn", "Teleport", "Move" };
-
-    [Header("Interaction Settings")]
-    [SerializeField] private string[] interactionKeywords = { "Direct Interactor", "UI&Teleport Ray Interactor" };
-
+    // [변경] 이름 검색 방식 제거 -> 키워드 설정 불필요
     #endregion
 
     #region Internal State
-
     private GameObject currentXROrigin;
-
     #endregion
 
     #region Unity Lifecycle
-
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -67,7 +58,6 @@ public class PlayerManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // 1. XR Origin 탐색
         currentXROrigin = FindXROrigin();
 
         if (currentXROrigin == null)
@@ -76,7 +66,7 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        // 2. 초기 권한 설정
+        // 초기 설정: 일단 다 끄고 시작 (GameStepManager가 켜줄 것임)
         if (scene.name.Equals("Main_Street", System.StringComparison.OrdinalIgnoreCase))
         {
             SetInteraction(false);
@@ -86,87 +76,78 @@ public class PlayerManager : MonoBehaviour
         else
         {
             SetInteraction(true);
-            SetLocomotion(false);
-            Debug.Log("[PlayerManager] Intro Scene: Interaction ON / Locomotion OFF");
+            SetLocomotion(true); // 인트로 등에서는 이동 허용
         }
 
-        // 3. 멀미 모드 강제 동기화
-        bool comfortMode = false;
-        if (DataManager.Instance != null)
-        {
-            comfortMode = DataManager.Instance.IsAntiMotionSicknessMode;
-        }
-        else
-        {
-            Debug.LogWarning("[PlayerManager] DataManager Instance not found. Defaulting Comfort Mode to FALSE.");
-        }
-
-        // 씬 로드 직후 안정적인 검색을 위해 약간 지연 후 실행 권장하지만, 일단 직접 실행
+        bool comfortMode = (DataManager.Instance != null) && DataManager.Instance.IsAntiMotionSicknessMode;
         SetComfortMode(comfortMode);
     }
-
     #endregion
 
     #region Public API
 
+    /// <summary>
+    /// 이동(Move, Turn, Teleport) 기능을 켜거나 끕니다.
+    /// [수정] 컴포넌트를 직접 찾아 제어하므로 이름이 달라도 작동합니다.
+    /// </summary>
     public void SetLocomotion(bool isEnabled)
     {
-        if (EnsureOriginFound()) ControlLocomotion(currentXROrigin, isEnabled);
-    }
+        if (!EnsureOriginFound()) return;
 
-    public void SetInteraction(bool isEnabled)
-    {
-        if (EnsureOriginFound()) ControlFeaturesByKeywords(currentXROrigin, interactionKeywords, isEnabled);
+        // LocomotionProvider는 Move, Turn, Teleport 등의 부모 클래스입니다.
+        // 이것들을 다 찾아서 끄면 이동/회전이 멈춥니다.
+        var providers = currentXROrigin.GetComponentsInChildren<LocomotionProvider>(true);
+
+        foreach (var provider in providers)
+        {
+            provider.enabled = isEnabled;
+        }
+
+        Debug.Log($"[PlayerManager] Locomotion set to: {isEnabled} (Controlled {providers.Length} providers)");
     }
 
     /// <summary>
-    /// 멀미 방지 모드(Tunneling Vignette)를 켜거나 끕니다.
-    /// [수정됨] MainCamera 태그를 사용하여 더 확실하게 찾습니다.
+    /// 상호작용(Ray, Direct Interactor) 기능을 켜거나 끕니다.
     /// </summary>
-    public void SetComfortMode(bool isEnabled)
+    public void SetInteraction(bool isEnabled)
     {
-        // 1. 태그로 메인 카메라 찾기 (가장 확실한 방법)
-        Camera mainCam = Camera.main;
+        if (!EnsureOriginFound()) return;
 
-        // 태그로 못 찾았으면 XR Origin 하위에서 검색 (차선책)
-        if (mainCam == null && EnsureOriginFound())
-        {
-            mainCam = currentXROrigin.GetComponentInChildren<Camera>();
-        }
+        // XRRayInteractor, XRDirectInteractor 등을 찾아서 제어
+        // (XRBaseInteractor는 모든 상호작용의 부모)
+        // 주의: Locomotion도 Interactor를 쓸 수 있으므로, 손(Hand)에 있는 것만 끄는 것이 좋으나
+        // 여기서는 간단히 Interactor 전체를 제어합니다.
 
-        if (mainCam == null)
-        {
-            Debug.LogWarning("[PlayerManager] 씬에서 Main Camera를 찾을 수 없습니다. (MainCamera 태그를 확인하세요)");
-            return;
-        }
+        // [팁] 만약 텔레포트 Ray까지 꺼지면 안 된다면 태그나 레이어 필터링이 필요할 수 있습니다.
+        // 여기서는 기존 로직대로 '이름'에 Interactor가 포함된 것들을 찾거나, 컴포넌트로 제어합니다.
 
-        // 2. 카메라 바로 아래 자식들 중에서 이름으로 찾기
-        // (재귀 함수 대신 직접 자식을 순회하여 정확도 높임)
-        Transform vignetteTr = null;
-        foreach (Transform child in mainCam.transform)
+        // 이름 기반 검색 (기존 유지 - 상호작용은 보통 손에 달려있어서 이름이 명확함)
+        string[] keywords = { "Interactor" };
+        Transform[] allChildren = currentXROrigin.GetComponentsInChildren<Transform>(true);
+
+        foreach (Transform child in allChildren)
         {
-            if (child.name.Equals(vignetteKeyword))
+            // Locomotion 관련 Interactor는 끄지 않도록 예외 처리 가능
+            if (child.name.Contains("Locomotion") || child.name.Contains("Teleport")) continue;
+
+            if (child.name.Contains("Interactor"))
             {
-                vignetteTr = child;
-                break;
+                child.gameObject.SetActive(isEnabled);
             }
         }
+    }
 
-        // 만약 바로 아래에 없다면 재귀 검색 시도
-        if (vignetteTr == null)
-        {
-            vignetteTr = FindChildRecursive(mainCam.transform, vignetteKeyword);
-        }
+    public void SetComfortMode(bool isEnabled)
+    {
+        Camera mainCam = Camera.main;
+        if (mainCam == null && EnsureOriginFound()) mainCam = currentXROrigin.GetComponentInChildren<Camera>();
 
+        if (mainCam == null) return;
+
+        Transform vignetteTr = FindChildRecursive(mainCam.transform, vignetteKeyword);
         if (vignetteTr != null)
         {
             vignetteTr.gameObject.SetActive(isEnabled);
-            Debug.Log($"[PlayerManager] Vignette '{vignetteTr.name}' SetActive: {isEnabled}");
-        }
-        else
-        {
-            // 찾기 실패 시 계층 구조 로그 출력하여 디버깅 도움
-            Debug.LogWarning($"[PlayerManager] '{vignetteKeyword}'를 '{mainCam.name}' 하위에서 찾을 수 없습니다.");
         }
     }
 
@@ -190,42 +171,17 @@ public class PlayerManager : MonoBehaviour
                 return obj;
             }
         }
+        // 태그로 찾기 시도 (차선책)
+        GameObject tagObj = GameObject.FindGameObjectWithTag("Player");
+        if (tagObj != null) return tagObj;
+
         return null;
-    }
-
-    private void ControlLocomotion(GameObject xrOrigin, bool isEnabled)
-    {
-        Transform locomotionTr = FindChildRecursive(xrOrigin.transform, locomotionKeyword);
-        if (locomotionTr != null)
-        {
-            foreach (string keyword in moveKeywords)
-            {
-                Transform targetTr = FindChildRecursive(locomotionTr, keyword);
-                if (targetTr != null) targetTr.gameObject.SetActive(isEnabled);
-            }
-        }
-    }
-
-    private void ControlFeaturesByKeywords(GameObject root, string[] keywords, bool isEnabled)
-    {
-        Transform[] allChildren = root.GetComponentsInChildren<Transform>(true);
-        foreach (Transform child in allChildren)
-        {
-            foreach (string keyword in keywords)
-            {
-                if (child.name.IndexOf(keyword, System.StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    child.gameObject.SetActive(isEnabled);
-                }
-            }
-        }
     }
 
     private Transform FindChildRecursive(Transform parent, string namePart)
     {
         foreach (Transform child in parent)
         {
-            // [수정] 정확한 이름 일치를 우선 확인하도록 변경 가능하나, 기존 로직 유지하되 대소문자 무시
             if (child.name.IndexOf(namePart, System.StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return child;
@@ -235,6 +191,5 @@ public class PlayerManager : MonoBehaviour
         }
         return null;
     }
-
     #endregion
 }

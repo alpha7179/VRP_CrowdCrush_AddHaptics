@@ -1,19 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using UnityEngine.XR;
-
-/// <summary>
-/// 인게임 UI(HUD), 팝업 패널, 압박 효과(Vignette) 및 미션 진행 상황을 총괄하는 매니저입니다.
-/// <para>
-/// 1. HUD 요소(텍스트, 게이지)를 갱신하고 안내/일시정지/경고 패널을 제어합니다.<br/>
-/// 2. PressureVignette와 연동하여 게임 내 압박감(시각적 왜곡)을 조절합니다.<br/>
-/// 3. 컨트롤러 입력을 받아 일시정지(Y버튼), 패널 닫기(A버튼) 등의 상호작용을 처리합니다.
-/// </para>
-/// </summary>
 
 public class IngameUIManager : MonoBehaviour
 {
@@ -83,7 +73,6 @@ public class IngameUIManager : MonoBehaviour
     {
         InitializeUI();
         InitializeEvents();
-        // 시작 시에는 소리를 재생하지 않음 (레벨 0 가정)
     }
 
     private void OnEnable()
@@ -133,15 +122,14 @@ public class IngameUIManager : MonoBehaviour
         if (GameManager.Instance != null) GameManager.Instance.OnPauseStateChanged += HandlePauseState;
     }
 
-    // [복구됨] 압박 사운드 재생 메서드 (isLoop: true 필수)
     private void PlayPressureSounds()
     {
         if (AudioManager.Instance != null)
         {
-            // 루프 재생 시작
-            AudioManager.Instance.PlaySFX(SFXType.heartbeat, isLoop: true);
-            AudioManager.Instance.PlaySFX(SFXType.breath, isLoop: true);
-            AudioManager.Instance.PlaySFX(SFXType.EarRinging, isLoop: true);
+            // [수정] 페이드를 켜서 부드럽게 시작되도록 함 (볼륨 튀는 현상 방지)
+            AudioManager.Instance.PlaySFX(SFXType.heartbeat, isLoop: true, useFade: true);
+            AudioManager.Instance.PlaySFX(SFXType.breath, isLoop: true, useFade: true);
+            AudioManager.Instance.PlaySFX(SFXType.EarRinging, isLoop: true, useFade: true);
         }
     }
 
@@ -149,15 +137,14 @@ public class IngameUIManager : MonoBehaviour
     {
         if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.StopSFX(SFXType.heartbeat);
-            AudioManager.Instance.StopSFX(SFXType.breath);
-            AudioManager.Instance.StopSFX(SFXType.EarRinging);
+            AudioManager.Instance.StopSFX(SFXType.heartbeat, true); // 페이드 아웃하며 종료
+            AudioManager.Instance.StopSFX(SFXType.breath, true);
+            AudioManager.Instance.StopSFX(SFXType.EarRinging, true);
         }
     }
     #endregion
 
     #region Input Handlers & Haptics
-
     private void TriggerInteractionFeedback()
     {
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(SFXType.UI_Click);
@@ -166,7 +153,6 @@ public class IngameUIManager : MonoBehaviour
 
     private void TriggerHapticImpulse(float rawAmplitude = 0.5f, float duration = 0.1f)
     {
-        // [진동 정규화 적용] DataManager를 통해 보정된 값 가져오기
         float finalAmplitude = rawAmplitude;
         if (DataManager.Instance != null)
         {
@@ -276,34 +262,58 @@ public class IngameUIManager : MonoBehaviour
 
     public void UpdatePressureGauge(int level)
     {
-        // 0 -> 1 이상: 소리 재생 시작
-        if (currentPressureLevel == 0 && level > 0)
-        {
-            PlayPressureSounds();
-        }
-        // 1 이상 -> 0: 소리 정지
-        else if (level == 0)
-        {
-            StopAllPressureSounds();
-        }
+        // 1. 사운드 처리 (기존 로직)
+        if (currentPressureLevel == 0 && level > 0) PlayPressureSounds();
+        else if (level == 0) StopAllPressureSounds();
 
         currentPressureLevel = level;
-
-        // [중요] 볼륨 업데이트는 소리 재생 명령 이후에 수행하여 즉시 적용
         UpdatePressureSoundVolume(level);
 
-        if (pressureStateText) { int stateIndex = Mathf.Clamp(level, 0, PressureState.Length - 1); pressureStateText.text = PressureState[stateIndex]; }
-        float maxLevel = 5.0f; float intensity = Mathf.Clamp01((float)level / maxLevel); SetPressureIntensity(intensity);
-        if (pressureGaugeImages == null) return; int targetIndex = level - 1;
+        // 2. [수정됨] BodyHaptic 제어 (안전장치 포함)
+        if (BodyHaptic.Instance != null)
+        {
+            if (level == 0)
+            {
+                // 안전 상태면 진동 끄기
+                BodyHaptic.Instance.StopBodyHaptics();
+            }
+            else
+            {
+                // 압박 상태면 해당 레벨 반복 재생 (level이 곧 햅틱 강도라고 가정)
+                // 인덱스 1(경고) -> Haptic 1번 재생
+                BodyHaptic.Instance.PlayBodyHaptics(level);
+            }
+        }
+
+        // 3. UI 텍스트 및 게이지 처리 (기존 로직)
+        if (pressureStateText)
+        {
+            int stateIndex = Mathf.Clamp(level, 0, PressureState.Length - 1);
+            pressureStateText.text = PressureState[stateIndex];
+        }
+
+        float maxLevel = 5.0f;
+        float intensity = Mathf.Clamp01((float)level / maxLevel);
+        SetPressureIntensity(intensity);
+
+        if (pressureGaugeImages == null) return;
+        int targetIndex = level - 1;
+
         for (int i = 0; i < pressureGaugeImages.Length; i++)
         {
             Image img = pressureGaugeImages[i]; Image highlightImg = pressureHighlightImages[i];
             if (img == null || highlightImg == null) continue;
+
             if (imageCoroutines.ContainsKey(img) && imageCoroutines[img] != null) StopCoroutine(imageCoroutines[img]);
             if (imageCoroutines.ContainsKey(highlightImg) && imageCoroutines[highlightImg] != null) StopCoroutine(imageCoroutines[highlightImg]);
+
             bool shouldBeOn = (i < level); bool isPulseTarget = (i == targetIndex);
-            if (shouldBeOn) imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 1.0f, true, false)); else imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 0.0f, false, false));
-            if (isPulseTarget) imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 1.0f, true, isPulseTarget)); else imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 0.0f, false, false));
+
+            if (shouldBeOn) imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 1.0f, true, false));
+            else imageCoroutines[img] = StartCoroutine(FadeImageRoutine(img, 0.0f, false, false));
+
+            if (isPulseTarget) imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 1.0f, true, isPulseTarget));
+            else imageCoroutines[highlightImg] = StartCoroutine(FadeImageRoutine(highlightImg, 0.0f, false, false));
         }
     }
 
@@ -311,14 +321,17 @@ public class IngameUIManager : MonoBehaviour
     {
         if (AudioManager.Instance == null) return;
 
-        // [수정] float로 명확하게 캐스팅하여 비율 계산 (0.2, 0.4, 0.6, 0.8, 1.0)
         float maxLevel = 5.0f;
-        float ratio = Mathf.Clamp01((float)level / maxLevel);
+        float normalizedLevel = Mathf.Clamp01((float)level / maxLevel); // 0.2, 0.4, 0.6...
 
-        // LoopSFXScale은 현재 볼륨 대비 비율을 설정합니다.
-        AudioManager.Instance.SetLoopingSFXScale(SFXType.heartbeat, ratio);
-        AudioManager.Instance.SetLoopingSFXScale(SFXType.breath, ratio);
-        AudioManager.Instance.SetLoopingSFXScale(SFXType.EarRinging, ratio);
+        // [수정] 볼륨 보정: 1단계에서도 최소 30% 볼륨 확보 (안 들리는 문제 해결)
+        float adjustedVolume = (level == 0) ? 0f : 0.3f + (normalizedLevel * 0.7f);
+
+        // Debug.Log($"[Pressure Sound] Level: {level}, Vol: {adjustedVolume}");
+
+        AudioManager.Instance.SetLoopingSFXScale(SFXType.heartbeat, adjustedVolume);
+        AudioManager.Instance.SetLoopingSFXScale(SFXType.breath, adjustedVolume);
+        AudioManager.Instance.SetLoopingSFXScale(SFXType.EarRinging, adjustedVolume);
     }
     #endregion
 
