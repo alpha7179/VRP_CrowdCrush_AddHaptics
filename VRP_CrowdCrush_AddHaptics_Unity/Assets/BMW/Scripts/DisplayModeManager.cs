@@ -17,12 +17,19 @@ public class DisplayModeManager : MonoBehaviour
     [SerializeField] private DisplayMode currentDisplayMode;
     private DisplayMode previousDisplayMode;
 
-    [Header("Display Mode Settings (Inspector)")]
-    [Tooltip("표시할 디스플레이 인덱스 (0: Display 1, 1: Display 2 ...)")]
+    [Header("Display Settings")]
+    [Tooltip("표시할 타겟 디스플레이 인덱스 (0: Display 1, 1: Display 2 ...)")]
     [SerializeField] private int targetDisplayIndex = 1;
 
-    [Tooltip("전체화면 팝업 창의 해상도 (너비 x 높이)")]
+    [Header("Resolution Configuration")]
+    [Tooltip("Display 모드일 때 사용할 해상도 (보통 1920x1080)")]
     [SerializeField] private Vector2 displayResolution = new Vector2(1920, 1080);
+
+    [Tooltip("Cave 모드일 때 사용할 해상도 (48:9 비율 -> 예: 5760x1080)")]
+    [SerializeField] private Vector2 caveResolution = new Vector2(5760, 1080);
+
+    [Tooltip("디스플레이 주사율 (보통 60)")]
+    [SerializeField] private int refreshRate = 60;
 
     public event Action<DisplayMode> OnDisplayModeChanged;
     public DisplayMode CurrentDisplayMode => currentDisplayMode;
@@ -42,11 +49,35 @@ public class DisplayModeManager : MonoBehaviour
         ActivateMultiDisplay();
     }
 
+    /// <summary>
+    /// 현재 설정된 모드에 맞는 해상도로 디스플레이를 활성화합니다.
+    /// </summary>
     void ActivateMultiDisplay()
     {
-        if (Display.displays.Length > targetDisplayIndex && targetDisplayIndex > 0)
+        Debug.Log($"[DisplayManager] 감지된 모니터 개수: {Display.displays.Length}");
+
+        if (targetDisplayIndex > 0 && Display.displays.Length > targetDisplayIndex)
         {
-            Display.displays[targetDisplayIndex].Activate();
+            // 현재 모드에 따라 해상도 결정
+            int w, h;
+            if (currentDisplayMode == DisplayMode.Cave)
+            {
+                w = (int)caveResolution.x;
+                h = (int)caveResolution.y;
+            }
+            else // Display 모드 혹은 기본
+            {
+                w = (int)displayResolution.x;
+                h = (int)displayResolution.y;
+            }
+
+            // 해당 해상도로 활성화
+            if (!Display.displays[targetDisplayIndex].active)
+            {
+                // 주사율을 새로운 구조체 형식으로 변환하여 전달
+                Display.displays[targetDisplayIndex].Activate(w, h, new RefreshRate() { numerator = (uint)refreshRate, denominator = 1 });
+                Debug.Log($"[DisplayManager] Display {targetDisplayIndex + 1} 활성화됨 ({w}x{h})");
+            }
         }
         else if (Display.displays.Length > 1)
         {
@@ -57,7 +88,6 @@ public class DisplayModeManager : MonoBehaviour
     IEnumerator Start()
     {
         yield return null;
-
         ApplyScreenMode();
         previousDisplayMode = currentDisplayMode;
     }
@@ -72,9 +102,10 @@ public class DisplayModeManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (currentDisplayMode == DisplayMode.Display)
+            // Display나 Cave 모드에서 ESC를 누르면 VR 모드(기본)로 복귀
+            if (currentDisplayMode == DisplayMode.Display || currentDisplayMode == DisplayMode.Cave)
             {
-                Debug.Log("[Manager] ESC 눌림 -> 전체화면 해제 및 기본창 복구");
+                Debug.Log("[Manager] ESC 눌림 -> OnlyVR 모드로 전환");
                 currentDisplayMode = DisplayMode.OnlyVR;
             }
         }
@@ -85,11 +116,21 @@ public class DisplayModeManager : MonoBehaviour
         switch (currentDisplayMode)
         {
             case DisplayMode.OnlyVR:
-                FullScreenOff();
+                SetEditorPopupState(false, Vector2.zero); // 팝업 닫기
+
+                // 빌드: 창모드
+                if (Screen.fullScreen)
+                {
+                    Screen.fullScreenMode = FullScreenMode.Windowed;
+                    Screen.fullScreen = false;
+                }
                 break;
 
-            case DisplayMode.Cave:
-                SetEditorPopupState(false);
+            case DisplayMode.Display:
+                // [Display 모드] 1920x1080 적용
+                SetEditorPopupState(true, displayResolution);
+
+                // 빌드 설정
                 if (!Screen.fullScreen)
                 {
                     Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
@@ -97,8 +138,14 @@ public class DisplayModeManager : MonoBehaviour
                 }
                 break;
 
-            case DisplayMode.Display:
-                SetEditorPopupState(true);
+            case DisplayMode.Cave:
+                // [Cave 모드] 48:9 (5760x1080) 적용
+                // 에디터에서도 확인하고 싶다면 true로 설정, 끄고 싶다면 false
+                SetEditorPopupState(true, caveResolution);
+
+                // 빌드 설정 (해상도 재적용 및 전체화면)
+                ActivateMultiDisplay(); // 해상도 변경을 위해 재호출
+
                 if (!Screen.fullScreen)
                 {
                     Screen.fullScreenMode = FullScreenMode.FullScreenWindow;
@@ -113,7 +160,7 @@ public class DisplayModeManager : MonoBehaviour
 
     public void FullScreenOff()
     {
-        SetEditorPopupState(false);
+        SetEditorPopupState(false, Vector2.zero);
         if (Screen.fullScreen)
         {
             Screen.fullScreenMode = FullScreenMode.Windowed;
@@ -121,13 +168,13 @@ public class DisplayModeManager : MonoBehaviour
         }
     }
 
-    private void SetEditorPopupState(bool isOpen)
+    private void SetEditorPopupState(bool isOpen, Vector2 size)
     {
 #if UNITY_EDITOR
         if (isOpen)
-            FullscreenGameView.Open(targetDisplayIndex, displayResolution);
+            FullscreenGameView.Open(targetDisplayIndex, size);
         else
-            FullscreenGameView.Close(true, displayResolution);
+            FullscreenGameView.Close(true, size); // 닫을 때도 해상도 정보를 넘겨 복구 가능
 #endif
     }
 }
@@ -156,26 +203,15 @@ public static class FullscreenGameView
     {
         if (GameViewType == null) return;
 
-        // 1. 기존 창 닫기 로직 (엄격한 타입 검사 적용)
+        // 기존 창 닫기 (SimulatorWindow 제외)
         var allGameViews = Resources.FindObjectsOfTypeAll(GameViewType);
         foreach (var view in allGameViews)
         {
-            // EditorWindow로 캐스팅이 안되면 무시
             if (!(view is EditorWindow window)) continue;
-
-            // [가장 중요한 수정]
-            // 상속받은 자식 클래스(SimulatorWindow 등)는 제외하고
-            // 정확히 'UnityEditor.GameView' 타입인 것만 닫습니다.
+            if (EditorUtility.IsPersistent(window)) continue;
             if (view.GetType() != GameViewType) continue;
 
-            try
-            {
-                window.Close();
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[FullscreenGameView] 창을 닫는 중 오류 발생(무시됨): {e.Message}");
-            }
+            try { window.Close(); } catch { }
         }
 
         instance = null;
@@ -188,8 +224,10 @@ public static class FullscreenGameView
             TargetDisplayField.SetValue(instance, targetDisplayIndex);
         }
 
+        // 요청된 해상도(Size)로 GameView 프리셋 설정
         SetGameViewSize(instance, (int)size.x, (int)size.y);
 
+        // 팝업 창 크기 및 위치 설정
         var fullscreenRect = new Rect(0, 0, size.x, size.y);
         instance.ShowPopup();
         instance.position = fullscreenRect;
@@ -209,10 +247,9 @@ public static class FullscreenGameView
             var restoredWindow = EditorWindow.GetWindow(GameViewType);
             restoredWindow.Show();
 
-            if (size.x > 0 && size.y > 0)
-            {
+            // 복구 시에는 기본 1920x1080이나 지정된 사이즈로 복구
+            if (size.x > 0)
                 SetGameViewSize(restoredWindow, (int)size.x, (int)size.y);
-            }
         }
     }
 
@@ -240,10 +277,12 @@ public static class FullscreenGameView
                 var gameViewSize = getGameViewSizeMethod.Invoke(group, new object[] { i });
                 var widthProp = gameViewSize.GetType().GetProperty("width");
                 var heightProp = gameViewSize.GetType().GetProperty("height");
+                // var typeProp = gameViewSize.GetType().GetProperty("sizeType"); // 필요한 경우 타입 체크
 
                 int w = (int)widthProp.GetValue(gameViewSize, null);
                 int h = (int)heightProp.GetValue(gameViewSize, null);
 
+                // 정확히 픽셀 크기가 일치하는 프리셋을 찾음
                 if (w == width && h == height)
                 {
                     targetIndex = i;
@@ -257,12 +296,12 @@ public static class FullscreenGameView
                 selectedSizeIndexProp.SetValue(gameViewWindow, targetIndex, null);
                 gameViewWindow.Repaint();
             }
+            else
+            {
+                Debug.LogWarning($"[FullscreenGameView] 해상도 {width}x{height}에 맞는 GameView 프리셋을 찾을 수 없습니다. Game View 설정에서 'Fixed Resolution'으로 해당 크기를 추가해주세요.");
+            }
         }
-        catch (Exception e)
-        {
-            // 해상도 설정 중 오류가 나도 게임은 멈추지 않도록 로그만 찍음
-            Debug.LogWarning($"[FullscreenGameView] 해상도 프리셋 자동 설정 실패: {e.Message}");
-        }
+        catch (Exception) { }
     }
 }
 #endif

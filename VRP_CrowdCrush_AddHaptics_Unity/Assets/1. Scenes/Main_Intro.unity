@@ -8245,6 +8245,8 @@ MonoBehaviour:
   currentDisplayMode: 1
   targetDisplayIndex: 1
   displayResolution: {x: 1920, y: 1080}
+  caveResolution: {x: 5760, y: 1080}
+  refreshRate: 60
 --- !u!1001 &235914865
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30587,8 +30589,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75708d1ecdfbfc4479330c9995976f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frontCamera: {fileID: 0}
+  frontCamera: {fileID: 883429877}
   caveCameraRoot: {fileID: 883429875}
+--- !u!20 &883429877 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1438894298562800503, guid: fd9843b425acd794fbf020953bca492a, type: 3}
+  m_PrefabInstance: {fileID: 883429873}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &883558385
 PrefabInstance:
   m_ObjectHideFlags: 0

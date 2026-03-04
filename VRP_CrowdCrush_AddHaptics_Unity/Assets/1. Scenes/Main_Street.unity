@@ -84696,8 +84696,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75708d1ecdfbfc4479330c9995976f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  frontCamera: {fileID: 0}
-  caveCameraRoot: {fileID: 0}
+  frontCamera: {fileID: 1634116884}
+  caveCameraRoot: {fileID: 1634116882}
+--- !u!20 &1634116884 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1438894298562800503, guid: fd9843b425acd794fbf020953bca492a, type: 3}
+  m_PrefabInstance: {fileID: 1634116880}
+  m_PrefabAsset: {fileID: 0}
 --- !u!20 &1635591984 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 3302684979527640672, guid: 51ee37014c327474ea078ba8f063faba, type: 3}
